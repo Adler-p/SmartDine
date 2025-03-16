@@ -4,7 +4,8 @@
     align-items: center;
     min-height: 100vh;
     margin: 0;
-    background-color: #d1e7c5;
+    background-color: #f4f4f4;
+    flex-direction: column; /* Ensures items are centered vertically and horizontally */
 }
 
 .page-content {
@@ -14,9 +15,13 @@
     width: 100%;
 }
 
-h1 {
+.headerTitle {
     color: #333;
     margin-bottom: 30px;
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    width: 100%;
 }
 
 .loginContainer {
@@ -24,7 +29,30 @@ h1 {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
 }
+
+.inputBox {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.inputField {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #b0dbb2;
+    border-radius: 15px;
+    font-size: 1rem;
+    outline: none;
+}
+
+    .inputField:focus {
+        border-color: #98c8a0;
+    }
 
 .button {
     background-color: #80e27e;
@@ -39,10 +67,10 @@ h1 {
     font-family: inherit;
 }
 
+    .button:hover {
+        background-color: #66c66c;
+    }
+
 .loginContainer button + button {
     margin-top: 20px;
-}
-
-.button:hover {
-    background-color: #66c66c;
 }
