@@ -1,9 +1,9 @@
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import styles from './CartDetailPage.module.css';
-import StaffHeader from '../../components/StaffHeader';
-import StaffSidebar from '../../components/StaffSidebar';
-import StatusUpdateButton from '../../components/StatusUpdateButton';
+import CartHeader from '../../components/customer/CartHeader';
+import DeleteItemButton from '../../components/customer/DeleteItemButton';
+import { ShoppingCart } from "lucide-react";
 
 const CartDetailPage = () => {
     const router = useRouter();
@@ -16,9 +16,9 @@ const CartDetailPage = () => {
             time: '2025-02-25 11:45',
             table: 'Table 01',
             items: [
-                { name: 'Chicken Chop', quantity: 1, payment: 'Paid', status: 'Preparing' },
-                { name: 'Fish Fillet', quantity: 1, payment: 'Paid', status: 'Preparing' },
-                { name: 'Ice Water', quantity: 1, payment: 'Paid', status: 'Preparing' }
+                { name: 'Chicken Chop', quantity: 1, price: 5.00 },
+                { name: 'Fish Fillet', quantity: 1, price: 10.00 },
+                { name: 'Ice Water', quantity: 1, price: 6.00 }
             ]
         },
         {
@@ -26,7 +26,7 @@ const CartDetailPage = () => {
             time: '2025-02-25 12:15',
             table: 'Table 02',
             items: [
-                { name: 'Steak', quantity: 1, payment: 'Paid', status: 'Preparing' }
+                { name: 'Steak', quantity: 2, price: 15.00 }
             ]
         },
         {
@@ -55,42 +55,87 @@ const CartDetailPage = () => {
         });
     };
 
+    const handleQuantityChange = (orderId, itemIndex, change) => {
+        setOrders(prevOrders => {
+            return prevOrders.map(order => {
+                if (order.orderId === orderId) {
+                    const updatedOrder = { ...order };
+                    updatedOrder.items = updatedOrder.items.map((item, idx) => {
+                        if (idx === itemIndex) {
+                            return { ...item, quantity: Math.max(1, item.quantity + change) };
+                        }
+                        return item;
+                    });
+                    return updatedOrder;
+                }
+                return order;
+            });
+        });
+    };
+
+    // Function to delete an item
+    const handleDeleteItem = (orderId, itemIndex) => {
+        setOrders(prevOrders => prevOrders.map(order => {
+            if (order.orderId === orderId) {
+                return {
+                    ...order,
+                    items: order.items.filter((_, idx) => idx !== itemIndex)
+                };
+            }
+            return order;
+        }));
+    };
+
     return (
         <div className={styles.container}>
-            <StaffHeader />
+            <CartHeader />
             <div className={styles.content}>
-                <StaffSidebar />
+                {/* <StaffSidebar /> */}
                 <div className={styles.main}>
-                    <h2 className={styles.title}>Order Detail</h2>
+                    <div className={styles.header}>
+                        <ShoppingCart size={32} className={styles.cartIcon} />
+                        <h2 className={styles.title}>My Cart</h2>
+                    </div>
                     {order ? (
                         <>
-                            <h3>Order ID: {order.orderId}</h3>
-                            <p>Time Ordered: {order.time}</p>
-                            <p>Table: {order.table}</p>
+                            <div className={styles.orderDetails}>
+                                <h3>Table: {order.table}</h3>
+                                <h3>Order ID: {order.orderId}</h3>
+                            </div>
+                            <p>Items in Cart</p>
 
                             <table className={styles.table}>
                                 <thead>
                                     <tr>
                                         <th>Name</th>
                                         <th>Quantity</th>
-                                        <th>Payment</th>
-                                        <th>Status</th>
-                                        <th>Update Status</th> 
+                                        <th>Price</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {order.items.map((item, index) => (
                                         <tr key={index}>
                                             <td>{item.name}</td>
-                                            <td>{item.quantity}</td>
-                                            <td>{item.payment}</td>
-                                            <td>{item.status}</td>
                                             <td>
-                                                {/* Include StatusUpdateButton component for each item */}
-                                                <StatusUpdateButton
-                                                    status={item.status}
-                                                    onStatusChange={(newStatus) => handleStatusChange(order.orderId, index, newStatus)}
-                                                />
+                                                <button 
+                                                    className={styles.btn} 
+                                                    onClick={() => handleQuantityChange(order.orderId, index, -1)}
+                                                    disabled={item.quantity <= 1} // Prevent quantity going below 1
+                                                >
+                                                    -
+                                                </button>
+                                                <span className={styles.quantity}>{item.quantity}</span>
+                                                <button 
+                                                    className={styles.btn} 
+                                                    onClick={() => handleQuantityChange(order.orderId, index, 1)}
+                                                >
+                                                    +
+                                                </button>
+                                            </td>
+                                            <td>{`$${(item.quantity * item.price).toFixed(2)}`}</td>
+                                            <td>
+                                                <DeleteItemButton onDelete={() => handleDeleteItem(order.orderId, index)} />
                                             </td>
                                         </tr>
                                     ))}
@@ -98,7 +143,7 @@ const CartDetailPage = () => {
                             </table>
                         </>
                     ) : (
-                        <p>Order not found</p>
+                        <p>Items not found</p>
                     )}
                 </div>
             </div>

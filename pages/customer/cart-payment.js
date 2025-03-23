@@ -1,13 +1,20 @@
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
-import styles from './CardPaymentPage.module.css';
-import StaffHeader from '../../components/StaffHeader';
-import StaffSidebar from '../../components/StaffSidebar';
-import StatusUpdateButton from '../../components/StatusUpdateButton';
+import styles from './CartPaymentPage.module.css';
+import PaymentHeader from '../../components/customer/PaymentHeader';
+import { ShoppingCart } from "lucide-react";
+import Modal from 'react-modal';
 
-const CardPaymentPage = () => {
+const CartPaymentPage = () => {
     const router = useRouter();
     const { id } = router.query; 
+
+    const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+    const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+    const [cardNumber, setCardNumber] = useState('');
+    const [cvv, setCvv] = useState('');
+    const [expiryDate, setExpiryDate] = useState('');
+
 
     // Hardcoded orders data for now
     const [orders, setOrders] = useState([
@@ -16,9 +23,9 @@ const CardPaymentPage = () => {
             time: '2025-02-25 11:45',
             table: 'Table 01',
             items: [
-                { name: 'Chicken Chop', quantity: 1, payment: 'Paid', status: 'Preparing' },
-                { name: 'Fish Fillet', quantity: 1, payment: 'Paid', status: 'Preparing' },
-                { name: 'Ice Water', quantity: 1, payment: 'Paid', status: 'Preparing' }
+                { name: 'Chicken Chop', quantity: 1, price: 5.00 },
+                { name: 'Fish Fillet', quantity: 1, price: 10.00 },
+                { name: 'Ice Water', quantity: 1, price: 6.00 }
             ]
         },
         {
@@ -26,7 +33,7 @@ const CardPaymentPage = () => {
             time: '2025-02-25 12:15',
             table: 'Table 02',
             items: [
-                { name: 'Steak', quantity: 1, payment: 'Paid', status: 'Preparing' }
+                { name: 'Steak', quantity: 2, price: 15.00 }
             ]
         },
         {
@@ -40,42 +47,38 @@ const CardPaymentPage = () => {
     // Find the order matching the id from the URL
     const order = orders.find(order => order.orderId === id);
 
-    // Function to handle status change for each item
-    const handleStatusChange = (orderId, itemIndex, newStatus) => {
-        // Update the status of the item based on index
-        setOrders(prevOrders => {
-            return prevOrders.map(order => {
-                if (order.orderId === orderId) {
-                    const updatedOrder = { ...order };
-                    updatedOrder.items[itemIndex].status = newStatus;
-                    return updatedOrder;
-                }
-                return order;
-            });
-        });
+    // Calculate total amount
+    const totalAmount = order ? order.items.reduce((sum, item) => sum + item.price * item.quantity, 0) : 0;
+
+    const handleConfirmPayment = () => {
+        setIsPaymentModalOpen(false); // Close payment modal
+        setIsSuccessModalOpen(true);  // Open success modal
     };
 
     return (
         <div className={styles.container}>
-            <StaffHeader />
+            <PaymentHeader />
             <div className={styles.content}>
-                <StaffSidebar />
+                {/* <StaffSidebar /> */}
                 <div className={styles.main}>
-                    <h2 className={styles.title}>Order Detail</h2>
+                    <div className={styles.header}>
+                        <ShoppingCart size={32} className={styles.cartIcon} />
+                        <h2 className={styles.title}>My Cart</h2>
+                    </div>
                     {order ? (
                         <>
-                            <h3>Order ID: {order.orderId}</h3>
-                            <p>Time Ordered: {order.time}</p>
-                            <p>Table: {order.table}</p>
+                            <div className={styles.orderDetails}>
+                                <h3>Table: {order.table}</h3>
+                                <h3>Order ID: {order.orderId}</h3>
+                            </div>
+                            <p>Items in Cart</p>
 
                             <table className={styles.table}>
                                 <thead>
                                     <tr>
                                         <th>Name</th>
                                         <th>Quantity</th>
-                                        <th>Payment</th>
-                                        <th>Status</th>
-                                        <th>Update Status</th> 
+                                        <th>Price</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -83,27 +86,71 @@ const CardPaymentPage = () => {
                                         <tr key={index}>
                                             <td>{item.name}</td>
                                             <td>{item.quantity}</td>
-                                            <td>{item.payment}</td>
-                                            <td>{item.status}</td>
-                                            <td>
-                                                {/* Include StatusUpdateButton component for each item */}
-                                                <StatusUpdateButton
-                                                    status={item.status}
-                                                    onStatusChange={(newStatus) => handleStatusChange(order.orderId, index, newStatus)}
-                                                />
-                                            </td>
+                                            <td>{`$${(item.quantity * item.price).toFixed(2)}`}</td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
+
+                            {/* Total Amount */}
+                            <div className={styles.totalAmount}>
+                                <h3>Total Amount: ${totalAmount.toFixed(2)}</h3>
+                            </div>
+
+                            <button className={styles.paymentButton} onClick={() => setIsPaymentModalOpen(true)}>
+                                Proceed to Payment
+                            </button>
                         </>
                     ) : (
-                        <p>Order not found</p>
+                        <p>Items not found</p>
                     )}
                 </div>
+
+                {/* Payment Modal */}
+                <Modal
+                    isOpen={isPaymentModalOpen}
+                    onRequestClose={() => setIsPaymentModalOpen(false)}
+                    className={styles.modal}
+                    overlayClassName={styles.overlay}
+                >
+                    <h3>Enter Payment Details</h3>
+                    <input
+                        type="text"
+                        placeholder="Card Number"
+                        value={cardNumber}
+                        onChange={(e) => setCardNumber(e.target.value)}
+                    />
+                    <input
+                        type="text"
+                        placeholder="CVV"
+                        value={cvv}
+                        onChange={(e) => setCvv(e.target.value)}
+                    />
+                    <input
+                        type="text"
+                        placeholder="Expiry Date (MM/YY)"
+                        value={expiryDate}
+                        onChange={(e) => setExpiryDate(e.target.value)}
+                    />
+                    <div className={styles.modalButtons}>
+                        <button onClick={() => setIsPaymentModalOpen(false)}>Cancel</button>
+                        <button onClick={handleConfirmPayment}>Confirm</button>
+                    </div>
+                </Modal>
+
+                {/* Success Modal */}
+                <Modal
+                    isOpen={isSuccessModalOpen}
+                    onRequestClose={() => setIsSuccessModalOpen(false)}
+                    className={styles.modal}
+                    overlayClassName={styles.overlay}
+                >
+                    <h3>Order Successfully Placed!</h3>
+                    <button onClick={() => setIsSuccessModalOpen(false)}>Close</button>
+                </Modal>
             </div>
         </div>
     );
 };
 
-export default CardPaymentPage;
+export default CartPaymentPage;
