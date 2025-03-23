@@ -63,7 +63,7 @@ const CartPaymentPage = () => {
                 <div className={styles.main}>
                     <div className={styles.header}>
                         <ShoppingCart size={32} className={styles.cartIcon} />
-                        <h2 className={styles.title}>My Cart</h2>
+                        <h2 className={styles.title}>Payment</h2>
                     </div>
                     {order ? (
                         <>
