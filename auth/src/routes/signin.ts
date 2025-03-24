@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
 import jwt from 'jsonwebtoken';
-import { validateRequest, BadRequestError } from '@rallycoding/common';
+import { validateRequest, BadRequestError } from '@smartdine/common';
 
 import { Password } from '../services/password';
 import { User } from '../models/user';
@@ -33,14 +33,15 @@ router.post(
       password
     );
     if (!passwordsMatch) {
-      throw new BadRequestError('Invalid Credentials');
+      throw new BadRequestError('Invalid credentials');
     }
 
     // Generate JWT
     const userJwt = jwt.sign(
       {
         id: existingUser.id,
-        email: existingUser.email
+        email: existingUser.email,
+        role: existingUser.role
       },
       process.env.JWT_KEY!
     );

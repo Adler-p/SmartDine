@@ -68,3 +68,59 @@ it('emits an order created event', async () => {
 
   expect(natsWrapper.client.publish).toHaveBeenCalled();
 });
+
+it('returns an error if the items array is empty', async () => {
+  await request(app)
+    .post('/api/orders')
+    .set('Cookie', global.signin())
+    .send({
+      items: []
+    })
+    .expect(400);
+});
+
+it('creates an order with valid inputs', async () => {
+  const items = [
+    {
+      menuItemId: new mongoose.Types.ObjectId().toHexString(),
+      name: 'Test Item',
+      price: 20,
+      quantity: 1
+    }
+  ];
+
+  const response = await request(app)
+    .post('/api/orders')
+    .set('Cookie', global.signin())
+    .send({
+      items
+    })
+    .expect(201);
+
+  const order = await Order.findById(response.body.id);
+  expect(order).not.toBeNull();
+  expect(order!.status).toEqual(OrderStatus.Created);
+  expect(order!.items.length).toEqual(1);
+  expect(order!.totalAmount).toEqual(20);
+});
+
+it('emits an order created event', async () => {
+  const items = [
+    {
+      menuItemId: new mongoose.Types.ObjectId().toHexString(),
+      name: 'Test Item',
+      price: 20,
+      quantity: 1
+    }
+  ];
+
+  await request(app)
+    .post('/api/orders')
+    .set('Cookie', global.signin())
+    .send({
+      items
+    })
+    .expect(201);
+
+  expect(natsWrapper.client.publish).toHaveBeenCalled();
+});

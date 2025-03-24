@@ -1,5 +1,6 @@
-import { Subjects, Publisher, PaymentCreatedEvent } from '@rallycoding/common';
+import { Publisher, Subjects, PaymentCreatedEvent } from '@smartdine/common';
 
+// Publisher for payment created events
 export class PaymentCreatedPublisher extends Publisher<PaymentCreatedEvent> {
-  subject: Subjects.PaymentCreated = Subjects.PaymentCreated;
-}
+  readonly subject = Subjects.PaymentCreated;
+} 

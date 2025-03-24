@@ -2,13 +2,15 @@ import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
 import {
   requireAuth,
+  requireRole,
+  UserRole,
   validateRequest,
   BadRequestError,
-  NotAuthorizedError,
   NotFoundError,
+  NotAuthorizedError,
   OrderStatus,
-} from '@rallycoding/common';
-import { stripe } from '../stripe';
+  PaymentStatus
+} from '@smartdine/common';
 import { Order } from '../models/order';
 import { Payment } from '../models/payment';
 import { PaymentCreatedPublisher } from '../events/publishers/payment-created-publisher';
@@ -19,41 +21,57 @@ const router = express.Router();
 router.post(
   '/api/payments',
   requireAuth,
-  [body('token').not().isEmpty(), body('orderId').not().isEmpty()],
+  [
+    body('orderId')
+      .not()
+      .isEmpty()
+      .withMessage('orderId is required'),
+    body('amount')
+      .isFloat({ gt: 0 })
+      .withMessage('Amount must be greater than 0')
+  ],
   validateRequest,
   async (req: Request, res: Response) => {
-    const { token, orderId } = req.body;
+    const { orderId, amount } = req.body;
 
+    // Find the order the user is trying to pay for
     const order = await Order.findById(orderId);
 
     if (!order) {
       throw new NotFoundError();
     }
+
+    // Make sure the order belongs to the user
     if (order.userId !== req.currentUser!.id) {
       throw new NotAuthorizedError();
     }
+
+    // Make sure the order can be paid for
     if (order.status === OrderStatus.Cancelled) {
-      throw new BadRequestError('Cannot pay for an cancelled order');
+      throw new BadRequestError('Cannot pay for a cancelled order');
     }
 
-    const charge = await stripe.charges.create({
-      currency: 'usd',
-      amount: order.price * 100,
-      source: token,
-    });
+    // Create the payment
     const payment = Payment.build({
       orderId,
-      stripeId: charge.id,
+      amount,
+      status: PaymentStatus.Created,
+      userId: req.currentUser!.id
     });
     await payment.save();
-    new PaymentCreatedPublisher(natsWrapper.client).publish({
+
+    // Publish payment created event
+    await new PaymentCreatedPublisher(natsWrapper.client).publish({
       id: payment.id,
       orderId: payment.orderId,
-      stripeId: payment.stripeId,
+      amount: payment.amount,
+      status: payment.status,
+      userId: payment.userId,
+      version: payment.version
     });
 
-    res.status(201).send({ id: payment.id });
+    res.status(201).send(payment);
   }
 );
 
-export { router as createChargeRouter };
+export { router as createPaymentRouter }; 

@@ -1,76 +1,85 @@
 import mongoose from 'mongoose';
-import express, { Request, Response } from 'express';
+import express, { Request, Response, Router } from 'express';
 import {
   requireAuth,
   validateRequest,
   NotFoundError,
   OrderStatus,
   BadRequestError
-} from '@rallycoding/common';
+} from '@smartdine/common';
 import { body } from 'express-validator';
 import { Ticket } from '../models/ticket';
 import { Order } from '../models/order';
 import { OrderCreatedPublisher } from '../events/publishers/order-created-publisher';
 import { natsWrapper } from '../nats-wrapper';
+import { CartItem } from '../models/cart-item';
 
-const router = express.Router();
+const router: Router = express.Router();
 
-const EXPIRATION_WINDOW_SECONDS = 1 * 60;
+const EXPIRATION_WINDOW_MINUTES = 15;
 
 router.post(
   '/api/orders',
   requireAuth,
   [
-    body('ticketId')
-      .not()
-      .isEmpty()
-      .custom((input: string) => mongoose.Types.ObjectId.isValid(input))
-      .withMessage('TicketId must be provided')
+    body('items')
+      .isArray()
+      .withMessage('Items must be an array')
+      .notEmpty()
+      .withMessage('Must include at least one item'),
+    body('items.*.menuItemId')
+      .notEmpty()
+      .withMessage('Menu item ID is required'),
+    body('items.*.quantity')
+      .isInt({ gt: 0 })
+      .withMessage('Quantity must be greater than 0'),
   ],
   validateRequest,
   async (req: Request, res: Response) => {
-    const { ticketId } = req.body;
+    const { items } = req.body;
 
-    // Find the ticket the user is trying to order in the database
-    const ticket = await Ticket.findById(ticketId);
-    if (!ticket) {
-      throw new NotFoundError();
-    }
-
-    // Make sure that this ticket is not already reserved
-    const isReserved = await ticket.isReserved();
-    if (isReserved) {
-      throw new BadRequestError('Ticket is already reserved');
-    }
-
-    // Calculate an expiration date for this order
+    // Calculate expiration
     const expiration = new Date();
-    expiration.setSeconds(expiration.getSeconds() + EXPIRATION_WINDOW_SECONDS);
+    expiration.setMinutes(expiration.getMinutes() + EXPIRATION_WINDOW_MINUTES);
 
-    // Build the order and save it to the database
+    // Calculate total amount
+    const totalAmount = items.reduce((total: number, item: any) => {
+      return total + (item.price * item.quantity);
+    }, 0);
+
+    // Create order
     const order = Order.build({
       userId: req.currentUser!.id,
       status: OrderStatus.Created,
       expiresAt: expiration,
-      ticket
+      items: items.map((item: any) => ({
+        menuItemId: item.menuItemId,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity
+      })),
+      totalAmount
     });
+
     await order.save();
 
-    // Publish an event saying that an order was created
-    new OrderCreatedPublisher(natsWrapper.client).publish({
+    // Publish order created event
+    await new OrderCreatedPublisher(natsWrapper.client).publish({
       id: order.id,
       version: order.version,
       status: order.status,
       userId: order.userId,
       expiresAt: order.expiresAt.toISOString(),
-      ticket: {
-        id: ticket.id,
-        price: ticket.price
-      }
+      items: order.items.map(item => ({
+        menuItemId: item.menuItemId,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity
+      }))
     });
 
     res.status(201).send(order);
   }
 );
 
-export { router as newOrderRouter };
+export { router as createOrderRouter };

@@ -1,16 +1,17 @@
+import { Message } from 'node-nats-streaming';
 import {
-  Subjects,
   Listener,
   PaymentCreatedEvent,
+  Subjects,
   OrderStatus,
-} from '@rallycoding/common';
-import { Message } from 'node-nats-streaming';
-import { queueGroupName } from './queue-group-name';
+} from '@smartdine/common';
 import { Order } from '../../models/order';
+import { OrderCreatedPublisher } from '../publishers/order-created-publisher';
+import { natsWrapper } from '../../nats-wrapper';
 
 export class PaymentCreatedListener extends Listener<PaymentCreatedEvent> {
-  subject: Subjects.PaymentCreated = Subjects.PaymentCreated;
-  queueGroupName = queueGroupName;
+  readonly subject = Subjects.PaymentCreated;
+  queueGroupName = 'orders-service';
 
   async onMessage(data: PaymentCreatedEvent['data'], msg: Message) {
     const order = await Order.findById(data.orderId);
@@ -20,9 +21,23 @@ export class PaymentCreatedListener extends Listener<PaymentCreatedEvent> {
     }
 
     order.set({
-      status: OrderStatus.Complete,
+      status: OrderStatus.AwaitingPreparation,
     });
     await order.save();
+
+    await new OrderCreatedPublisher(natsWrapper.client).publish({
+      id: order.id,
+      version: order.version,
+      status: order.status,
+      userId: order.userId,
+      expiresAt: order.expiresAt.toISOString(),
+      items: order.items.map(item => ({
+        menuItemId: item.menuItemId,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity
+      }))
+    });
 
     msg.ack();
   }

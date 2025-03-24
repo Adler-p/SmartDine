@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
+import { UserRole } from '../types/user-role';
 interface UserPayload {
     id: string;
     email: string;
+    role: UserRole;
 }
 declare global {
     namespace Express {
