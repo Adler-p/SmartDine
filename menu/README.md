@@ -19,7 +19,8 @@ This service handles menu item management for the SmartDine application.
       "price": 10.99,
       "category": "Category",
       "imageUrl": "https://example.com/image.jpg",
-      "availability": "available"
+      "availability": "available",
+      "version": 0
     }
   ]
   ```
@@ -38,7 +39,8 @@ This service handles menu item management for the SmartDine application.
       "price": 10.99,
       "category": "Category",
       "imageUrl": "https://example.com/image.jpg",
-      "availability": "available"
+      "availability": "available",
+      "version": 0
     }
   ]
   ```
@@ -56,7 +58,8 @@ This service handles menu item management for the SmartDine application.
     "price": 10.99,
     "category": "Category",
     "imageUrl": "https://example.com/image.jpg",
-    "availability": "available"
+    "availability": "available",
+    "version": 0
   }
   ```
 
@@ -81,7 +84,7 @@ This service handles menu item management for the SmartDine application.
   - Price must be greater than 0
   - Category is required
   - Image URL must be a valid URL (optional)
-  - Availability must be either "available" or "out_of_stock" (optional)
+  - Availability must be either "available" or "out_of_stock" (optional, defaults to "available")
 - Response: 201 Created
 
 ### Update Menu Item
@@ -108,20 +111,6 @@ This service handles menu item management for the SmartDine application.
   - Availability must be either "available" or "out_of_stock" if provided
 - Response: 200 OK
 
-### Update Menu Item Price
-- **PATCH** `/api/menu/:id/price`
-- Updates only the price of a menu item
-- Requires: Authentication (Staff only)
-- Request Body:
-  ```json
-  {
-    "price": 15.99
-  }
-  ```
-- Validation:
-  - Price must be greater than 0
-- Response: 200 OK
-
 ### Update Menu Item Availability
 - **PATCH** `/api/menu/:id/availability`
 - Updates the availability status of a menu item
@@ -132,12 +121,6 @@ This service handles menu item management for the SmartDine application.
     "availability": "available" | "out_of_stock"
   }
   ```
-- Response: 200 OK
-
-### Mark Menu Item Out of Stock
-- **PUT** `/api/menu/:id/out-of-stock`
-- Marks a menu item as out of stock
-- Requires: Authentication (Staff only)
 - Response: 200 OK
 
 ## Error Responses
@@ -207,6 +190,12 @@ All endpoints may return the following error responses:
   version: number;
 }
 ```
+
+## Model Methods
+
+The MenuItem model includes the following methods:
+- `updatePrice(newPrice: number)`: Updates the price of a menu item
+- `markAsOutOfStock()`: Marks a menu item as out of stock
 
 ## Environment Variables
 

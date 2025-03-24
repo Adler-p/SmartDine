@@ -169,8 +169,14 @@ All endpoints may return the following error responses:
     id: string;
     userId: string;
     status: string;
-    amount: number;
     version: number;
+    expiresAt: string;
+    items: {
+      menuItemId: string;
+      name: string;
+      price: number;
+      quantity: number;
+    }[];
   }
   ```
 

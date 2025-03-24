@@ -199,6 +199,31 @@ All endpoints may return the following error responses:
 }
 ```
 
+## Events Subscribed
+
+### PaymentCreated
+- Updates order status to awaiting:preparation
+- Data:
+  ```typescript
+  {
+    id: string;
+    orderId: string;
+    amount: number;
+    status: string;
+    userId: string;
+    version: number;
+  }
+  ```
+
+### ExpirationComplete
+- Cancels an order if it's not already completed
+- Data:
+  ```typescript
+  {
+    orderId: string;
+  }
+  ```
+
 ## Order Status Flow
 
 ```

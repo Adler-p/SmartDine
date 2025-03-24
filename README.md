@@ -9,46 +9,32 @@ The system consists of the following microservices:
 - **Auth Service**: User authentication and authorization
   - User registration and login
   - Role-based access control (Customer/Staff)
-  - Session management
+  - Session management with JWT
 
 - **Menu Service**: Menu management
   - Menu item CRUD operations
-  - Category management
+  - Category filtering
   - Availability tracking
 
 - **Order Service**: Order management
   - Order creation and tracking
   - Status updates (Created → AwaitingPreparation → InPreparation → Ready → Completed)
-  - Order history
+  - Order history and filtering
+  - Order expiration handling
 
 - **Payment Service**: Payment processing
   - Payment creation and processing
-  - Status tracking (Created → Pending → Completed/Failed)
-  - Refund handling
-
-- **Kitchen Service**: Kitchen order management
-  - Order queue management
-  - Preparation status updates
-  - Real-time order tracking
-
-- **Notification Service**: Notification handling
-  - Order status notifications
-  - Payment confirmations
-  - System alerts
+  - Status tracking (Created → Pending → Completed/Failed/Refunded)
+  - Payment history
 
 ## Technical Stack
 
-- **Backend**:
-  - Node.js & TypeScript
-  - Express.js
-  - MongoDB (Database)
-  - NATS Streaming (Message Queue)
-  - Jest (Testing)
-
-- **Infrastructure**:
-  - Docker & Kubernetes
-  - NGINX (API Gateway)
-  - Redis (Caching)
+- Node.js & TypeScript
+- Express.js
+- MongoDB (Database)
+- NATS Streaming (Message Queue)
+- Docker & Kubernetes
+- Jest (Testing)
 
 ## Project Structure
 
@@ -58,8 +44,6 @@ smartdine/
 ├── menu/           # Menu service
 ├── orders/         # Order service
 ├── payments/       # Payment service
-├── kitchen/        # Kitchen service
-├── notification/   # Notification service
 ├── common/         # Shared library
 └── client/         # Frontend application
 ```
@@ -67,41 +51,32 @@ smartdine/
 ## API Documentation
 
 ### Auth Service API
-- POST `/api/auth/signup` - Register new user
-- POST `/api/auth/signin` - User login
-- POST `/api/auth/signout` - User logout
-- GET `/api/auth/currentuser` - Get current user info
+- POST `/api/users/signup` - Register new user (email, password, name, role)
+- POST `/api/users/signin` - User login (email, password)
+- POST `/api/users/signout` - User logout
+- GET `/api/users/currentuser` - Get current user info
 
 ### Menu Service API
-- GET `/api/menu` - List all menu items
+- GET `/api/menu` - List all menu items (optional filter: available=true)
+- GET `/api/menu/category/:category` - Get menu items by category
 - GET `/api/menu/:id` - Get menu item details
 - POST `/api/menu` - Create menu item (Staff only)
 - PUT `/api/menu/:id` - Update menu item (Staff only)
-- DELETE `/api/menu/:id` - Delete menu item (Staff only)
+- PATCH `/api/menu/:id/availability` - Update menu item availability (Staff only)
 
 ### Order Service API
-- POST `/api/orders` - Create new order
-- GET `/api/orders` - List user's orders
-- GET `/api/orders/:id` - Get order details
-- PUT `/api/orders/:id/status` - Update order status (Staff only)
-- DELETE `/api/orders/:id` - Cancel order
+- POST `/api/orders` - Create new order (Customer only)
+- GET `/api/orders` - List user's orders (Customer only)
+- GET `/api/orders/staff` - List all orders (Staff only)
+- GET `/api/orders/:orderId` - Get order details
+- PUT `/api/orders/:orderId/status` - Update order status (Staff only)
+- DELETE `/api/orders/:orderId` - Cancel order (Customer only)
 
 ### Payment Service API
-- POST `/api/payments` - Create payment
-- GET `/api/payments/:id` - Get payment details
-- GET `/api/payments` - List payments (Staff only)
-- PUT `/api/payments/:id/status` - Update payment status
-- POST `/api/payments/:id/refund` - Process refund (Staff only)
-
-### Kitchen Service API
-- GET `/api/kitchen/orders` - Get active orders
-- PUT `/api/kitchen/orders/:id/status` - Update preparation status
-- GET `/api/kitchen/queue` - Get order queue
-
-### Notification Service API
-- POST `/api/notifications/subscribe` - Subscribe to notifications
-- GET `/api/notifications` - Get user notifications
-- PUT `/api/notifications/:id/read` - Mark notification as read
+- POST `/api/payments` - Create payment (Order owner only)
+- GET `/api/payments/:id` - Get payment details (Payment owner only)
+- GET `/api/payments` - List all payments (Staff only)
+- PUT `/api/payments/:id/status` - Update payment status (Staff only)
 
 ## Message Queue Events
 
@@ -110,23 +85,32 @@ The system uses NATS Streaming for event communication:
 ### Order Events
 - `order:created` - New order created
 - `order:cancelled` - Order cancelled
-- `order:status-updated` - Order status changed
 
 ### Payment Events
 - `payment:created` - Payment initiated
-- `payment:completed` - Payment successful
-- `payment:failed` - Payment failed
-- `payment:refunded` - Payment refunded
+- `payment:updated` - Payment status updated
 
 ### Menu Events
 - `menu:item:created` - New menu item added
 - `menu:item:updated` - Menu item updated
-- `menu:item:deleted` - Menu item removed
 
 ### User Events
 - `user:created` - New user registered
 - `user:updated` - User profile updated
 - `user:deleted` - User account deleted
+
+### Expiration Events
+- `expiration:complete` - Order time limit reached
+
+## Event Listeners
+
+- **Orders Service**:
+  - Listens for `payment:created` to update order status
+  - Listens for `expiration:complete` to cancel expired orders
+
+- **Payments Service**:
+  - Listens for `order:created` to track valid orders
+  - Listens for `order:cancelled` to prevent payment for cancelled orders
 
 ## Development Setup
 

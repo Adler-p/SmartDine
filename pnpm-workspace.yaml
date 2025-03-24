@@ -4,5 +4,4 @@ packages:
   - 'orders'
   - 'menu'
   - 'payments'
-  - 'kitchen'
-  - 'notification' 
+  - 'client' 
