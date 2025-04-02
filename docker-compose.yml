@@ -1,0 +1,142 @@
+version: '3.8'
+
+services:
+  auth:
+    build:
+      context: .
+      dockerfile: auth/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGO_URI=mongodb://auth-mongo:27017/auth
+      - JWT_KEY=your_jwt_key
+      - NATS_CLIENT_ID=auth
+      - NATS_URL=http://nats-streaming:4222
+      - NATS_CLUSTER_ID=smartdine
+    depends_on:
+      - auth-mongo
+      - nats-streaming
+
+  menu:
+    build:
+      context: .
+      dockerfile: menu/Dockerfile
+    ports:
+      - "3001:3000"
+    environment:
+      - MONGO_URI=mongodb://menu-mongo:27017/menu
+      - JWT_KEY=your_jwt_key
+      - NATS_CLIENT_ID=menu-${HOSTNAME}
+      - NATS_URL=http://nats-streaming:4222
+      - NATS_CLUSTER_ID=smartdine
+    depends_on:
+      - menu-mongo
+      - nats-streaming
+
+  orders:
+    build:
+      context: .
+      dockerfile: orders/Dockerfile
+    ports:
+      - "3002:3000"
+    environment:
+      - MONGO_URI=mongodb://orders-mongo:27017/orders
+      - JWT_KEY=your_jwt_key
+      - NATS_CLIENT_ID=orders-${HOSTNAME}
+      - NATS_URL=http://nats-streaming:4222
+      - NATS_CLUSTER_ID=smartdine
+    depends_on:
+      - orders-mongo
+      - nats-streaming
+
+  payments:
+    build:
+      context: .
+      dockerfile: payments/Dockerfile
+    ports:
+      - "3003:3000"
+    environment:
+      - MONGO_URI=mongodb://payments-mongo:27017/payments
+      - JWT_KEY=your_jwt_key
+      - STRIPE_KEY=your_stripe_key
+      - NATS_CLIENT_ID=payments-${HOSTNAME}
+      - NATS_URL=http://nats-streaming:4222
+      - NATS_CLUSTER_ID=smartdine
+    depends_on:
+      - payments-mongo
+      - nats-streaming
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "3050:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost
+    depends_on:
+      - auth
+      - menu
+      - orders
+      - payments
+
+  # MongoDB instances for each service
+  auth-mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - auth-mongo-data:/data/db
+
+  menu-mongo:
+    image: mongo:latest
+    ports:
+      - "27018:27017"
+    volumes:
+      - menu-mongo-data:/data/db
+
+  orders-mongo:
+    image: mongo:latest
+    ports:
+      - "27019:27017"
+    volumes:
+      - orders-mongo-data:/data/db
+
+  payments-mongo:
+    image: mongo:latest
+    ports:
+      - "27020:27017"
+    volumes:
+      - payments-mongo-data:/data/db
+
+  # NATS Streaming server
+  nats-streaming:
+    image: nats-streaming:latest
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    command: [
+      "-p",
+      "4222",
+      "-m",
+      "8222",
+      "-hbi",
+      "5s",
+      "-hbt",
+      "5s",
+      "-hbf",
+      "2",
+      "-SD",
+      "-cid",
+      "smartdine"
+    ]
+
+networks:
+  default:
+    name: smartdine-network
+
+volumes:
+  auth-mongo-data:
+  menu-mongo-data:
+  orders-mongo-data:
+  payments-mongo-data: 

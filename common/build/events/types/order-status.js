@@ -11,8 +11,14 @@ var OrderStatus;
     // The order expires before payment
     OrderStatus["Cancelled"] = "cancelled";
     // The order has successfully reserved the ticket
-    OrderStatus["AwaitingPayment"] = "awaiting:payment";
+    OrderStatus["AwaitingPreparation"] = "awaiting:preparation";
     // The order has reserved the ticket and the user has
     // provided payment successfully
-    OrderStatus["Complete"] = "complete";
+    OrderStatus["InPreparation"] = "in:preparation";
+    // The order has reserved the ticket and the user has
+    // provided payment successfully
+    OrderStatus["Ready"] = "ready";
+    // The order has reserved the ticket and the user has
+    // provided payment successfully
+    OrderStatus["Completed"] = "completed";
 })(OrderStatus || (exports.OrderStatus = OrderStatus = {}));

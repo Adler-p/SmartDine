@@ -1,8 +1,9 @@
 export declare enum Subjects {
-    TicketCreated = "ticket:created",
-    TicketUpdated = "ticket:updated",
     OrderCreated = "order:created",
     OrderCancelled = "order:cancelled",
     ExpirationComplete = "expiration:complete",
-    PaymentCreated = "payment:created"
+    PaymentCreated = "payment:created",
+    PaymentUpdated = "payment:updated",
+    MenuItemCreated = "menu:item:created",
+    MenuItemUpdated = "menu:item:updated"
 }

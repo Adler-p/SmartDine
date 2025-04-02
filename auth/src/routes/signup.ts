@@ -1,9 +1,10 @@
 import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
 import jwt from 'jsonwebtoken';
-import { validateRequest, BadRequestError } from '@rallycoding/common';
-
-import { User } from '../models/user';
+import { validateRequest, BadRequestError } from '@smartdine/common';
+import { User, UserRole } from '../models/user';
+import { UserCreatedPublisher } from '../events/publishers/user-created-publisher';
+import { natsWrapper } from '../nats-wrapper';
 
 const router = express.Router();
 
@@ -16,11 +17,18 @@ router.post(
     body('password')
       .trim()
       .isLength({ min: 4, max: 20 })
-      .withMessage('Password must be between 4 and 20 characters')
+      .withMessage('Password must be between 4 and 20 characters'),
+    body('name')
+      .trim()
+      .notEmpty()
+      .withMessage('Name is required'),
+    body('role')
+      .isIn([UserRole.CUSTOMER, UserRole.STAFF])
+      .withMessage('Invalid role')
   ],
   validateRequest,
   async (req: Request, res: Response) => {
-    const { email, password } = req.body;
+    const { email, password, name, role } = req.body;
 
     const existingUser = await User.findOne({ email });
 
@@ -28,14 +36,15 @@ router.post(
       throw new BadRequestError('Email in use');
     }
 
-    const user = User.build({ email, password });
+    const user = User.build({ email, password, name, role });
     await user.save();
 
     // Generate JWT
     const userJwt = jwt.sign(
       {
         id: user.id,
-        email: user.email
+        email: user.email,
+        role: user.role
       },
       process.env.JWT_KEY!
     );
@@ -44,6 +53,15 @@ router.post(
     req.session = {
       jwt: userJwt
     };
+
+    // Publish user created event
+    await new UserCreatedPublisher(natsWrapper.client).publish({
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      name: user.name,
+      version: 0
+    });
 
     res.status(201).send(user);
   }
