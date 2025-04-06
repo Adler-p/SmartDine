@@ -1,76 +1,96 @@
-import React from 'react';
-import styles from './StaffPage.module.css';
-import StaffHeader from '../../components/StaffHeader';
-import StaffSidebar from '../../components/StaffSidebar';
+// pages/customer/index.js
+import React, { useState } from 'react';
+import CustomerHeader from '../../components/customer/CustomerHeader';
+import StaffSidebarMenu from '../../components/StaffSidebarMenu';
+import styles from './CustomerPage.module.css';
+import Modal from 'react-modal';
 
-const IncomingOrders = () => {
-    const orders = [
-        {
-            orderId: '001',
-            time: '2025-02-25 11:45',
-            table: 'Table 01',
-            items: [
-                { name: 'Chicken Chop', quantity: 1, payment: 'Paid', status: 'Preparing' },
-                { name: 'Fish Fillet', quantity: 1, payment: 'Paid', status: 'Preparing' },
-                { name: 'Ice Water', quantity: 1, payment: 'Paid', status: 'Preparing' }
-            ]
-        },
-        {
-            orderId: '002',
-            time: '2025-02-25 12:15',
-            table: 'Table 02',
-            items: [
-                { name: 'Steak', quantity: 1, payment: 'Paid', status: 'Preparing' }
-            ]
-        },
-        {
-            orderId: '003',
-            time: '2025-02-25 12:30',
-            table: 'Table 03',
-            items: []
-        }
-    ];
+const mockMenu = [
+    // Chicken
+    { id: 1, name: "Grilled Chicken", category: "Chicken", price: 10.00, img: "/chicken1.jpg", available: true },
+    { id: 2, name: "Spicy Fried Chicken", category: "Chicken", price: 13.00, img: "/chicken2.jpg", available: true },
+
+    // Fish
+    { id: 3, name: "Fish & Chips", category: "Fish", price: 13.00, img: "/fish1.jpg", available: false },
+    { id: 4, name: "Grilled Salmon", category: "Fish", price: 15.00, img: "/fish2.jpg", available: true },
+
+    // Steak
+    { id: 5, name: "Sirloin Steak", category: "Steak", price: 21.00, img: "/steak1.jpg", available: true },
+    { id: 6, name: "Ribeye Steak", category: "Steak", price: 25.00, img: "/steak2.jpg", available: true },
+
+    // Burger
+    { id: 7, name: "Classic Beef Burger", category: "Burger", price: 12.00, img: "/burger1.jpg", available: true },
+    { id: 8, name: "Chicken Burger", category: "Burger", price: 10.00, img: "/burger2.jpg", available: false },
+
+    // Spaghetti
+    { id: 9, name: "Spaghetti Carbonara", category: "Spaghetti", price: 15.00, img: "/spaghetti1.jpg", available: true },
+    { id: 10, name: "Spaghetti Bolognese", category: "Spaghetti", price: 15.00, img: "/spaghetti2.jpg", available: true },
+
+    // Drinks
+    { id: 11, name: "Iced Lemon Tea", category: "Drinks", price: 2.50, img: "/drink1.jpg", available: true },
+    { id: 12, name: "Coca-Cola", category: "Drinks", price: 2.50, img: "/drink2.jpg", available: true },
+    { id: 12, name: "Ice Water", category: "Drinks", price: 1.50, img: "/drink2.jpg", available: true },
+
+    // Add more...
+];
+
+const Menu = () => {
+    const [selectedCategory, setSelectedCategory] = useState('All');
+    const [menuItems, setMenuItems] = useState(mockMenu);
+    const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+    
+
+    const handleConfirmPayment = (id) => {
+        setMenuItems(prev =>
+            prev.map(item =>
+                item.id === id ? { ...item, available: !item.available } : item
+            )
+        );
+        setIsSuccessModalOpen(true);  // Open success modal
+    };
+
+    const filteredItems = selectedCategory === 'All'
+        ? menuItems
+        : menuItems.filter(item => item.category === selectedCategory);
 
     return (
-        <div className={styles.container}>
-            <StaffHeader />
-            <div className={styles.content}>
-                <StaffSidebar />
-                <div className={styles.main}>
-                    <h2 className={styles.title}>Incoming Orders</h2>
-                    {orders.map(order => (
-                        <div key={order.orderId} className={styles.orderBlock}>
-                            <h3>Order ID {order.orderId} - Time Order: {order.time}</h3>
-                            {order.items.length > 0 ? (
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Quantity</th>
-                                            <th>Payment</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {order.items.map((item, index) => (
-                                            <tr key={index}>
-                                                <td>{item.name}</td>
-                                                <td>{item.quantity}</td>
-                                                <td>{item.payment}</td>
-                                                <td>{item.status}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            ) : (
-                                <p>No orders for this table.</p>
-                            )}
-                        </div>
-                    ))}
+        <>
+            <CustomerHeader />
+            <div className={styles.pageLayout}>
+                <StaffSidebarMenu selected={selectedCategory} onSelect={setSelectedCategory} />
+                <div className={styles.content}>
+                    <h2>{selectedCategory}</h2>
+                    <div className={styles.grid}>
+                        {filteredItems.map(item => (
+                            <div key={item.id} className={styles.card}>
+                                <img src={item.img} alt={item.name} className={styles.image} />
+                                <h3>{item.name}</h3>
+                                <p>${item.price.toFixed(2)}</p>
+                                <button
+                                    onClick={() => handleConfirmPayment(item.id)}
+                                    className={item.available ? styles.availableBtn : styles.unavailableBtn}
+                                    disabled={item.available == false}
+                                >
+                                    {item.available ? "Add to Cart" : "Unavailable"}
+                                </button>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
-        </div>
+
+            {/* Success Modal */}
+            <Modal
+                isOpen={isSuccessModalOpen}
+                onRequestClose={() => setIsSuccessModalOpen(false)}
+                className={styles.modal}
+                overlayClassName={styles.overlay}
+            >
+                <h3>You have added to your cart: {}</h3>
+                <button onClick={() => setIsSuccessModalOpen(false)}>Back to menu</button>
+            </Modal>
+        </>
     );
 };
 
-export default IncomingOrders;
+export default Menu;
