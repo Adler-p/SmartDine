@@ -1,14 +1,6 @@
 {
   "ExpandedNodes": [
-    "",
-    "\\auth",
-    "\\client",
-    "\\common",
-    "\\expiration",
-    "\\infra",
-    "\\nats-test",
-    "\\orders"
+    ""
   ],
-  "SelectedNode": "\\frontend",
   "PreviewInSolutionExplorer": false
 }
