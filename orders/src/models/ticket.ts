@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
+import { Order } from './order';
+import { OrderStatus } from '@smartdine/common';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
-import { Order, OrderStatus } from './order';
 
 interface TicketAttrs {
   id: string;
@@ -17,10 +18,7 @@ export interface TicketDoc extends mongoose.Document {
 
 interface TicketModel extends mongoose.Model<TicketDoc> {
   build(attrs: TicketAttrs): TicketDoc;
-  findByEvent(event: {
-    id: string;
-    version: number;
-  }): Promise<TicketDoc | null>;
+  findByEvent(event: { id: string; version: number }): Promise<TicketDoc | null>;
 }
 
 const ticketSchema = new mongoose.Schema(
@@ -54,6 +52,7 @@ ticketSchema.statics.findByEvent = (event: { id: string; version: number }) => {
     version: event.version - 1,
   });
 };
+
 ticketSchema.statics.build = (attrs: TicketAttrs) => {
   return new Ticket({
     _id: attrs.id,
@@ -61,15 +60,17 @@ ticketSchema.statics.build = (attrs: TicketAttrs) => {
     price: attrs.price,
   });
 };
+
 ticketSchema.methods.isReserved = async function () {
   // this === the ticket document that we just called 'isReserved' on
   const existingOrder = await Order.findOne({
-    ticket: this,
+    ticket: this as any,
     status: {
       $in: [
         OrderStatus.Created,
-        OrderStatus.AwaitingPayment,
-        OrderStatus.Complete,
+        OrderStatus.InPreparation,
+        OrderStatus.AwaitingPreparation,
+        OrderStatus.Completed,
       ],
     },
   });

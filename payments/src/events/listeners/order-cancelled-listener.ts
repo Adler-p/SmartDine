@@ -1,30 +1,33 @@
-import {
-  OrderCancelledEvent,
-  Subjects,
-  Listener,
-  OrderStatus,
-} from '@rallycoding/common';
 import { Message } from 'node-nats-streaming';
+import { Subjects, Listener, OrderCancelledEvent, OrderStatus } from '@smartdine/common';
 import { queueGroupName } from './queue-group-name';
 import { Order } from '../../models/order';
 
 export class OrderCancelledListener extends Listener<OrderCancelledEvent> {
-  subject: Subjects.OrderCancelled = Subjects.OrderCancelled;
+  readonly subject = Subjects.OrderCancelled;
   queueGroupName = queueGroupName;
 
   async onMessage(data: OrderCancelledEvent['data'], msg: Message) {
-    const order = await Order.findOne({
-      _id: data.id,
-      version: data.version - 1,
-    });
+    try {
+      const order = await Order.findByEvent({
+        id: data.id,
+        version: data.version,
+      });
 
-    if (!order) {
-      throw new Error('Order not found');
+      if (!order) {
+        console.log(`Order ${data.id} not found, skipping cancellation`);
+        msg.ack();
+        return;
+      }
+
+      order.status = OrderStatus.Cancelled;
+      await order.save();
+
+      msg.ack();
+    } catch (err) {
+      console.error('Error processing order cancelled event:', err);
+      // Acknowledge to avoid infinite reprocessing
+      msg.ack();
     }
-
-    order.set({ status: OrderStatus.Cancelled });
-    await order.save();
-
-    msg.ack();
   }
-}
+} 

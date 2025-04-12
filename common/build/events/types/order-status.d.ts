@@ -1,6 +1,8 @@
 export declare enum OrderStatus {
     Created = "created",
     Cancelled = "cancelled",
-    AwaitingPayment = "awaiting:payment",
-    Complete = "complete"
+    AwaitingPreparation = "awaiting:preparation",
+    InPreparation = "in:preparation",
+    Ready = "ready",
+    Completed = "completed"
 }
