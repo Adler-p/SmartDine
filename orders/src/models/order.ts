@@ -1,96 +1,91 @@
-import mongoose from 'mongoose';
-import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
+// import mongoose from 'mongoose';
+// import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 import { OrderStatus } from '@smartdine/common';
+import { DataTypes, Model, Sequelize } from 'sequelize';
+import { OrderItem } from './orderItem';
 
 // Interface for Order attributes
-interface OrderAttrs {
-  userId: string;
-  status: OrderStatus;
-  expiresAt: Date;
-  items: {
-    menuItemId: string;
-    name: string;
-    price: number;
-    quantity: number;
-  }[];
+interface OrderAttributes {
+  orderId: string;
+  sessionId: string;    // Session ID of customer who confirmed the cart
+  tableId: string;
+  orderStatus: OrderStatus;
   totalAmount: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+  version?: number; 
 }
 
-// Interface for Order Document
-interface OrderDoc extends mongoose.Document {
-  userId: string;
-  status: OrderStatus;
-  expiresAt: Date;
-  items: {
-    menuItemId: string;
-    name: string;
-    price: number;
-    quantity: number;
-  }[];
-  totalAmount: number;
-  version: number;
+// Interface for Order Creation Attributes 
+interface OrderCreationAttributes extends Omit<OrderAttributes, 'orderId' | 'orderStatus'> {
+  orderStatus?: OrderStatus;
 }
 
-// Interface for Order Model
-interface OrderModel extends mongoose.Model<OrderDoc> {
-  build(attrs: OrderAttrs): OrderDoc;
-}
+// Extend Sequelize Model to create Order model
+export class Order extends Model<OrderAttributes, OrderCreationAttributes> implements OrderAttributes {
+  public orderId!: string;
+  public sessionId!: string;
+  public tableId!: string;
+  public orderStatus!: OrderStatus;
+  public totalAmount!: number;
+  // Timestamps (provided by Sequelize)
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
+  public readonly version!: number; 
 
-const orderSchema = new mongoose.Schema({
-  userId: {
-    type: String,
-    required: true
-  },
-  status: {
-    type: String,
-    required: true,
-    enum: Object.values(OrderStatus),
-    default: OrderStatus.Created
-  },
-  expiresAt: {
-    type: mongoose.Schema.Types.Date
-  },
-  items: [{
-    menuItemId: {
-      type: String,
-      required: true
-    },
-    name: {
-      type: String,
-      required: true
-    },
-    price: {
-      type: Number,
-      required: true
-    },
-    quantity: {
-      type: Number,
-      required: true
-    }
-  }],
-  totalAmount: {
-    type: Number,
-    required: true
+  // This will be populated when you call `getOrderItems()` on an Order instance
+  public readonly orderItems?: OrderItem[]; 
+  public static associate(models: any) {
+    // Define association with OrderItem model
+    Order.hasMany(models.OrderItem, {
+      foreignKey: 'orderId',
+      as: 'orderItems'
+    });
   }
-}, {
-  toJSON: {
-    transform(doc: any, ret: any) {
-      ret.id = ret._id;
-      delete ret._id;
+}
+
+// Initialise the Order model
+export const initOrderModel = (sequelize: Sequelize) => {
+  Order.init({
+    orderId: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true
+    },
+    sessionId: {
+      type: DataTypes.UUID,
+      allowNull: false
+    },
+    tableId: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    orderStatus: {
+      type: DataTypes.ENUM(...Object.values(OrderStatus)),
+      allowNull: false, 
+      defaultValue: OrderStatus.CREATED
+    },
+    totalAmount: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false
     }
-  },
-  timestamps: true,
-  versionKey: 'version'
-});
+  }, {
+    sequelize,
+    tableName: 'orders',
+    timestamps: true, // Automatically adds createdAt and updatedAt
+    version: true, // Enables optimistic concurrency control
+  })
+}
+
 
 // Add optimistic concurrency control
-orderSchema.set('versionKey', 'version');
-orderSchema.plugin(updateIfCurrentPlugin);
+// orderSchema.set('versionKey', 'version');
+// orderSchema.plugin(updateIfCurrentPlugin);
 
-orderSchema.statics.build = (attrs: OrderAttrs) => {
-  return new Order(attrs);
-};
+// orderSchema.statics.build = (attrs: OrderAttrs) => {
+//   return new Order(attrs);
+// };
 
-const Order = mongoose.model<OrderDoc, OrderModel>('Order', orderSchema);
+// const Order = mongoose.model<OrderDoc, OrderModel>('Order', orderSchema);
 
-export { Order, OrderDoc, OrderStatus };
+// export { Order, OrderDoc, OrderStatus };

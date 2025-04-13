@@ -1,12 +1,7 @@
 export enum OrderStatus {
-  Created = 'created',
-  
-
-  Cancelled = 'cancelled',
-  
-  AwaitingPreparation = 'awaiting:preparation',
-  
-  InPreparation = 'in:preparation',
-  
-  Completed = 'completed'
+  CREATED = 'created',
+  CANCELLED = 'cancelled',
+  AWAITING_PREPARATION = 'awaiting:preparation',
+  IN_PREPARATION = 'in:preparation',
+  COMPLETED = 'completed'
 } 

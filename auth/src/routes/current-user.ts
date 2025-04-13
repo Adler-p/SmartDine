@@ -1,9 +1,10 @@
-import express from 'express';
+import express, { Request, Response, Router } from 'express';
 import { currentUser } from '@smartdine/common';
+import { redis } from '../redis-client';
 
-const router = express.Router();
+const router: Router = express.Router();
 
-router.get('/api/users/currentuser', currentUser, (req, res) => {
+router.get('/api/users/currentuser', currentUser(redis), (req: Request, res: Response) => {
   res.send({ currentUser: req.currentUser || null });
 });
 

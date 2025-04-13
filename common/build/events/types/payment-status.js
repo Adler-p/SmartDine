@@ -3,9 +3,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PaymentStatus = void 0;
 var PaymentStatus;
 (function (PaymentStatus) {
-    PaymentStatus["Created"] = "created";
-    PaymentStatus["Pending"] = "pending";
-    PaymentStatus["Completed"] = "completed";
-    PaymentStatus["Failed"] = "failed";
-    PaymentStatus["Refunded"] = "refunded";
+    // CREATED = 'created',
+    // PENDING = 'pending',
+    // COMPLETED = 'completed',
+    // FAILED = 'failed',
+    // REFUNDED = 'refunded'
+    PaymentStatus["PENDING"] = "pending";
+    PaymentStatus["SUCCESSFUL"] = "successful";
+    PaymentStatus["FAILED"] = "failed";
 })(PaymentStatus || (exports.PaymentStatus = PaymentStatus = {}));

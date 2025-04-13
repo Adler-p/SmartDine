@@ -1,79 +1,123 @@
 # Authentication Service
 
-This service handles user authentication and authorization for the SmartDine application.
+The Auth Service is responsible for handling user authentication and session management in the SmartDine application. It provides endpoints for user signup, signin, signout, session creation, and token refresh.
+
+## Features
+- User authentication for staff (signup, signin, signout). 
+- Session management for customers (using cookies). 
+- Refresh token support ofr secure and scalable authentication (frontend will check token expiry and trigger this endpoint to refresh token). 
 
 ## API Endpoints
 
-### User Registration
-- **POST** `/api/users/signup`
-- Creates a new user account
-- Request Body:
-  ```json
-  {
-    "email": "user@example.com",
-    "password": "password123",
-    "name": "User Name",
-    "role": "customer" | "staff"
-  }
-  ```
-- Validation:
-  - Email must be valid and unique
-  - Password must be between 4 and 20 characters
-  - Name is required
-  - Role must be either "customer" or "staff"
-- Response: 201 Created
-  ```json
-  {
-    "id": "user_id",
-    "email": "user@example.com",
-    "name": "User Name",
-    "role": "customer"
-  }
-  ```
-
-### User Login
-- **POST** `/api/users/signin`
-- Authenticates an existing user
-- Request Body:
-  ```json
-  {
-    "email": "user@example.com",
-    "password": "password123"
-  }
-  ```
-- Response: 200 OK
-  ```json
-  {
-    "id": "user_id",
-    "email": "user@example.com",
-    "name": "User Name",
-    "role": "customer"
-  }
-  ```
-
-### Current User
-- **GET** `/api/users/currentuser`
-- Returns information about the currently logged-in user
-- Requires: Valid session cookie
-- Response: 200 OK
-  ```json
-  {
-    "currentUser": {
-      "id": "user_id",
-      "email": "user@example.com",
-      "name": "User Name",
-      "role": "customer"
+### User Registration (Staff)
+-   **POST** `/api/users/signup`
+-   **Description**: Creates a new user account.
+-   **Request Body**:
+```json
+    {
+      "email": "user@example.com",
+      "password": "password123",
+      "name": "User Name",
+      "role": "staff"
     }
-  }
-  ```
-
-### Sign Out
-- **POST** `/api/users/signout`
-- Logs out the current user by clearing their session
-- Response: 200 OK
-  ```json
-  {}
-  ```
+```
+-   **Validation**:
+    -   `email`: Must be valid and unique.
+    -   `password`: Must be between 4 and 20 characters.
+    -   `name`: Required.
+    -   `role`: Must be `"staff"` (future enhancements may introduce other roles).
+-   **Response**: `201 Created`
+```json
+    {
+      "id": "user_id",
+      "email": "user@example.com",
+      "name": "User Name",
+      "role": "staff"
+    }
+```
+* * * * *
+### User Login (Staff)
+-   **POST** `/api/users/signin`
+-   **Description**: Authenticates an existing user.
+-   **Request Body**:
+```json
+    {
+      "email": "user@example.com",
+      "password": "password123"
+    }
+```
+-   **Validation**:
+    -   `email`: Must be valid.
+    -   `password`: Required.
+-   **Response**: `200 OK`
+```json
+    {
+      "id": "user_id",
+      "email": "user@example.com",
+      "name": "User Name",
+      "role": "staff"
+    }
+```
+* * * * *
+### Sign Out (Staff)
+-   **POST** `/api/users/signout`
+-   **Description**: Logs out the current user by clearing their session.
+-   **Request Body**: None.
+-   **Response**: `200 OK`
+```json
+    {}
+```
+* * * * *
+### Current User (Staff)
+-   **GET** `/api/users/currentuser`
+-   **Description**: Returns information about the currently logged-in user.
+-   **Requires**: Valid session cookie.
+-   **Request Body**: None.
+-   **Response**: `200 OK`
+```json
+    {
+      "currentUser": {
+        "id": "user_id",
+        "email": "user@example.com",
+        "name": "User Name",
+        "role": "staff"
+      }
+    }
+```
+* * * * *
+### New Session for Customer
+-   **GET** `/api/session/create`
+-   **Description**: Creates a new session for a customer.
+-   **Query Parameters**:
+    -   `role`: Role of the user (e.g., `"customer"`).
+    -   `tableId`: ID of the table.
+-   **Validation**:
+    -   `role`: Required.
+    -   `tableId`: Required.
+-   **Response**: Redirects to the frontend with the session ID in the query parameters.
+    -   Example Redirect URL:
+```json
+        http://smartdine.com/menu?tableId=table-123&sessionId=session-abc123
+```
+* * * * *
+### Refresh Token (Staff)
+-   **POST** `/api/auth/refresh-token`
+-   **Description**: Refreshes the user's access token using a refresh token.
+-   **Request Body**:
+```json
+    {
+      "refreshToken": "refresh_token_value"
+    }
+```
+-   **Validation**:
+    -   `refreshToken`: Must be valid and not expired.
+-   **Response**: `200 OK`
+```json
+    {
+      "accessToken": "new_access_token",
+      "refreshToken": "new_refresh_token"
+    }
+```
 
 ## Error Responses
 
@@ -133,10 +177,10 @@ All endpoints may return the following error responses:
 ## Environment Variables
 
 - `JWT_KEY`: Secret key for JWT signing (required)
-- `MONGO_URI`: MongoDB connection string
 - `NATS_URL`: NATS streaming server URL
 - `NATS_CLUSTER_ID`: NATS streaming cluster ID
 - `NATS_CLIENT_ID`: NATS streaming client ID
+- `POSTGRES_URI`: POSTGRES connection string 
 
 ## Events Published
 
@@ -201,23 +245,23 @@ The Authentication Service is a microservice responsible for user authentication
 ```
 auth/
 ├── src/
-│   ├── index.ts           # Service entry point
-│   ├── app.ts            # Express app setup
-│   ├── models/           # Data models
-│   │   └── user.ts       # User model
-│   ├── routes/           # API routes
-│   │   ├── current-user.ts
-│   │   ├── signin.ts
-│   │   ├── signout.ts
-│   │   └── signup.ts
-│   ├── events/           # Event handlers
-│   │   ├── publishers/
-│   │   └── listeners/
-│   ├── services/         # Business logic
-│   │   └── password.ts   # Password hashing
-│   └── test/            # Test setup and helpers
-├── package.json
-└── tsconfig.json
+│   ├── app.ts                # Express app setup
+│   ├── index.ts              # Service entry point
+│   ├── routes/               # Route handlers
+│   │   ├── current-user.ts   # Current user route
+│   │   ├── signin.ts         # Signin route
+│   │   ├── signout.ts        # Signout route
+│   │   ├── signup.ts         # Signup route
+│   │   ├── new-session.ts    # Session creation route
+│   │   └── refresh-token.ts  # Refresh token route
+│   ├── models/               # Database models
+│   ├── events/               # Event publishers and listeners
+│   ├── middlewares/          # Custom middleware
+│   ├── utils/                # Utility functions
+├── package.json              # Dependencies and scripts
+├── tsconfig.json             # TypeScript configuration
+├── Dockerfile                # Docker configuration
+├── .env                      # Environment variables
 ```
 
 ## Development

@@ -1,32 +1,46 @@
 import { Message } from 'node-nats-streaming';
-import { Subjects, Listener, OrderCancelledEvent, OrderStatus } from '@smartdine/common';
+import { Subjects, Listener, OrderCancelledEvent, PaymentStatus } from '@smartdine/common';
 import { queueGroupName } from './queue-group-name';
-import { Order } from '../../models/order';
+import { Payment } from '../../models/payment';
 
 export class OrderCancelledListener extends Listener<OrderCancelledEvent> {
   readonly subject = Subjects.OrderCancelled;
   queueGroupName = queueGroupName;
 
   async onMessage(data: OrderCancelledEvent['data'], msg: Message) {
-    try {
-      const order = await Order.findByEvent({
-        id: data.id,
-        version: data.version,
-      });
+    const { orderId } = data;
 
-      if (!order) {
-        console.log(`Order ${data.id} not found, skipping cancellation`);
+    try {
+
+      // await Payment.update(
+      //   { paymentStatus: PaymentStatus.FAILED },
+      //   { where: { orderId } }
+      //   )
+
+      const payment = await Payment.findOne({ where: { orderId } });
+      if (!payment) {
+        console.log(`Payment not found for order ${orderId}`);
         msg.ack();
         return;
       }
 
-      order.status = OrderStatus.Cancelled;
-      await order.save();
-
-      msg.ack();
+      payment.paymentStatus = PaymentStatus.FAILED;
+      // Save with optimistic locking
+      try {
+        await payment.save();
+        console.log(`Payment status updated to FAILED for order ${orderId}`);
+        msg.ack();
+      } catch (err) {
+        if (err.name === 'SequelizeOptimisticLockError') {
+          console.log(`Concurrency conflict: Payment ${orderId} was updated before order:cancelled event processed`); 
+          msg.ack();
+        } else {
+          console.error('Error saving payment after order:cancelled event:', err); 
+          msg.ack();
+        }
+      }
     } catch (err) {
       console.error('Error processing order cancelled event:', err);
-      // Acknowledge to avoid infinite reprocessing
       msg.ack();
     }
   }

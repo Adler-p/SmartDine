@@ -2,11 +2,15 @@ import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import { validateRequest, BadRequestError } from '@smartdine/common';
-
 import { Password } from '../services/password';
-import { User } from '../models/user';
+import { initUserModel } from '../models/user';
+import { sequelize } from '../sequelize';
+import { generateRefreshToken } from '../services/generate-refresh-token';
 
-const router = express.Router();
+
+const router: express.Router = express.Router();
+const userModel = initUserModel(sequelize);
+
 
 router.post(
   '/api/users/signin',
@@ -23,9 +27,9 @@ router.post(
   async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
-    const existingUser = await User.findOne({ email });
+    const existingUser = await userModel.findOne({ where: { email } });
     if (!existingUser) {
-      throw new BadRequestError('Invalid credentials');
+      throw new BadRequestError('Invalid user');
     }
 
     const passwordsMatch = await Password.compare(
@@ -33,25 +37,37 @@ router.post(
       password
     );
     if (!passwordsMatch) {
-      throw new BadRequestError('Invalid credentials');
+      throw new BadRequestError('Invalid password');
     }
 
-    // Generate JWT
-    const userJwt = jwt.sign(
+    // Generate JWT Access Token
+    const accessToken = jwt.sign(
       {
         id: existingUser.id,
         email: existingUser.email,
         role: existingUser.role
       },
-      process.env.JWT_KEY!
-    );
+      process.env.JWT_KEY!,
+      { expiresIn: '5m' } // Token expires in 5 minutes
+    )
 
-    // Store it on session object
+    // Generate and Store Refresh Token
+    const refreshToken = await generateRefreshToken(existingUser.id);
+
+    // Store Access Token in Session 
     req.session = {
-      jwt: userJwt
+      jwt: accessToken
     };
 
-    res.status(200).send(existingUser);
+    // Send Refresh Token as HTTP-only, Secure Cookie
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000 
+    }); 
+
+    res.status(200).send({ user: { id: existingUser.id, email: existingUser.email, role: existingUser.role, name: existingUser.name } });
   }
 );
 

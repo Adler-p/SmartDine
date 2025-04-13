@@ -33,6 +33,22 @@ services:
       - menu-mongo
       - nats-streaming
 
+  cart:
+    build:
+      context: .
+      dockerfile: cart/Dockerfile
+    ports:
+      - "3004:3000"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - NATS_CLIENT_ID=cart-${HOSTNAME}
+      - NATS_URL=http://nats-streaming:4222
+      - NATS_CLUSTER_ID=smartdine
+    depends_on:
+      - redis
+      - nats-streaming
+
   orders:
     build:
       context: .
@@ -130,6 +146,12 @@ services:
       "-cid",
       "smartdine"
     ]
+  
+  # Redis for caching
+  redis:
+    image: "redis:6-alpine"
+    ports:
+      - "6379:6379"
 
 networks:
   default:

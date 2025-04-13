@@ -12,5 +12,5 @@ declare global {
         }
     }
 }
-export declare const currentUser: (req: Request, res: Response, next: NextFunction) => void;
+export declare const currentUser: (redisClient: any) => (req: Request, res: Response, next: NextFunction) => Promise<void | Response<any, Record<string, any>>>;
 export {};
