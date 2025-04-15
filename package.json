@@ -2,14 +2,13 @@
   "name": "smartdine",
   "private": true,
   "version": "1.0.0",
-  "description": "NUS ISS Project\r SmartDine is a web app that streamlines restaurant order management, allowing staff to efficiently handle orders, update statuses, manage inventory, verify payments, and communicate with customers. With real-time order tracking and seamless coordination for pickups and deliveries, SmartDine enhances operational efficiency and improves customer satisfaction.",
+  "description": "NUS ISS Project - SmartDine is a web app that streamlines restaurant order management, allowing staff to efficiently handle orders, update statuses, manage inventory, verify payments, and communicate with customers. With real-time order tracking and seamless coordination for pickups and deliveries, SmartDine enhances operational efficiency and improves customer satisfaction.",
   "main": "index.js",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "test": "echo \"Error: no test specified\" && exit 1"
-//    "build": "pnpm -r build"
   },
   "author": "",
   "license": "ISC",
@@ -19,7 +18,7 @@
     "next": "^12.0.0",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
-    "react-modal": "^3.16.3"
+    "react-modal": "^3.16.3",
     "express": "^4.18.2",
     "cookie-session": "^2.0.0",
     "express-validator": "^7.0.1",
