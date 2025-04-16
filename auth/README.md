@@ -5,7 +5,7 @@ The Auth Service is responsible for handling user authentication and session man
 ## Features
 - User authentication for staff (signup, signin, signout). 
 - Session management for customers (using cookies). 
-- Refresh token support ofr secure and scalable authentication (frontend will check token expiry and trigger this endpoint to refresh token). 
+- Refresh token support for secure and scalable authentication (frontend will check token expiry and trigger this endpoint to refresh token). 
 
 ## API Endpoints
 
@@ -15,10 +15,10 @@ The Auth Service is responsible for handling user authentication and session man
 -   **Request Body**:
 ```json
     {
-      "email": "user@example.com",
-      "password": "password123",
-      "name": "User Name",
-      "role": "staff"
+      "email": "don@example.com", 
+      "password": "12345", 
+      "name": "Don", 
+      "role": "staff"
     }
 ```
 -   **Validation**:
@@ -29,21 +29,20 @@ The Auth Service is responsible for handling user authentication and session man
 -   **Response**: `201 Created`
 ```json
     {
-      "id": "user_id",
-      "email": "user@example.com",
-      "name": "User Name",
-      "role": "staff"
+      "id": "user_id", 
+      "email": "don@example.com", 
+      "name": "Don", 
+      "role": "staff"
     }
 ```
-* * * * *
 ### User Login (Staff)
 -   **POST** `/api/users/signin`
 -   **Description**: Authenticates an existing user.
 -   **Request Body**:
 ```json
     {
-      "email": "user@example.com",
-      "password": "password123"
+      "email": "don@example.com", 
+      "password": "12345"
     }
 ```
 -   **Validation**:
@@ -52,13 +51,12 @@ The Auth Service is responsible for handling user authentication and session man
 -   **Response**: `200 OK`
 ```json
     {
-      "id": "user_id",
-      "email": "user@example.com",
-      "name": "User Name",
-      "role": "staff"
+      "id": "user_id", 
+      "email": "don@example.com", 
+      "name": "Don", 
+      "role": "staff"
     }
 ```
-* * * * *
 ### Sign Out (Staff)
 -   **POST** `/api/users/signout`
 -   **Description**: Logs out the current user by clearing their session.
@@ -67,7 +65,6 @@ The Auth Service is responsible for handling user authentication and session man
 ```json
     {}
 ```
-* * * * *
 ### Current User (Staff)
 -   **GET** `/api/users/currentuser`
 -   **Description**: Returns information about the currently logged-in user.
@@ -76,17 +73,30 @@ The Auth Service is responsible for handling user authentication and session man
 -   **Response**: `200 OK`
 ```json
     {
-      "currentUser": {
-        "id": "user_id",
-        "email": "user@example.com",
-        "name": "User Name",
-        "role": "staff"
-      }
+      "currentUser": {
+        "id": "user_id", 
+        "email": "don@example.com", 
+        "name": "Don", 
+        "role": "staff"
+      }
     }
 ```
-* * * * *
+### Refresh Token (Staff)
+-   **POST** `/api/users/refresh-token`
+-   **Description**: Refreshes the user's access token using a refresh token.
+-   **Request Body**: None. Refresh token is expected as an HTTP-only, secure cookie named `refreshToken`. 
+-   **Validation**:
+    -   The `refreshToken` cookie must be valid, not expired, and exist in the database.
+-   **Response**: `200 OK`
+```json
+    {
+      "accessToken": "new_access_token"
+    }
+```
+-   **Response Headers**: A new `refreshToken` is set as an HTTP-only, secure cookie in the `Set-Cookie` header. 
+
 ### New Session for Customer
--   **GET** `/api/session/create`
+-   **GET** `/api/session/create?role=customer&table=table123`
 -   **Description**: Creates a new session for a customer.
 -   **Query Parameters**:
     -   `role`: Role of the user (e.g., `"customer"`).
@@ -97,26 +107,7 @@ The Auth Service is responsible for handling user authentication and session man
 -   **Response**: Redirects to the frontend with the session ID in the query parameters.
     -   Example Redirect URL:
 ```json
-        http://smartdine.com/menu?tableId=table-123&sessionId=session-abc123
-```
-* * * * *
-### Refresh Token (Staff)
--   **POST** `/api/auth/refresh-token`
--   **Description**: Refreshes the user's access token using a refresh token.
--   **Request Body**:
-```json
-    {
-      "refreshToken": "refresh_token_value"
-    }
-```
--   **Validation**:
-    -   `refreshToken`: Must be valid and not expired.
--   **Response**: `200 OK`
-```json
-    {
-      "accessToken": "new_access_token",
-      "refreshToken": "new_refresh_token"
-    }
+        http://smartdine.com/menu?tableId=table123&sessionId=session-abc123
 ```
 
 ## Error Responses
@@ -160,13 +151,15 @@ All endpoints may return the following error responses:
 ## Security Features
 
 1. Password Hashing
-   - Passwords are hashed using scrypt with a random salt
+   - Passwords are hashed using `scrypt` with a unique, randomly generated salt for each password
    - Original passwords are never stored
 
 2. Session Management
-   - JWT-based authentication
-   - Secure cookie session storage
-   - HTTPS-only cookies in production
+   - JWT-based authentication for access tokens
+   - Secure cookie session storage for access and refresh tokens
+   - `HttpOnly` flags set on cookies to prevent client-side script access
+   - `Secure` flag set on cookies to ensure transmission only over HTTPS 
+   - Refresh Token Rotation implemented
 
 3. Input Validation
    - Email format validation
@@ -183,6 +176,20 @@ All endpoints may return the following error responses:
 - `POSTGRES_URI`: POSTGRES connection string 
 
 ## Events Published
+
+### `session:created`
+Published when a new customer session is successfully created. This happens after a customer initiates a session upon scanning the QR code on the table. 
+**Payload:**
+```json
+{
+  "subject": "session:created",
+  "data": {
+    "sessionId": "abc-123-xyz-456",
+    "tableId": "T42",
+    "role": "customer"
+  }
+}
+```
 
 ### UserCreated
 ```typescript
