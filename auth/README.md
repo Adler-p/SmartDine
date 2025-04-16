@@ -42,12 +42,12 @@ These events are consumed by other services that need to react to user-related c
 -   **POST** `/api/users/signin`
 -   **Description**: Authenticates an existing user.
 -   **Request Body**:
-```json
+    ```json
     {
       "email": "don@example.com", 
       "password": "12345"
     }
-```
+    ```
 -   **Validation**:
     -   `email`: Must be valid.
     -   `password`: Required.
@@ -65,9 +65,9 @@ These events are consumed by other services that need to react to user-related c
 -   **Description**: Logs out the current user by clearing their session.
 -   **Request Body**: None.
 -   **Response**: `200 OK`
-```json
+    ```json
     {}
-```
+    ```
 ### Current User (Staff)
 -   **GET** `/api/users/currentuser`
 -   **Description**: Returns information about the currently logged-in user.
@@ -110,7 +110,7 @@ These events are consumed by other services that need to react to user-related c
 -   **Response**: Redirects to the frontend with the session ID in the query parameters.
     -   Example Redirect URL:
     ```json
-        http://smartdine.com/menu?tableId=table123&sessionId=session-abc123
+    http://smartdine.com/menu?tableId=table123&sessionId=session12345566
     ```
 
 ## Error Responses
@@ -123,7 +123,7 @@ All endpoints may return the following error responses:
   "errors": [
     {
       "message": "Error message",
-      "field": "field_name" // Optional
+      "field": "field_name"    // Optional
     }
   ]
 }
@@ -181,35 +181,35 @@ All endpoints may return the following error responses:
 ## Events Published
 
 ### `session:created`
-Published when a new customer session is successfully created. This happens after a customer initiates a session upon scanning the QR code on the table. 
-
-**Payload:**
-```json
-{
-  "subject": "session:created",
-  "data": {
-    "sessionId": "abc-123-xyz-456",
-    "tableId": "T42",
-    "role": "customer"
-  }
-}
-```
+-   **Description**: Published when a new customer session is successfully created. This happens after a customer initiates a session upon scanning the QR code on the table. 
+-   **Event Listener**: [SessionCreatedPublisher]
+-   **Event Data:**
+    ```json
+    {
+      "subject": "session:created",
+      "data": {
+        "sessionId": "abc-123-xyz-456",
+        "tableId": "T42",
+        "role": "customer"
+      }
+    }
+    ```
 
 ### `user:created`
-Published when a new user account is successfully created (only for staff). 
-
-**Payload:**
-```json
-{
-  "subject": "user:created",
-  "data": {
-    "id": "user-5e7a2b9c1d3e4f5a6b7c8d9e",
-    "email": "newstaff@example.com",
-    "name": "New Staff Member",
-    "role": "staff"
-  }
-}
-```
+-   **Description**: Published when a new user account is successfully created (only for staff). 
+-   **Event Listener**: [UserCreatedPublisher]
+-   **Event Data:**
+    ```json
+    {
+      "subject": "user:created",
+      "data": {
+        "id": "user-5e7a2b9c1d3e4f5a6b7c8d9e",
+        "email": "newstaff@example.com",
+        "name": "New Staff Member",
+        "role": "staff"
+      }
+    }
+    ```
 
 ## Development
 

@@ -45,10 +45,14 @@ router.post('/api/cart/add', validateSession(redis), async (req: Request, res: R
             quantity: cartItem.quantity,
         })),
         totalItems,
-            totalPrice,
+        totalPrice,
 });
 
-    res.status(200).send({ message: 'Item added to cart', cart: sessionData.cart });
+    res.status(200).send({ 
+        message: 'Item added to cart', 
+        sessionId: sessionId,
+        cart: sessionData.cart 
+    });
 })
 
 export { router as addItemRouter };

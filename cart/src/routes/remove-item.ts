@@ -43,7 +43,12 @@ router.post('/api/cart/remove', validateSession(redis), async (req: Request, res
         });
     }
 
-    res.status(200).send({ message: 'Item removed from cart', cart: sessionData.cart });
+    res.status(200).send({ 
+        message: 'Item removed from cart', 
+        sessionId:sessionId, 
+        cart: sessionData.cart 
+
+    });
 })
 
 export { router as removeItemRouter };

@@ -63,7 +63,11 @@ router.post(
         totalPrice,
     });
 
-    res.status(200).send({ message: 'Cart updated', cart: sessionData.cart });
+    res.status(200).send({ 
+      message: 'Cart updated', 
+      sessionId: sessionId,
+      cart: sessionData.cart 
+    });
   }
 );
 
