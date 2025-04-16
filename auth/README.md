@@ -3,9 +3,12 @@
 The Auth Service is responsible for handling user authentication and session management in the SmartDine application. It provides endpoints for user signup, signin, signout, session creation, and token refresh.
 
 ## Features
-- User authentication for staff (signup, signin, signout). 
-- Session management for customers (using cookies). 
-- Refresh token support for secure and scalable authentication (frontend will check token expiry and trigger this endpoint to refresh token). 
+- User authentication for staff (signup, signin, signout)
+- Session management for customers (using cookies)
+- Refresh token support for secure and scalable authentication (frontend will check token expiry and trigger this endpoint to refresh token)
+- Event publishing for user-related events
+
+These events are consumed by other services that need to react to user-related changes.
 
 ## API Endpoints
 
@@ -13,28 +16,28 @@ The Auth Service is responsible for handling user authentication and session man
 -   **POST** `/api/users/signup`
 -   **Description**: Creates a new user account.
 -   **Request Body**:
-```json
+    ```json
     {
       "email": "don@example.com", 
       "password": "12345", 
       "name": "Don", 
       "role": "staff"
     }
-```
+    ```
 -   **Validation**:
     -   `email`: Must be valid and unique.
     -   `password`: Must be between 4 and 20 characters.
     -   `name`: Required.
     -   `role`: Must be `"staff"` (future enhancements may introduce other roles).
 -   **Response**: `201 Created`
-```json
+    ```json
     {
       "id": "user_id", 
       "email": "don@example.com", 
       "name": "Don", 
       "role": "staff"
     }
-```
+    ```
 ### User Login (Staff)
 -   **POST** `/api/users/signin`
 -   **Description**: Authenticates an existing user.
@@ -49,14 +52,14 @@ The Auth Service is responsible for handling user authentication and session man
     -   `email`: Must be valid.
     -   `password`: Required.
 -   **Response**: `200 OK`
-```json
+    ```json
     {
       "id": "user_id", 
       "email": "don@example.com", 
       "name": "Don", 
       "role": "staff"
     }
-```
+    ```
 ### Sign Out (Staff)
 -   **POST** `/api/users/signout`
 -   **Description**: Logs out the current user by clearing their session.
@@ -71,7 +74,7 @@ The Auth Service is responsible for handling user authentication and session man
 -   **Requires**: Valid session cookie.
 -   **Request Body**: None.
 -   **Response**: `200 OK`
-```json
+    ```json
     {
       "currentUser": {
         "id": "user_id", 
@@ -80,7 +83,7 @@ The Auth Service is responsible for handling user authentication and session man
         "role": "staff"
       }
     }
-```
+    ```
 ### Refresh Token (Staff)
 -   **POST** `/api/users/refresh-token`
 -   **Description**: Refreshes the user's access token using a refresh token.
@@ -88,11 +91,11 @@ The Auth Service is responsible for handling user authentication and session man
 -   **Validation**:
     -   The `refreshToken` cookie must be valid, not expired, and exist in the database.
 -   **Response**: `200 OK`
-```json
+    ```json
     {
       "accessToken": "new_access_token"
     }
-```
+    ```
 -   **Response Headers**: A new `refreshToken` is set as an HTTP-only, secure cookie in the `Set-Cookie` header. 
 
 ### New Session for Customer
@@ -106,9 +109,9 @@ The Auth Service is responsible for handling user authentication and session man
     -   `tableId`: Required.
 -   **Response**: Redirects to the frontend with the session ID in the query parameters.
     -   Example Redirect URL:
-```json
+    ```json
         http://smartdine.com/menu?tableId=table123&sessionId=session-abc123
-```
+    ```
 
 ## Error Responses
 
@@ -191,14 +194,18 @@ Published when a new customer session is successfully created. This happens afte
 }
 ```
 
-### UserCreated
-```typescript
+### `user:created`
+Published when a new user account is successfully created (only for staff). 
+**Payload:**
+```json
 {
-  id: string;
-  email: string;
-  role: string;
-  name: string;
-  version: number;
+  "subject": "user:created",
+  "data": {
+    "id": "user-5e7a2b9c1d3e4f5a6b7c8d9e",
+    "email": "newstaff@example.com",
+    "name": "New Staff Member",
+    "role": "staff"
+  }
 }
 ```
 
@@ -231,16 +238,6 @@ Run the container:
 docker run -p 3000:3000 smartdine/auth
 ```
 
-## Overview
-The Authentication Service is a microservice responsible for user authentication and authorization in the SmartDine system. It handles user registration, login, and role-based access control for both customers and restaurant staff.
-
-## Features
-- User registration with role selection (Customer/Staff)
-- Secure authentication using JWT
-- Role-based access control
-- Session management
-- Event publishing for user-related events
-
 ## Technical Stack
 - Node.js with TypeScript
 - Express.js
@@ -270,181 +267,3 @@ auth/
 ├── Dockerfile                # Docker configuration
 ├── .env                      # Environment variables
 ```
-
-## Development
-
-### Installation
-```bash
-pnpm install
-```
-
-### Running Tests
-```bash
-pnpm test
-```
-
-### Starting the Service
-```bash
-pnpm start
-```
-
-## Testing
-The service includes comprehensive test coverage for:
-- Route handlers
-- Middleware functions
-- Event publishers
-- Authentication logic
-
-## Error Handling
-The service implements standardized error handling for:
-- Validation errors
-- Authentication errors
-- Database errors
-- Not found errors
-- Bad request errors
-
-## Security
-- Password hashing using scrypt
-- JWT-based authentication
-- Session management with cookie-session
-- Role-based access control
-- Request validation
-
-## Event Publishing
-The service publishes events when:
-- A new user is created
-- A user's details are updated
-- A user is deleted
-
-These events are consumed by other services that need to react to user-related changes.
-
----
-
-# 认证服务
-
-## 概述
-认证服务是 SmartDine 系统中负责用户认证和授权的微服务。它处理用户注册、登录，以及针对顾客和餐厅员工的基于角色的访问控制。
-
-## 功能特性
-- 支持角色选择的用户注册（顾客/员工）
-- 使用 JWT 的安全认证
-- 基于角色的访问控制
-- 会话管理
-- 用户相关事件发布
-
-## API 接口
-
-### POST /api/users/signup
-注册新用户
-```json
-{
-  "email": "user@example.com",
-  "password": "password",
-  "name": "用户名",
-  "role": "customer|staff"
-}
-```
-
-### POST /api/users/signin
-用户登录
-```json
-{
-  "email": "user@example.com",
-  "password": "password"
-}
-```
-
-### POST /api/users/signout
-用户登出
-
-### GET /api/users/currentuser
-获取当前用户信息
-
-## 事件发布
-- 用户创建事件
-- 用户更新事件
-- 用户删除事件
-
-## 技术栈
-- Node.js 与 TypeScript
-- Express.js 框架
-- MongoDB 与 Mongoose
-- NATS Streaming 消息队列
-- Jest 测试框架
-
-## 项目结构
-```
-auth/
-├── src/
-│   ├── index.ts           # 服务入口点
-│   ├── app.ts            # Express应用设置
-│   ├── models/           # 数据模型
-│   │   └── user.ts       # 用户模型
-│   ├── routes/           # API路由
-│   │   ├── current-user.ts
-│   │   ├── signin.ts
-│   │   ├── signout.ts
-│   │   └── signup.ts
-│   ├── events/           # 事件处理
-│   │   ├── publishers/
-│   │   └── listeners/
-│   ├── services/         # 业务逻辑
-│   │   └── password.ts   # 密码哈希
-│   └── test/            # 测试设置和辅助函数
-├── package.json
-└── tsconfig.json
-```
-
-## 环境变量
-- JWT_KEY: JWT 签名密钥
-- MONGO_URI: MongoDB 连接字符串
-- NATS_URL: NATS 流服务器地址
-- NATS_CLUSTER_ID: NATS 集群 ID
-- NATS_CLIENT_ID: NATS 客户端 ID
-
-## 开发
-
-### 安装
-```bash
-pnpm install
-```
-
-### 运行测试
-```bash
-pnpm test
-```
-
-### 启动服务
-```bash
-pnpm start
-```
-
-## 测试
-服务包含全面的测试覆盖：
-- 路由处理器
-- 中间件函数
-- 事件发布器
-- 认证逻辑
-
-## 错误处理
-服务实现了标准化的错误处理：
-- 验证错误
-- 认证错误
-- 数据库错误
-- 未找到错误
-- 错误请求
-
-## 安全性
-- 使用 scrypt 进行密码哈希
-- 基于 JWT 的认证
-- 使用 cookie-session 的会话管理
-- 基于角色的访问控制
-- 请求验证
-
-## 事件发布
-服务在以下情况下发布事件：
-- 新用户创建
-- 用户详情更新
-- 用户删除
-
-这些事件会被需要响应用户相关变更的其他服务消费。 
