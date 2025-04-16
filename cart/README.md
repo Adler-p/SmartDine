@@ -63,34 +63,28 @@ The Cart Service is responsible for managing shopping carts for customer session
 -   **Request Body**:
     ```json
     {
-      "itemId": "item-1",
-      "quantity": 3
+        "itemId": "product_id", 
+        "quantity": "2"
     }
     ```
 -   **Validation**:
     -   `itemId`: Required, string
     -   `quantity`: Required, integer greater than 0
 -   **Response**: `200 OK`
-```json
+    ```json
     {
-      "message": "Cart updated",
-      "sessionId": "session_id",
-      "cart": [
-        {
-          "itemId": "item-1",
-          "itemName": "Pizza",
-          "unitPrice": 12.99,
-          "quantity": 3
-        },
-        {
-          "itemId": "item-2",
-          "itemName": "Pasta",
-          "unitPrice": 8.99,
-          "quantity": 1
-        }
-      ]
+        "message": "Cart updated", 
+        "sessionId": "session_id", 
+        "cart": [
+            {
+                "itemId": "product_id",
+                "itemName": "Product Name",
+                "unitPrice": 10.99,
+                "quantity": 2
+            }, // ... other items
+        ]
     }
-```
+    ```
 
 ### Remove Item from Cart
 -   **POST** `/api/cart/remove`
@@ -174,7 +168,7 @@ The Cart Service is responsible for managing shopping carts for customer session
             {
             "itemId": "string",
             "itemName": "string",
-            "unitPrice": number,
+            "unitPrice": number, 
             "quantity": number
             }
             // ... more items
@@ -202,16 +196,16 @@ The cart is stored in Redis under the key `session:<sessionId>`.
 **Value**:
 ```json
 {
-  "role": "customer",
-  "tableId": "table-1",
-  "cart": [
-    {
-      "itemId": "item-1",
-      "itemName": "Pizza",
-      "unitPrice": 12.99,
-      "quantity": 2
-    }
-  ]
+    "role": "", 
+    "tableId": "table123", 
+    "cart": [
+        {
+            "itemId": "product_id",
+            "itemName": "Product Name",
+            "unitPrice": 10.99,
+            "quantity": 2
+        }, // ... other items
+    ]
 }
 ```
 
