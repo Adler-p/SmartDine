@@ -1,127 +1,175 @@
 # Menu Service
 
-This service handles menu item management for the SmartDine application.
+This service handles menu item management for the SmartDine application. It provides endpoints for creating, updating, retrieving, and listing menu items.
+
+## Features
+-   Allows staff to create new menu items with details like name, description, price, category, image URL, and availability.
+-   Enables staff to update existing menu items, including marking them as out of stock or updating their price.
+-   Provides endpoints for retrieving a list of all menu items, with optional filtering by category.
+-   Allows retrieval of a single menu item by its ID.
+-   Publishes events when menu items are created or updated to notify other services.
+
 
 ## API Endpoints
 
-### List All Menu Items
-- **GET** `/api/menu`
-- Returns all menu items
-- Optional query parameter: `available=true` to filter only available items
-- Requires: Authentication (Staff or Customer)
-- Response: 200 OK
-  ```json
-  [
-    {
-      "id": "menu_item_id",
-      "name": "Item Name",
-      "description": "Item Description",
-      "price": 10.99,
-      "category": "Category",
-      "imageUrl": "https://example.com/image.jpg",
-      "availability": "available",
-      "version": 0
-    }
-  ]
-  ```
-
-### Get Menu Items by Category
-- **GET** `/api/menu/category/:category`
-- Returns menu items in a specific category
-- Requires: Authentication (Staff or Customer)
-- Response: 200 OK
-  ```json
-  [
-    {
-      "id": "menu_item_id",
-      "name": "Item Name",
-      "description": "Item Description",
-      "price": 10.99,
-      "category": "Category",
-      "imageUrl": "https://example.com/image.jpg",
-      "availability": "available",
-      "version": 0
-    }
-  ]
-  ```
+### Get All Menu Items (Optional Filtering)
+-   **GET** `/api/menu`
+-   **Description**: Retrieves a list of all menu items. Optionally filters by `category` using a query parameter
+-   **Query Parameters**:
+    -   `category`: Optional string to filter menu items by category (e.g., `/api/menu?category=Dessert`)
+-   **Response**: `200 OK`
+    ```json
+    [
+      {
+        "id": "menuItemId1",
+        "name": "Delicious Burger",
+        "description": "...",
+        "price": 12.99,
+        "category": "Main",
+        "imageUrl": "...",
+        "availability": "available",
+        "version": 0
+      },
+      {
+        "id": "menuItemId2",
+        "name": "Chocolate Cake",
+        "description": "...",
+        "price": 6.50,
+        "category": "Dessert",
+        "imageUrl": "...",
+        "availability": "available",
+        "version": 0
+      }
+      // ... more menu items
+    ]
+    ```
 
 ### Get Single Menu Item
-- **GET** `/api/menu/:id`
-- Returns details of a specific menu item
-- Requires: Authentication (Staff or Customer)
-- Response: 200 OK
-  ```json
-  {
-    "id": "menu_item_id",
-    "name": "Item Name",
-    "description": "Item Description",
-    "price": 10.99,
-    "category": "Category",
-    "imageUrl": "https://example.com/image.jpg",
-    "availability": "available",
-    "version": 0
-  }
-  ```
+-   **GET** `/api/menu/:id`
+-   **Description**: Returns details of a specific menu item
+-   **Requires**: Authentication (Staff or Customer)
+-   **Response**: 200 OK
+    ```json
+    {
+      "id": "menu_item_id",
+      "name": "Item Name",
+      "description": "Item Description",
+      "price": 10.99,
+      "category": "Category",
+      "imageUrl": "https://example.com/image.jpg",
+      "availability": "available",
+      "version": 0
+    }
+    ```
 
-### Create Menu Item
-- **POST** `/api/menu`
-- Creates a new menu item
-- Requires: Authentication (Staff only)
-- Request Body:
-  ```json
-  {
-    "name": "Item Name",
-    "description": "Item Description",
-    "price": 10.99,
-    "category": "Category",
-    "imageUrl": "https://example.com/image.jpg",
-    "availability": "available"
-  }
-  ```
-- Validation:
-  - Name is required
-  - Description is required
-  - Price must be greater than 0
-  - Category is required
-  - Image URL must be a valid URL (optional)
-  - Availability must be either "available" or "out_of_stock" (optional, defaults to "available")
-- Response: 201 Created
+### Create New Menu Item (Staff)
+-   **POST** `/api/menu`
+-   **Description**: Creates a new menu item. Requires staff authentication
+-   **Requires**: Authentication as a staff user
+-   **Request Body**:
+    ```json
+    {
+      "name": "Delicious Burger",
+      "description": "A juicy beef burger with all the fixings.",
+      "price": 12.99,
+      "category": "Main",
+      "imageUrl": "https://example.com/burger.jpg",
+      "availability": "available"
+    }
+    ```
+-   **Validation**:
+    -   `name`: Required, not empty
+    -   `description`: Required, not empty
+    -   `price`: Required, must be a number greater than 0
+    -   `category`: Required, not empty
+    -   `imageUrl`: Optional, must be a valid URL
+    -   `availability`: Optional, must be either `"available"` or `"out_of_stock"`, defaults to `"available"`
+-   **Response**: `201 Created`
+    ```json
+    {
+      "id": "menuItemId",
+      "name": "Delicious Burger",
+      "description": "A juicy beef burger with all the fixings.",
+      "price": 12.99,
+      "category": "Main",
+      "imageUrl": "https://example.com/burger.jpg",
+      "availability": "available",
+      "version": 0
+    }
+    ```
 
 ### Update Menu Item
-- **PUT** `/api/menu/:id`
-- Updates an existing menu item
-- Requires: Authentication (Staff only)
-- Request Body (all fields optional):
-  ```json
-  {
-    "name": "Updated Name",
-    "description": "Updated Description",
-    "price": 12.99,
-    "category": "Updated Category",
-    "imageUrl": "https://example.com/new-image.jpg",
-    "availability": "available"
-  }
-  ```
-- Validation:
-  - Name cannot be empty if provided
-  - Description cannot be empty if provided
-  - Price must be greater than 0 if provided
-  - Category cannot be empty if provided
-  - Image URL must be valid if provided
-  - Availability must be either "available" or "out_of_stock" if provided
-- Response: 200 OK
+-   **PUT** `/api/menu/:id`
+-   **Description**: Updates an existing menu item
+-   **Requires**: Authentication as a staff user.
+-   **Request Body**: (all fields optional):
+    ```json
+    {
+      "name": "Updated Name",
+      "description": "Updated Description",
+      "price": 12.99,
+      "category": "Updated Category",
+      "imageUrl": "https://example.com/new-image.jpg",
+      "availability": "available"
+    }
+    ```
+-   **Validation**:
+    -   Name cannot be empty if provided
+    -   Description cannot be empty if provided
+    -   Price must be greater than 0 if provided
+    -   Category cannot be empty if provided
+    -   Image URL must be valid if provided
+    -   Availability must be either "available" or "out_of_stock" if provided
+-   **Response**: `200 OK`
 
-### Update Menu Item Availability
-- **PATCH** `/api/menu/:id/availability`
-- Updates the availability status of a menu item
-- Requires: Authentication (Staff only)
-- Request Body:
-  ```json
-  {
-    "availability": "available" | "out_of_stock"
-  }
-  ```
-- Response: 200 OK
+### Update Menu Item Price (Staff)
+-   **PATCH** `/api/menu/:id/price`
+-   **Description**: Updates the price of an existing menu item. Requires staff authentication.
+-   **Requires**: Authentication as a staff user.
+-   **Path Parameter**:
+    -   `id`: The ID of the menu item to update.
+-   **Request Body**:
+    ```json
+    {
+      "price": 14.00
+    }
+    ```
+-   **Validation**:
+    -   `price`: Required, must be a positive number.
+-   **Response**: `200 OK`
+    ```json
+    {
+      "id": "menuItemId",
+      "name": "Amazing Burger",
+      "description": "A juicy beef burger with all the fixings.",
+      "price": 14.00,
+      "category": "Main",
+      "imageUrl": "https://example.com/burger.jpg",
+      "availability": "available",
+      "version": 3
+    }
+    ```
+
+### Mark Menu Item as Out of Stock (Staff)
+-   **PUT** `/api/menu/:id/out-of-stock`
+-   **Description**: Marks a specific menu item as "out_of_stock". Requires staff authentication.
+-   **Requires**: Authentication as a staff user.
+-   **Path Parameter**:
+    -   `id`: The ID of the menu item to update.
+-   **Request Body**: None.
+-   **Response**: `200 OK`
+    ```json
+    {
+      "id": "menuItemId",
+      "name": "Delicious Burger",
+      "description": "A juicy beef burger with all the fixings.",
+      "price": 12.99,
+      "category": "Main",
+      "imageUrl": "https://example.com/burger.jpg",
+      "availability": "out_of_stock",
+      "version": 1
+    }
+    ```
 
 ## Error Responses
 
