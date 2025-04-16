@@ -38,8 +38,8 @@ router.post(
       throw new BadRequestError('Email in use');
     }
 
-    const user = userRepository.create({ email, password, name, role });
-    await userRepository.save(user);
+    const user = userModel.create({ email, password, name, role });
+    await userModel.save(user);
 
     // Generate JWT
     const userJwt = jwt.sign(
