@@ -2,9 +2,9 @@ import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import { validateRequest, BadRequestError } from '@smartdine/common';
-
 import { Password } from '../services/password';
 import { User } from '../models/user';
+import { AppDataSource } from '../config/typeorm.config';
 
 const router = express.Router();
 
@@ -23,7 +23,9 @@ router.post(
   async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
-    const existingUser = await User.findOne({ email });
+    const userRepository = AppDataSource.getRepository(User);
+    const existingUser = await userRepository.findOne({ where: { email } });
+    
     if (!existingUser) {
       throw new BadRequestError('Invalid credentials');
     }

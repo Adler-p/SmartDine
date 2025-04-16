@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, BeforeUpdate } from 'typeorm';
 import { Password } from '../services/password';
 
 export enum UserRole {
@@ -6,66 +6,38 @@ export enum UserRole {
   STAFF = 'staff'
 }
 
-interface UserAttrs {
+@Entity('users')
+export class User {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ unique: true })
   email: string;
+
+  @Column()
   password: string;
+
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.CUSTOMER
+  })
   role: UserRole;
+
+  @Column()
   name: string;
-}
 
-interface UserModel extends mongoose.Model<UserDoc> {
-  build(attrs: UserAttrs): UserDoc;
-}
-
-
-interface UserDoc extends mongoose.Document {
-  email: string;
-  password: string;
-  role: UserRole;
-  name: string;
-}
-
-const userSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: true
-  },
-  password: {
-    type: String,
-    required: true
-  },
-  role: {
-    type: String,
-    required: true,
-    enum: Object.values(UserRole)
-  },
-  name: {
-    type: String,
-    required: true
-  }
-}, {
-  toJSON: {
-    transform(doc, ret) {
-      ret.id = ret._id;
-      delete ret._id;
-      delete ret.password;
-      delete ret.__v;
+  @BeforeInsert()
+  @BeforeUpdate()
+  async hashPassword() {
+    if (this.password) {
+      this.password = await Password.toHash(this.password);
     }
   }
-});
 
-userSchema.pre('save', async function(done) {
-  if (this.isModified('password')) {
-    const hashed = await Password.toHash(this.get('password'));
-    this.set('password', hashed);
+  toJSON() {
+    const obj = { ...this };
+    delete obj.password;
+    return obj;
   }
-  done();
-});
-
-userSchema.statics.build = (attrs: UserAttrs) => {
-  return new User(attrs);
-};
-
-const User = mongoose.model<UserDoc, UserModel>('User', userSchema);
-
-export { User };
+}

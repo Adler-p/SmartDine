@@ -5,6 +5,7 @@ import { validateRequest, BadRequestError } from '@smartdine/common';
 import { User, UserRole } from '../models/user';
 import { UserCreatedPublisher } from '../events/publishers/user-created-publisher';
 import { natsWrapper } from '../nats-wrapper';
+import { AppDataSource } from '../config/typeorm.config';
 
 const router = express.Router();
 
@@ -30,14 +31,15 @@ router.post(
   async (req: Request, res: Response) => {
     const { email, password, name, role } = req.body;
 
-    const existingUser = await User.findOne({ email });
+    const userRepository = AppDataSource.getRepository(User);
+    const existingUser = await userRepository.findOne({ where: { email } });
 
     if (existingUser) {
       throw new BadRequestError('Email in use');
     }
 
-    const user = User.build({ email, password, name, role });
-    await user.save();
+    const user = userRepository.create({ email, password, name, role });
+    await userRepository.save(user);
 
     // Generate JWT
     const userJwt = jwt.sign(
