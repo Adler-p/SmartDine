@@ -140,32 +140,6 @@ All endpoints may return the following error responses:
 }
 ```
 
-## Events Published
-
-### PaymentCreated
-```typescript
-{
-  id: string;
-  orderId: string;
-  amount: number;
-  status: string;
-  userId: string;
-  version: number;
-}
-```
-
-### PaymentUpdated
-```typescript
-{
-  id: string;
-  orderId: string;
-  amount: number;
-  status: string;
-  userId: string;
-  version: number;
-}
-```
-
 ## Events Subscribed
 
 ### `order:created`
