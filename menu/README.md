@@ -281,3 +281,39 @@ Run the container:
 ```bash
 docker run -p 3000:3000 smartdine/menu
 ``` 
+
+## Project Structure
+```
+menu/
+├── src/
+│   ├── app.ts                # Express app setup
+│   ├── index.ts              # Service entry point
+│   ├── routes/               # Route handlers
+│   │   ├── get-menu.ts       # Retrieve all menu items route
+│   │   ├── get-menu-item.ts  # Retrieve a single menu item route
+│   │   ├── create-menu.ts    # Create a new menu item route
+│   │   ├── update-menu.ts    # Update menu item details route
+│   │   ├── update-price.ts   # Update menu item price route
+│   │   └── mark-out-of-stock.ts # Mark menu item as out of stock route
+│   ├── events/               # Event listeners and publishers
+│   │   ├── publishers/
+│   │   │   ├── menu-item-created-publisher.ts # Publishes MenuItemCreated events
+│   │   │   └── menu-item-updated-publisher.ts # Publishes MenuItemUpdated events
+│   │   └── listeners/
+│   │       └── some-event-listener.ts         # Example listener (if needed)
+│   ├── models/               # Data models
+│   │   └── menu-item.ts      # MenuItem model
+│   ├── test/                 # Test setup and utilities
+│   │   ├── setup.ts          # Test environment setup
+│   │   └── menu.test.ts      # Unit tests for menu functionality
+│   ├── utils/                # Utility functions
+│   │   └── validate-request.ts # Middleware to validate requests
+│   ├── nats-wrapper.ts       # NATS client wrapper
+│   ├── mongo-client.ts       # MongoDB client setup
+├── package.json              # Dependencies and scripts
+├── tsconfig.json             # TypeScript configuration
+├── Dockerfile                # Docker configuration
+├── .env                      # Environment variables
+├── README.md                 # Documentation for the service
+```
+* * * * *

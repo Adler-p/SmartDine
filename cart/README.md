@@ -159,7 +159,7 @@ The Cart Service is responsible for managing shopping carts for customer session
 
 ### `cart:updated`
 -   **Description**: Published when the contents of a customer's cart are updated (item added, removed, quantity changed, or cart cleared).
--   **Event Listener**: [CartUpdatedPublisher]
+-   **Event Publisher**: [CartUpdatedPublisher]
 -   **Event Data:**
     ```json
     {
@@ -209,15 +209,6 @@ The cart is stored in Redis under the key `session:<sessionId>`.
 }
 ```
 
-## Environment Variables
-
--   `REDIS_HOST`: Redis server hostname
--   `REDIS_PORT`: Redis server port
--   `NATS_URL`: NATS streaming server URL
--   `NATS_CLUSTER_ID`: NATS streaming cluster ID
--   `NATS_CLIENT_ID`: NATS client ID
-
-
 ## Development
 
 1. Install dependencies:
@@ -262,22 +253,19 @@ cart/
 │   ├── index.ts              # Service entry point
 │   ├── routes/               # Route handlers
 │   │   ├── view-cart.ts      # Retrieve cart route
+│   │   ├── clear-cart.ts     # Clear/Empty cart route
 │   │   ├── add-item.ts       # Add item to cart route
 │   │   ├── update-quantity.ts # Update item quantity route
 │   │   └── remove-item.ts    # Remove item from cart route
 │   ├── events/               # Event listeners
 │   │   └── listeners/
 │   │       ├── session-created-listener.ts # Handles SessionCreated events
-│   │       └── item-updated-listener.ts    # Handles ItemUpdated events
+│   │   └── publishers/
+│   │       └── cart-updated-publisher.ts    # Handles CartUpdated events
 │   ├── models/               # Data models
-│   │   └── cart.ts           # Cart model
+│   │   └── cart-item.ts      # Cart model
 │   ├── redis-client.ts       # Redis client setup
 │   ├── nats-wrapper.ts       # NATS client wrapper
-│   ├── test/                 # Test setup and utilities
-│   │   ├── setup.ts          # Test environment setup
-│   │   └── cart.test.ts      # Unit tests for cart functionality
-│   ├── utils/                # Utility functions
-│   │   └── validate-session.ts # Middleware to validate session
 ├── package.json              # Dependencies and scripts
 ├── tsconfig.json             # TypeScript configuration
 ├── Dockerfile                # Docker configuration
