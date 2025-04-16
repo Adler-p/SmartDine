@@ -82,7 +82,7 @@ The Order Service is responsible for managing customer orders within the SmartDi
     }
     ```
 -   **Validation**:
-    -   `orderStatus`: Required, must be one of the valid `OrderStatus` values (e.g., `"created"`, `"preparing"`, `"out_for_delivery"`, `"delivered"`, `"cancelled"`).
+    -   `orderStatus`: Required, must be one of the valid `OrderStatus` values: `"created"`, `"cancelled"`, `"awaiting:preparation"`, `"in:preparation"`, `"ready"`, `"completed"`.
 -   **Response**: `200 OK`
     ```json
     {
@@ -185,14 +185,14 @@ All endpoints may return the following error responses:
 -   **Description**: Published when a new order is successfully created 
 -   **Event Publisher**: [OrderCreatedPublisher]
 -   **Event Data**:
-    ```json
+    ```typescript
     {
       "orderId": "string",
       "version": number,
       "sessionId": "string",
       "tableId": "string",
-      "orderStatus": "created" | "preparing" | "out_for_delivery" | "delivered" | "cancelled",
-      "totalAmount": number,
+      "orderStatus": "created" | "cancelled" | "awaiting:preparation" | "in:preparation" | "ready" | "completed",
+  "totalAmount": number,
       "createdAt": "string (ISO 8601)",
       "items": [
         {
@@ -210,7 +210,7 @@ All endpoints may return the following error responses:
 -   **Description**: Published when an order's status is updated to "cancelled" (either by staff action or the expired order cancellation process)
 -   **Event Publisher**: [OrderCancelledPublisher]
 -   **Event Data**:
-    ```json
+    ```typescript
     {
       "orderId": "string"
     }
@@ -224,7 +224,7 @@ All endpoints may return the following error responses:
     -   If `paymentStatus` is `successful`, the order status is set to `awaiting_preparation`.
 -   **Event Listener**: [PaymentUpdatedListener]
 -   **Event Data**:
-    ```json
+    ```typescript
     {
       "subject": "payment:updated",
       "data": {
