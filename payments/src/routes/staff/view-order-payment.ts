@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import { requireAuth, validateRequest, requireRole, UserRole } from '@smartdine/common';
-import { Payment } from '../models/payment';
+import { Payment } from '../../models/payment';
 import { param } from 'express-validator';
 
 const router = express.Router();
