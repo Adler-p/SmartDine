@@ -182,6 +182,7 @@ All endpoints may return the following error responses:
 
 ### `session:created`
 Published when a new customer session is successfully created. This happens after a customer initiates a session upon scanning the QR code on the table. 
+
 **Payload:**
 ```json
 {
@@ -196,6 +197,7 @@ Published when a new customer session is successfully created. This happens afte
 
 ### `user:created`
 Published when a new user account is successfully created (only for staff). 
+
 **Payload:**
 ```json
 {
