@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import { app } from './app';
 import { natsWrapper } from './nats-wrapper';
 import { checkEnvVariables, gracefulShutdown } from '@smartdine/common';

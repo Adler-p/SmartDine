@@ -28,6 +28,9 @@ router.post(
     const { email, password } = req.body;
 
     const existingUser = await userModel.findOne({ where: { email } });
+    const userRepository = AppDataSource.getRepository(User);
+    const existingUser = await userRepository.findOne({ where: { email } });
+    
     if (!existingUser) {
       throw new BadRequestError('Invalid user');
     }

@@ -3,44 +3,44 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# 先复制所有package.json文件
+# Copy all package.json files first
 COPY package*.json ./
 COPY common/package*.json ./common/
 COPY auth/package*.json ./auth/
 
-# 构建common包
+# Build common package
 WORKDIR /app/common
 COPY common/ ./
 RUN npm install
 RUN npm run build
 
-# 构建auth服务
+# Build auth service
 WORKDIR /app/auth
 COPY auth/ ./
-# 使用npm install会自动解析file:../common路径
+# npm install will automatically resolve file:../common path
 RUN npm install
 RUN npm run build
 
-# 生产环境镜像
+# Production image
 FROM node:18-alpine
 
 WORKDIR /app
 
-# 复制common包
+# Copy common package
 COPY --from=builder /app/common /app/common
 
-# 复制auth服务
+# Copy auth service
 WORKDIR /app/auth
 COPY --from=builder /app/auth/package.json ./
 COPY --from=builder /app/auth/node_modules ./node_modules
 COPY --from=builder /app/auth/dist ./dist
 
-# 创建从auth/node_modules/@smartdine/common到/app/common的符号链接
+# Create symbolic link from auth/node_modules/@smartdine/common to /app/common
 RUN mkdir -p /app/auth/node_modules/@smartdine && \
     ln -sf /app/common /app/auth/node_modules/@smartdine/common
 
-# 设置环境变量
+# Set environment variables
 ENV NODE_ENV=production
 
-# 启动应用
+# Start the application
 CMD ["node", "dist/index.js"]

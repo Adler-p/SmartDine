@@ -9,7 +9,15 @@ export enum UserRole {
 export interface UserAttributes {
   id: string;
   email: string;
+
+  @Column()
   password: string;
+
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.CUSTOMER
+  })
   role: UserRole;
   name: string;
   resetToken?: string | null; 

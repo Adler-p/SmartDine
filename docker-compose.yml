@@ -8,13 +8,17 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - MONGO_URI=mongodb://auth-mongo:27017/auth
+      - POSTGRES_HOST=auth-postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=auth
       - JWT_KEY=your_jwt_key
       - NATS_CLIENT_ID=auth
       - NATS_URL=http://nats-streaming:4222
       - NATS_CLUSTER_ID=smartdine
     depends_on:
-      - auth-mongo
+      - auth-postgres
       - nats-streaming
 
   menu:
@@ -96,14 +100,19 @@ services:
       - orders
       - payments
 
-  # MongoDB instances for each service
-  auth-mongo:
-    image: mongo:latest
+  # PostgreSQL instance for auth service
+  auth-postgres:
+    image: postgres:latest
     ports:
-      - "27017:27017"
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=auth
     volumes:
-      - auth-mongo-data:/data/db
+      - auth-postgres-data:/var/lib/postgresql/data
 
+  # MongoDB instances for other services
   menu-mongo:
     image: mongo:latest
     ports:
@@ -158,7 +167,7 @@ networks:
     name: smartdine-network
 
 volumes:
-  auth-mongo-data:
+  auth-postgres-data:
   menu-mongo-data:
   orders-mongo-data:
   payments-mongo-data: 
