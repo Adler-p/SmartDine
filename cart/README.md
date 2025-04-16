@@ -163,18 +163,18 @@ The Cart Service is responsible for managing shopping carts for customer session
 -   **Event Data:**
     ```json
     {
-        "sessionId": "string",
+        "sessionId": "abc-123-xyz-456",
         "items": [
             {
-            "itemId": "string",
-            "itemName": "string",
-            "unitPrice": number, 
-            "quantity": number
+            "itemId": "product_id",
+            "itemName": "Product Name",
+            "unitPrice": 12.99, 
+            "quantity": 2
             }
             // ... more items
         ],
-        "totalItems": number,
-        "totalPrice": number
+        "totalItems": 5,
+        "totalPrice": 20
     }
     ```
 
