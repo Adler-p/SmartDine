@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './OrderDetailPage.module.css';
 import StaffHeader from '../../components/StaffHeader';
 import StaffSidebar from '../../components/StaffSidebar';
@@ -7,53 +7,62 @@ import StatusUpdateButton from '../../components/StatusUpdateButton';
 
 const OrderDetailPage = () => {
     const router = useRouter();
-    const { id } = router.query; 
+    const { id } = router.query;
+    const [order, setOrder] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    // Hardcoded orders data for now
-    const [orders, setOrders] = useState([
-        {
-            orderId: '001',
-            time: '2025-02-25 11:45',
-            table: 'Table 01',
-            items: [
-                { name: 'Chicken Chop', quantity: 1, payment: 'Paid', status: 'Preparing' },
-                { name: 'Fish Fillet', quantity: 1, payment: 'Paid', status: 'Preparing' },
-                { name: 'Ice Water', quantity: 1, payment: 'Paid', status: 'Preparing' }
-            ]
-        },
-        {
-            orderId: '002',
-            time: '2025-02-25 12:15',
-            table: 'Table 02',
-            items: [
-                { name: 'Steak', quantity: 1, payment: 'Paid', status: 'Preparing' }
-            ]
-        },
-        {
-            orderId: '003',
-            time: '2025-02-25 12:30',
-            table: 'Table 03',
-            items: []
-        }
-    ]);
+    useEffect(() => {
+        const fetchOrderDetails = async () => {
+            if (!id) return;
 
-    // Find the order matching the id from the URL
-    const order = orders.find(order => order.orderId === id);
-
-    // Function to handle status change for each item
-    const handleStatusChange = (orderId, itemIndex, newStatus) => {
-        // Update the status of the item based on index
-        setOrders(prevOrders => {
-            return prevOrders.map(order => {
-                if (order.orderId === orderId) {
-                    const updatedOrder = { ...order };
-                    updatedOrder.items[itemIndex].status = newStatus;
-                    return updatedOrder;
+            try {
+                const response = await fetch(`/api/staff/orders/${id}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch order details');
                 }
-                return order;
+                const data = await response.json();
+                setOrder(data);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchOrderDetails();
+    }, [id]);
+
+    const handleStatusChange = async (orderId, newStatus) => {
+        try {
+            const response = await fetch(`/api/staff/orders/${orderId}/status`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    orderStatus: newStatus,  // Send the updated status here
+                }),
             });
-        });
+
+            if (!response.ok) {
+                throw new Error('Failed to update order status');
+            }
+
+            const updatedOrder = await response.json();
+            setOrder(updatedOrder);  // Update local state with the new order data
+        } catch (err) {
+            setError(err.message);
+        }
     };
+
+    if (loading) {
+        return <p>Loading...</p>;
+    }
+
+    if (error) {
+        return <p>Error: {error}</p>;
+    }
 
     return (
         <div className={styles.container}>
@@ -65,8 +74,8 @@ const OrderDetailPage = () => {
                     {order ? (
                         <>
                             <h3>Order ID: {order.orderId}</h3>
-                            <p>Time Ordered: {order.time}</p>
-                            <p>Table: {order.table}</p>
+                            <p>Time Ordered: {order.createdAt}</p>
+                            <p>Table: {order.tableId}</p>
 
                             <table className={styles.table}>
                                 <thead>
@@ -75,21 +84,22 @@ const OrderDetailPage = () => {
                                         <th>Quantity</th>
                                         <th>Payment</th>
                                         <th>Status</th>
-                                        <th>Update Status</th> 
+                                        <th>Update Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {order.items.map((item, index) => (
+                                    {order.orderItems.map((item, index) => (
                                         <tr key={index}>
-                                            <td>{item.name}</td>
+                                            <td>{item.itemName}</td>
                                             <td>{item.quantity}</td>
-                                            <td>{item.payment}</td>
+                                            <td>{item.paymentStatus}</td>
                                             <td>{item.status}</td>
                                             <td>
-                                                {/* Include StatusUpdateButton component for each item */}
                                                 <StatusUpdateButton
                                                     status={item.status}
-                                                    onStatusChange={(newStatus) => handleStatusChange(order.orderId, index, newStatus)}
+                                                    onStatusChange={(newStatus) =>
+                                                        handleStatusChange(order.orderId, newStatus)  // Pass updated status
+                                                    }
                                                 />
                                             </td>
                                         </tr>
