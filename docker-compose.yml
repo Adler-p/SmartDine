@@ -17,9 +17,12 @@ services:
       - NATS_CLIENT_ID=auth
       - NATS_URL=http://nats-streaming:4222
       - NATS_CLUSTER_ID=smartdine
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     depends_on:
       - auth-postgres
       - nats-streaming
+      - redis
 
   menu:
     build:
@@ -60,13 +63,16 @@ services:
     ports:
       - "3002:3000"
     environment:
-      - MONGO_URI=mongodb://orders-mongo:27017/orders
+      - SQL_URI=postgres://postgres:postgres@orders-postgres:5432/orders
       - JWT_KEY=your_jwt_key
       - NATS_CLIENT_ID=orders-${HOSTNAME}
       - NATS_URL=http://nats-streaming:4222
       - NATS_CLUSTER_ID=smartdine
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     depends_on:
-      - orders-mongo
+      - orders-postgres
+      - redis
       - nats-streaming
 
   payments:
@@ -76,14 +82,17 @@ services:
     ports:
       - "3003:3000"
     environment:
-      - MONGO_URI=mongodb://payments-mongo:27017/payments
+      - SQL_URI=postgres://postgres:postgres@payments-postgres:5432/payments
       - JWT_KEY=your_jwt_key
       - STRIPE_KEY=your_stripe_key
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
       - NATS_CLIENT_ID=payments-${HOSTNAME}
       - NATS_URL=http://nats-streaming:4222
       - NATS_CLUSTER_ID=smartdine
     depends_on:
-      - payments-mongo
+      - payments-postgres
+      - redis
       - nats-streaming
 
   client:
@@ -112,6 +121,30 @@ services:
     volumes:
       - auth-postgres-data:/var/lib/postgresql/data
 
+  # PostgreSQL instance for payments service
+  payments-postgres:
+    image: postgres:latest
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=payments
+    volumes:
+      - payments-postgres-data:/var/lib/postgresql/data
+
+  # PostgreSQL instance for orders service
+  orders-postgres:
+    image: postgres:latest
+    ports:
+      - "5434:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=orders
+    volumes:
+      - orders-postgres-data:/var/lib/postgresql/data
+
   # MongoDB instances for other services
   menu-mongo:
     image: mongo:latest
@@ -119,20 +152,6 @@ services:
       - "27018:27017"
     volumes:
       - menu-mongo-data:/data/db
-
-  orders-mongo:
-    image: mongo:latest
-    ports:
-      - "27019:27017"
-    volumes:
-      - orders-mongo-data:/data/db
-
-  payments-mongo:
-    image: mongo:latest
-    ports:
-      - "27020:27017"
-    volumes:
-      - payments-mongo-data:/data/db
 
   # NATS Streaming server
   nats-streaming:
@@ -168,6 +187,6 @@ networks:
 
 volumes:
   auth-postgres-data:
-  menu-mongo-data:
-  orders-mongo-data:
-  payments-mongo-data: 
+  payments-postgres-data:
+  orders-postgres-data:
+  menu-mongo-data: 

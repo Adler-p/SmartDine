@@ -34,14 +34,7 @@ export class Order extends Model<OrderAttributes, OrderCreationAttributes> imple
   public readonly version!: number; 
 
   // This will be populated when you call `getOrderItems()` on an Order instance
-  public readonly orderItems?: OrderItem[]; 
-  public static associate(models: any) {
-    // Define association with OrderItem model
-    Order.hasMany(models.OrderItem, {
-      foreignKey: 'orderId',
-      as: 'orderItems'
-    });
-  }
+  public readonly orderItems?: any[];
 }
 
 // Initialise the Order model
@@ -74,9 +67,10 @@ export const initOrderModel = (sequelize: Sequelize) => {
     tableName: 'orders',
     timestamps: true, // Automatically adds createdAt and updatedAt
     version: true, // Enables optimistic concurrency control
-  })
-}
+  });
 
+  return Order;
+}
 
 // Add optimistic concurrency control
 // orderSchema.set('versionKey', 'version');

@@ -9,24 +9,14 @@ export enum UserRole {
 export interface UserAttributes {
   id: string;
   email: string;
-
-  @Column()
   password: string;
-
-  @Column({
-    type: 'enum',
-    enum: UserRole,
-    default: UserRole.CUSTOMER
-  })
   role: UserRole;
   name: string;
-  resetToken?: string | null; 
-  resetTokenExpiry?: Date | null; 
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-interface UserCreationAttributes extends Omit<UserAttributes, 'id' | 'createdAt' | 'updatedAt' | 'resetToken' | 'resetTokenExpiry'> {}
+interface UserCreationAttributes extends Omit<UserAttributes, 'id' | 'createdAt' | 'updatedAt'> {}
 
 export class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
   public id!: string;
@@ -34,8 +24,6 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
   public password!: string;
   public role!: UserRole;
   public name!: string;
-  public resetToken!: string | null;
-  public resetTokenExpiry!: Date | null;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
@@ -71,14 +59,6 @@ export const initUserModel = (sequelize: Sequelize) => {
       type: DataTypes.STRING,
       allowNull: false
     }, 
-    resetToken: {
-      type: DataTypes.STRING,
-      allowNull: true
-    },
-    resetTokenExpiry: {
-      type: DataTypes.DATE,
-      allowNull: true
-    },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE
   }, {

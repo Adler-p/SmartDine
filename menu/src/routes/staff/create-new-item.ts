@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
-import { requireAuth, validateRequest, requireRole, UserRole } from '@smartdine/common';
+import { requireAuth, validateRequest, requireRole, UserRole, BadRequestError } from '@smartdine/common';
 import { MenuItem } from '../../models/menu-item';
 import { MenuItemCreatedPublisher } from '../../events/publishers/menu-item-created-publisher';
 import { natsWrapper } from '../../nats-wrapper';
@@ -39,32 +39,84 @@ router.post(
   ],
   validateRequest,
   async (req: Request, res: Response) => {
-    const { name, description, price, category, imageUrl, availability } = req.body;
+    console.log('=====> CREATE MENU ITEM - Request received:', req.body);
+    
+    try {
+      const { name, description, price, category, imageUrl, availability } = req.body;
 
-    // Create menu item
-    const menuItem = MenuItem.build({
-      name,
-      description,
-      price,
-      category,
-      imageUrl,
-      availability: availability || 'available'
-    });
-    await menuItem.save();
+      if (!name || !description || !price || !category) {
+        console.error('=====> Missing required fields in request');
+        throw new BadRequestError('Missing required fields');
+      }
 
-    // Publish event with all relevant data
-    await new MenuItemCreatedPublisher(natsWrapper.client).publish({
-      id: menuItem.id,
-      name: menuItem.name,
-      description: menuItem.description,
-      price: menuItem.price,
-      category: menuItem.category,
-      imageUrl: menuItem.imageUrl,
-      availability: menuItem.availability,
-      version: menuItem.version
-    });
+      console.log('=====> Building menu item object');
+      // Create menu item
+      const menuItem = MenuItem.build({
+        name,
+        description,
+        price,
+        category,
+        imageUrl,
+        availability: availability || 'available'
+      });
+      
+      console.log('=====> Saving menu item to database');
+      try {
+        await menuItem.save();
+        console.log('=====> Menu item saved with ID:', menuItem.id);
+      } catch (dbError) {
+        console.error('=====> Database error saving menu item:', dbError);
+        throw new Error(`Failed to save menu item: ${dbError.message}`);
+      }
 
-    res.status(201).send(menuItem);
+      // Publish event with all relevant data
+      console.log('=====> About to publish menu item created event');
+      try {
+        // 设置超时，避免永久阻塞
+        console.log('=====> Setting up publish promise with timeout');
+        const publishPromise = new MenuItemCreatedPublisher(natsWrapper.client).publish({
+          id: menuItem.id,
+          name: menuItem.name,
+          description: menuItem.description,
+          price: menuItem.price,
+          category: menuItem.category,
+          imageUrl: menuItem.imageUrl,
+          availability: menuItem.availability,
+          version: menuItem.version
+        });
+        
+        console.log('=====> Setting up timeout promise (2000ms)');
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => {
+            console.log('=====> Event publish timeout reached');
+            reject(new Error('Event publish timeout'));
+          }, 2000);
+        });
+        
+        console.log('=====> Awaiting Promise.race for publish');
+        await Promise.race([publishPromise, timeoutPromise])
+          .then(() => {
+            console.log('=====> Event published successfully or timed out');
+          })
+          .catch(error => {
+            console.warn('=====> Event publishing error or timeout:', error.message);
+            // 继续执行，不阻塞响应
+          });
+        console.log('=====> After publish promise resolution');
+      } catch (publishError) {
+        console.error('=====> Error preparing to publish event:', publishError);
+        // 继续执行，不阻塞响应
+      }
+
+      console.log('=====> CRITICAL: Preparing to send response');
+      console.log('=====> Response data:', JSON.stringify(menuItem));
+      res.status(201).send(menuItem);
+      console.log('=====> CRITICAL: Response sent!');
+      return;
+    } catch (error) {
+      console.error('=====> Error creating menu item:', error);
+      throw error;
+    }
   }
 );
 

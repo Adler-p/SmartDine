@@ -18,7 +18,7 @@
     ]
   },
   "dependencies": {
-    "@smartdine/common": "link:../common",
+    "@smartdine/common": "file:../common",
     "@types/cookie-session": "^2.0.44",
     "@types/express": "^4.17.13",
     "@types/jsonwebtoken": "^8.5.8",

@@ -3,7 +3,7 @@ import 'express-async-errors';
 import { json } from 'body-parser';
 import cookieSession from 'cookie-session';
 import { errorHandler, NotFoundError, currentUser } from '@smartdine/common';
-import { createOrderRouter } from './routes/customer/newOrder';
+import { createOrderRouter } from './routes/customer/new-order';
 import { showOrderRouter } from './routes/customer/view-order';
 import { staffViewOrderRouter } from './routes/staff/view-order';
 import { staffViewAllOrdersRouter } from './routes/staff/view-all-orders';

@@ -3,16 +3,4 @@ export enum UserRole {
   STAFF = 'staff'
 }
 
-
-//expand express request interface to include current user
-declare global {
-  namespace Express {
-    interface Request {
-      currentUser?: {
-        id: string;
-        email: string;
-        role: UserRole;
-      };
-    }
-  }
-} 
+// 移除重复的声明，因为已经在current-user.ts中定义了
