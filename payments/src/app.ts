@@ -3,10 +3,11 @@ import 'express-async-errors';
 import { json } from 'body-parser';
 import cookieSession from 'cookie-session';
 import { errorHandler, NotFoundError, currentUser } from '@smartdine/common';
-import { createPaymentRouter } from './routes/new';
-import { showPaymentRouter } from './routes/show';
-import { indexPaymentRouter } from './routes/index';
-import { updatePaymentStatusRouter } from './routes/update-status';
+import { customerUpdatePaymentStatusRouter } from './routes/customer/customer-update-payment-status';
+import { listAllPaymentsRouter } from './routes/staff/list-all-payments';
+import { viewOrderPaymentRouter } from './routes/staff/view-order-payment';
+import { staffUpdatePaymentStatusRouter } from './routes/staff/staff-update-payment-status';
+import { redis } from './redis-client';
 
 const app: express.Application = express();
 app.set('trust proxy', true);
@@ -17,12 +18,15 @@ app.use(
     secure: false,
   })
 );
-app.use(currentUser);
+app.use(currentUser(redis));
 
-app.use(createPaymentRouter);
-app.use(showPaymentRouter);
-app.use(indexPaymentRouter);
-app.use(updatePaymentStatusRouter);
+// Customer endpoints
+app.use(customerUpdatePaymentStatusRouter); 
+
+// Staff endpoints
+app.use(listAllPaymentsRouter); 
+app.use(viewOrderPaymentRouter); 
+app.use(staffUpdatePaymentStatusRouter);  // Manual payment at counter
 
 app.all('*', async (req, res) => {
   throw new NotFoundError();

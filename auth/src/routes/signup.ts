@@ -2,11 +2,13 @@ import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import { validateRequest, BadRequestError } from '@smartdine/common';
-import { User, UserRole } from '../models/user';
+import { User, UserRole, initUserModel } from '../models/user';
 import { UserCreatedPublisher } from '../events/publishers/user-created-publisher';
 import { natsWrapper } from '../nats-wrapper';
+import { sequelize } from '../sequelize';
 
-const router = express.Router();
+const router: express.Router = express.Router();
+const userModel = initUserModel(sequelize);
 
 router.post(
   '/api/users/signup',
@@ -30,14 +32,14 @@ router.post(
   async (req: Request, res: Response) => {
     const { email, password, name, role } = req.body;
 
-    const existingUser = await User.findOne({ email });
+    const existingUser = await userModel.findOne({ where: { email } });
 
     if (existingUser) {
       throw new BadRequestError('Email in use');
     }
 
-    const user = User.build({ email, password, name, role });
-    await user.save();
+    const user = userModel.create({ email, password, name, role });
+    await userModel.save(user);
 
     // Generate JWT
     const userJwt = jwt.sign(

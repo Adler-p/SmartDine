@@ -1,15 +1,15 @@
 import { Subjects } from './subjects';
-import { OrderStatus } from './types/order-status';
+import { PaymentStatus } from './types/payment-status';
 
 export interface PaymentCreatedEvent {
   subject: Subjects.PaymentCreated;
   type: Subjects.PaymentCreated;
   data: {
-    id: string;
+    paymentId: string;
     orderId: string;
     amount: number;
-    status: string;
-    userId: string;
+    paymentStatus: PaymentStatus;
+    sessionId: string;
     version: number;
   };
 }

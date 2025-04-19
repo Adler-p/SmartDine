@@ -1,8 +1,14 @@
-import mongoose from 'mongoose';
+// import mongoose from 'mongoose';
 import { app } from './app';
 import { natsWrapper } from './nats-wrapper';
 import { ExpirationCompleteListener } from './events/listeners/expiration-complete-listener';
 import { PaymentCreatedListener } from './events/listeners/payment-created-listener';
+import { sequelize } from './sequelize';
+import { checkAndCancelExpiredOrders } from './services/check-expired-orders';
+
+import dotenv from 'dotenv';
+import { PaymentUpdatedListener } from './events/listeners/payment-updated-listener';
+dotenv.config();
 
 const start = async () => {
   if (!process.env.JWT_KEY) {
@@ -37,8 +43,21 @@ const start = async () => {
     new ExpirationCompleteListener(natsWrapper.client).listen();
     new PaymentCreatedListener(natsWrapper.client).listen();
 
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log('Connected to MongoDB');
+    // await mongoose.connect(process.env.MONGO_URI);
+    // console.log('Connected to MongoDB');
+
+    // Connect to the database
+    await sequelize.authenticate();
+    console.log('Connected to SQL database');
+
+    // Sync models with the database
+    await sequelize.sync().then(() => {
+      setInterval(checkAndCancelExpiredOrders, 60 * 1000);
+    });;
+
+    // Start listening for events
+    new PaymentUpdatedListener(natsWrapper.client).listen();
+
   } catch (err) {
     console.error(err);
   }

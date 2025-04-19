@@ -1,5 +1,6 @@
 import { UserRole } from '../types/user-role';
 
+// Only applicable for restaurant staff 
 export enum AuthEventType {
   UserCreated = 'user:created',
   UserUpdated = 'user:updated',

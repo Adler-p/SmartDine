@@ -5,15 +5,17 @@ export interface OrderCreatedEvent {
   type: Subjects.OrderCreated;
   subject: Subjects.OrderCreated;
   data: {
-    id: string;
+    orderId: string;
+    sessionId: string;
+    tableId: string;
     version: number;
-    status: OrderStatus;
-    userId: string;
-    expiresAt: string;
+    orderStatus: OrderStatus;
+    totalAmount: number;
+    createdAt: string;
     items: {
-      menuItemId: string;
-      name?: string;
-      price?: number;
+      itemId: string;
+      itemName?: string;
+      unitPrice?: number;
       quantity?: number;
     }[];
   };

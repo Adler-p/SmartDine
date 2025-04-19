@@ -4,13 +4,13 @@ export interface OrderCancelledEvent {
   type: Subjects.OrderCancelled;
   subject: Subjects.OrderCancelled;
   data: {
-    id: string;
-    version: number;
-    items: {
-      menuItemId: string;
-      name?: string;
-      price?: number;
-      quantity?: number;
-    }[];
+    orderId: string;
+    // version: number;
+    // items: {
+    //   itemId: string;
+    //   itemName?: string;
+    //   unitPrice?: number;
+    //   quantity?: number;
+    // }[];
   };
 }

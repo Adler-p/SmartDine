@@ -1,40 +1,29 @@
 import { Message } from 'node-nats-streaming';
-import { Subjects, Listener, OrderCreatedEvent } from '@smartdine/common';
+import { Subjects, Listener, OrderCreatedEvent, PaymentStatus } from '@smartdine/common';
 import { queueGroupName } from './queue-group-name';
-import { Order } from '../../models/order';
+import { Payment } from '../../models/payment';
 
 export class OrderCreatedListener extends Listener<OrderCreatedEvent> {
   readonly subject = Subjects.OrderCreated;
   queueGroupName = queueGroupName;
 
   async onMessage(data: OrderCreatedEvent['data'], msg: Message) {
-    try {
-      // Check if order exists
-      const existingOrder = await Order.findById(data.id);
-      
-      if (existingOrder) {
-        console.log(`Order ${data.id} already exists, skipping creation`);
-        msg.ack();
-        return;
-      }
-      
-      // Calculate total from items
-      const totalAmount = data.items.reduce((acc, item) => {
-        return acc + (item.price || 0) * (item.quantity || 1);
-      }, 0);
+    const { orderId, totalAmount, sessionId } = data;
 
-      const order = Order.build({
-        id: data.id,
-        version: data.version,
-        userId: data.userId,
-        status: data.status,
-        amount: totalAmount,
-      });
-      await order.save();
+    try {
+      
+      await Payment.create({
+        orderId, 
+        amount : totalAmount,
+        paymentStatus: PaymentStatus.PENDING, 
+        sessionId
+      })
 
       msg.ack();
+      console.log(`Payment record created for ${orderId}:`); 
+
     } catch (err) {
-      console.error('Error processing order created event:', err);
+      console.error('Error creating payment record:', err);
       // Acknowledge to avoid infinite reprocessing
       msg.ack();
     }

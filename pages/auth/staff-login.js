@@ -5,12 +5,33 @@ import styles from './StaffLogin.module.css';
 
 export default function StaffLogin() {
     const router = useRouter();
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
 
-    const handleLogin = () => {
-        // Just redirecting for now
-        router.push('/staff');
+    const handleLogin = async () => {
+        try {
+            const response = await fetch('/api/users/signin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+                credentials: 'include', // include cookies
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Login success:', data);
+                router.push('/staff');
+            } else {
+                const errorData = await response.json();
+                setError(errorData.errors?.[0]?.message || 'Login failed');
+            }
+        } catch (err) {
+            console.error(err);
+            setError('Something went wrong. Try again.');
+        }
     };
 
     return (
@@ -19,12 +40,14 @@ export default function StaffLogin() {
                 <h1 className={styles.headerTitle}>SmartDine</h1>
 
                 <div className={styles.loginContainer}>
+                    {error && <div className={styles.errorText}>{error}</div>}
+
                     <div className={styles.inputBox}>
-                        <label>Username:</label>
+                        <label>Email:</label>
                         <input
                             type="text"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             className={styles.inputField}
                         />
                     </div>
