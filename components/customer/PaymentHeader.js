@@ -16,14 +16,14 @@ const PaymentHeader = () => {
     return (
         <header className={styles.header}>
             <div className={styles.leftButtons}>
-                <Link href="/customer/cart-detail">
+                <Link href="/menu/cart-detail">
                     <a>
                         <button className={styles.button}>Cart</button>
                     </a>
                 </Link>
             </div>
             <div className={styles.title}>
-                <Link href="/customer">
+                <Link href="/menu">
                     <a><span>SmartDine</span></a>
                 </Link>
             </div>
