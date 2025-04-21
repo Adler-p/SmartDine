@@ -1,6 +1,7 @@
 export declare enum Subjects {
     SessionCreated = "session:created",
     CartUpdated = "cart:updated",
+    CartFinalised = "cart:finalised",
     OrderCreated = "order:created",
     OrderCancelled = "order:cancelled",
     ExpirationComplete = "expiration:complete",

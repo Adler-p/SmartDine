@@ -7,6 +7,7 @@ import { sequelize } from './sequelize';
 import { checkAndCancelExpiredOrders } from './services/check-expired-orders';
 import { PaymentUpdatedListener } from './events/listeners/payment-updated-listener';
 import dotenv from 'dotenv';
+import { CartFinalisedListener } from './events/listeners/cart-finalised-listener';
 
 dotenv.config();
 
@@ -54,6 +55,7 @@ const start = async () => {
     new ExpirationCompleteListener(natsWrapper.client).listen();
     new PaymentCreatedListener(natsWrapper.client).listen();
     new PaymentUpdatedListener(natsWrapper.client).listen();
+    new CartFinalisedListener(natsWrapper.client).listen();
 
     // 设置定时检查过期订单的任务
     setInterval(checkAndCancelExpiredOrders, 60 * 1000);

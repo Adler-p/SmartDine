@@ -5,6 +5,7 @@ var Subjects;
 (function (Subjects) {
     Subjects["SessionCreated"] = "session:created";
     Subjects["CartUpdated"] = "cart:updated";
+    Subjects["CartFinalised"] = "cart:finalised";
     Subjects["OrderCreated"] = "order:created";
     Subjects["OrderCancelled"] = "order:cancelled";
     Subjects["ExpirationComplete"] = "expiration:complete";
