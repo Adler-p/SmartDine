@@ -40,21 +40,21 @@ services:
       - menu-mongo
       - nats-streaming
 
-  cart:
-    build:
-      context: .
-      dockerfile: cart/Dockerfile
-    ports:
-      - "3004:3000"
-    environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - NATS_CLIENT_ID=cart-${HOSTNAME}
-      - NATS_URL=http://nats-streaming:4222
-      - NATS_CLUSTER_ID=smartdine
-    depends_on:
-      - redis
-      - nats-streaming
+  # cart:
+  #   build:
+  #     context: .
+  #     dockerfile: cart/Dockerfile
+  #   ports:
+  #     - "3004:3000"
+  #   environment:
+  #     - REDIS_HOST=redis
+  #     - REDIS_PORT=6379
+  #     - NATS_CLIENT_ID=cart-${HOSTNAME}
+  #     - NATS_URL=http://nats-streaming:4222
+  #     - NATS_CLUSTER_ID=smartdine
+  #   depends_on:
+  #     - redis
+  #     - nats-streaming
 
   orders:
     build:
@@ -95,19 +95,19 @@ services:
       - redis
       - nats-streaming
 
-  client:
-    build:
-      context: ./client
-      dockerfile: Dockerfile
-    ports:
-      - "3050:3000"
-    environment:
-      - NEXT_PUBLIC_API_URL=http://localhost
-    depends_on:
-      - auth
-      - menu
-      - orders
-      - payments
+  # client:
+  #   build:
+  #     context: ./client
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3050:3000"
+  #   environment:
+  #     - NEXT_PUBLIC_API_URL=http://localhost
+  #   depends_on:
+  #     - auth
+  #     - menu
+  #     - orders
+  #     - payments
 
   # PostgreSQL instance for auth service
   auth-postgres:
