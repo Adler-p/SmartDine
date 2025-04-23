@@ -44,6 +44,7 @@ __exportStar(require("./events/payment-success-event"), exports);
 __exportStar(require("./events/menu-item-created-event"), exports);
 __exportStar(require("./events/menu-item-updated-event"), exports);
 __exportStar(require("./events/cart-updated-event"), exports);
+__exportStar(require("./events/cart-finalised-event"), exports);
 __exportStar(require("./events/session-created-event"), exports);
 __exportStar(require("./utility/check-env"), exports);
 __exportStar(require("./utility/graceful-shutdown"), exports);

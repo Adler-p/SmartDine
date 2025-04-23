@@ -1,5 +1,6 @@
 import express, { Request, Response, Router } from 'express';
-import { currentUser } from '@smartdine/common';
+// 直接require，避免类型冲突
+const { currentUser } = require('@smartdine/common');
 import { redis } from '../redis-client';
 
 const router: Router = express.Router();

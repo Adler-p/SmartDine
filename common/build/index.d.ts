@@ -28,6 +28,7 @@ export * from './events/payment-success-event';
 export * from './events/menu-item-created-event';
 export * from './events/menu-item-updated-event';
 export * from './events/cart-updated-event';
+export * from './events/cart-finalised-event';
 export * from './events/session-created-event';
 export * from './utility/check-env';
 export * from './utility/graceful-shutdown';

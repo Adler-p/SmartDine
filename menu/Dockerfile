@@ -19,28 +19,14 @@ WORKDIR /app/menu
 COPY menu/ ./
 # 使用npm install会自动解析file:../common路径
 RUN npm install
+# 添加构建步骤
 RUN npm run build
 
-# 生产环境镜像
-FROM node:18-alpine
-
+# 生产环境镜像 - 使用同一个镜像，不再分阶段
 WORKDIR /app
-
-# 复制common包
-COPY --from=builder /app/common /app/common
-
-# 复制menu服务
-WORKDIR /app/menu
-COPY --from=builder /app/menu/package.json ./
-COPY --from=builder /app/menu/node_modules ./node_modules
-COPY --from=builder /app/menu/dist ./dist
-
-# 创建从menu/node_modules/@smartdine/common到/app/common的符号链接
-RUN mkdir -p /app/menu/node_modules/@smartdine && \
-    ln -sf /app/common /app/menu/node_modules/@smartdine/common
 
 # 设置环境变量
 ENV NODE_ENV=production
 
-# 启动应用
-CMD ["node", "dist/index.js"] 
+# 启动应用 - 使用node运行编译后的JavaScript
+CMD ["node", "/app/menu/dist/index.js"] 

@@ -1,8 +1,7 @@
 import { natsWrapper } from '../class/nats-wrapper';
-import mongoose from 'mongoose';
 
 // Graceful shutdown handler
-export const gracefulShutdown = async () => {
+export const gracefulShutdown = async (dbConnection?: any) => {
     console.log('Received shutdown signal. Starting graceful shutdown...');
     
     try {
@@ -12,9 +11,15 @@ export const gracefulShutdown = async () => {
       });
       natsWrapper.client.close();
   
-      // Close MongoDB connection
-      await mongoose.connection.close();
-      console.log('MongoDB connection closed');
+      // Close database connection if provided
+      if (dbConnection) {
+        if (typeof dbConnection.close === 'function') {
+          await dbConnection.close();
+        } else if (typeof dbConnection.connection?.close === 'function') {
+          await dbConnection.connection.close();
+        }
+        console.log('Database connection closed');
+      }
   
       // Exit process
       process.exit(0);
