@@ -1,7 +1,10 @@
 packages:
-  - 'common'
-  - 'auth'
-  - 'orders'
-  - 'menu'
-  - 'payments'
-  - 'client' 
+  - common
+  - auth
+  - orders
+  - menu
+  - payments
+  - client
+onlyBuiltDependencies:
+  - core-js
+  - mongodb-memory-server

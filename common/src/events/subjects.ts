@@ -1,5 +1,7 @@
 export enum Subjects {
+  SessionCreated = 'session:created',
 
+  CartUpdated = 'cart:updated',
 
   OrderCreated = 'order:created',
   OrderCancelled = 'order:cancelled',
@@ -8,6 +10,8 @@ export enum Subjects {
 
   PaymentCreated = 'payment:created',
   PaymentUpdated = 'payment:updated',
+  PaymentFailed = 'payment:failed',
+  PaymentSuccess = 'payment:success',
   
   MenuItemCreated = 'menu:item:created',
   MenuItemUpdated = 'menu:item:updated',

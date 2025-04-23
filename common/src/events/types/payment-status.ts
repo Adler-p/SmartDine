@@ -1,7 +1,10 @@
 export enum PaymentStatus {
-  Created = 'created',
-  Pending = 'pending',
-  Completed = 'completed',
-  Failed = 'failed',
-  Refunded = 'refunded'
+  // CREATED = 'created',
+  // PENDING = 'pending',
+  // COMPLETED = 'completed',
+  // FAILED = 'failed',
+  // REFUNDED = 'refunded'
+  PENDING = 'pending',
+  SUCCESSFUL = 'successful',
+  FAILED = 'failed'
 } 

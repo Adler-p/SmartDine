@@ -1,43 +1,40 @@
 // pages/staff/past-orders.js
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './PastOrdersPage.module.css';
 import StaffHeader from '../../components/StaffHeader';
 import StaffSidebar from '../../components/StaffSidebar';
+import axios from 'axios';
 
 const PastOrdersPage = () => {
-    // Hardcoded past orders data
-    const pastOrders = [
-        {
-            orderId: '004',
-            table: 'Table 01',
-            timeOrdered: '2025-02-25 11:45',
-            timeCompleted: '2025-02-25 12:30',
-            items: [
-                { name: 'Steak', quantity: 1, payment: 'Paid', status: 'Completed' },
-                { name: 'Fish Fillet', quantity: 1, payment: 'Paid', status: 'Completed' },
-                { name: 'Ice Water', quantity: 1, payment: 'Paid', status: 'Completed' }
-            ]
-        },
-        {
-            orderId: '005',
-            table: 'Table 02',
-            timeOrdered: '2025-02-25 12:15',
-            timeCompleted: '2025-02-25 12:45',
-            items: [
-                { name: 'Steak', quantity: 2, payment: 'Paid', status: 'Completed' },
-                { name: 'Chicken Chop', quantity: 1, payment: 'Paid', status: 'Completed' }
-            ]
-        },
-        {
-            orderId: '006',
-            table: 'Table 03',
-            timeOrdered: '2025-02-25 12:30',
-            timeCompleted: '2025-02-25 13:00',
-            items: [
-                { name: 'Burger', quantity: 2, payment: 'Paid', status: 'Completed' }
-            ]
-        }
-    ];
+    const [pastOrders, setPastOrders] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        // Fetching past orders from the backend
+        const fetchPastOrders = async () => {
+            try {
+                const response = await axios.get('/api/staff/orders', {
+                    params: { orderStatus: 'completed' }, // Fetching orders with status 'completed'
+                });
+                setPastOrders(response.data);
+            } catch (err) {
+                setError('Failed to fetch past orders.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPastOrders();
+    }, []);
+
+    if (loading) {
+        return <div>Loading past orders...</div>;
+    }
+
+    if (error) {
+        return <div>{error}</div>;
+    }
 
     return (
         <div className={styles.container}>
@@ -46,35 +43,39 @@ const PastOrdersPage = () => {
                 <StaffSidebar />
                 <div className={styles.main}>
                     <h2 className={styles.title}>Past Orders</h2>
-                    {pastOrders.map((order) => (
-                        <div key={order.orderId} className={styles.orderBlock}>
-                            <h3>Order ID: {order.orderId}</h3>
-                            <p>Table: {order.table}</p>
-                            <p>Time Ordered: {order.timeOrdered}</p>
-                            <p>Time Completed: {order.timeCompleted}</p>
+                    {pastOrders.length === 0 ? (
+                        <p>No past orders found.</p>
+                    ) : (
+                        pastOrders.map((order) => (
+                            <div key={order.orderId} className={styles.orderBlock}>
+                                <h3>Order ID: {order.orderId}</h3>
+                                <p>Table: {order.tableId}</p>
+                                <p>Time Ordered: {new Date(order.createdAt).toLocaleString()}</p>
+                                <p>Time Completed: {new Date(order.completedAt).toLocaleString()}</p>
 
-                            <table className={styles.table}>
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Quantity</th>
-                                        <th>Payment</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {order.items.map((item, index) => (
-                                        <tr key={index}>
-                                            <td>{item.name}</td>
-                                            <td>{item.quantity}</td>
-                                            <td>{item.payment}</td>
-                                            <td>{item.status}</td>
+                                <table className={styles.table}>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Quantity</th>
+                                            <th>Payment</th>
+                                            <th>Status</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    ))}
+                                    </thead>
+                                    <tbody>
+                                        {order.orderItems.map((item, index) => (
+                                            <tr key={index}>
+                                                <td>{item.itemName}</td>
+                                                <td>{item.quantity}</td>
+                                                <td>{item.paymentStatus}</td>
+                                                <td>{item.status}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ))
+                    )}
                 </div>
             </div>
         </div>

@@ -3,12 +3,12 @@ import 'express-async-errors';
 import { json } from 'body-parser';
 import cookieSession from 'cookie-session';
 import { errorHandler, NotFoundError, currentUser } from '@smartdine/common';
-import { deleteOrderRouter } from './routes/delete';
-import { indexOrderRouter } from './routes/index';
-import { createOrderRouter } from './routes/new';
-import { showOrderRouter } from './routes/show';
-import { updateOrderStatusRouter } from './routes/staff/update-status';
-import { staffOrderRouter } from './routes/staff/index';
+import { createOrderRouter } from './routes/customer/newOrder';
+import { showOrderRouter } from './routes/customer/view-order';
+import { staffViewOrderRouter } from './routes/staff/view-order';
+import { staffViewAllOrdersRouter } from './routes/staff/view-all-orders';
+import { updateOrderStatusRouter } from './routes/staff/update-order-status';
+import { redis } from './redis-client';
 
 const app: express.Application = express();
 app.set('trust proxy', true);
@@ -19,14 +19,16 @@ app.use(
     secure: false,
   })
 );
-app.use(currentUser);
+app.use(currentUser(redis));
 
-app.use(deleteOrderRouter);
-app.use(indexOrderRouter);
+// app.use(deleteOrderRouter);
+// app.use(indexOrderRouter);
+
 app.use(createOrderRouter);
 app.use(showOrderRouter);
 app.use(updateOrderStatusRouter);
-app.use(staffOrderRouter);
+app.use(staffViewOrderRouter);
+app.use(staffViewAllOrdersRouter);
 
 app.all('*', async (req, res) => {
   throw new NotFoundError();

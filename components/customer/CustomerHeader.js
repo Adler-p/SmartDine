@@ -20,12 +20,12 @@ const CustomerHeader = () => {
                 
             </div>
             <div className={styles.title}>
-                <Link href="/customer">
+                <Link href="/menu">
                     <a><span>SmartDine</span></a>
                 </Link>
             </div>
             <div className={styles.title}>
-                <Link href="/customer/cart-detail">
+                <Link href="/menu/cart-detail">
                     <ShoppingCart size={32} className={styles.cartIcon} />
                     {/* <a><span>Cart</span></a> */}
                 </Link>

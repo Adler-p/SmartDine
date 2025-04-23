@@ -4,12 +4,12 @@ import { json } from 'body-parser'
 import cookieSession from 'cookie-session'
 import { errorHandler, NotFoundError, currentUser } from '@smartdine/common'
 
-import { createMenuItemRouter } from './routes/new'
-import { showMenuItemRouter } from './routes/show'
+import { createMenuItemRouter } from './routes/staff/create-new-item'
+import { listMenuItemRouter } from './routes/list-one-item'
 import { indexMenuRouter } from './routes/index'
-import { updateMenuItemRouter } from './routes/update'
-import { updateMenuItemPriceRouter } from './routes/update-price'
-import { markMenuItemOutOfStockRouter } from './routes/mark-out-of-stock'
+import { updateMenuItemRouter } from './routes/staff/update-entire-item'
+import { updateMenuItemPriceRouter } from './routes/staff/update-price'
+import { markMenuItemOutOfStockRouter } from './routes/staff/mark-out-of-stock'
 
 const app = express()
 app.set('trust proxy', true)
@@ -25,8 +25,9 @@ app.use(
 app.use(currentUser)
 
 // Register routes
+// Staff endpoints
 app.use(createMenuItemRouter)
-app.use(showMenuItemRouter)
+app.use(listMenuItemRouter)
 app.use(indexMenuRouter)
 app.use(updateMenuItemRouter)
 app.use(updateMenuItemPriceRouter)

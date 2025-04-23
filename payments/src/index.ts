@@ -3,6 +3,10 @@ import { app } from './app';
 import { natsWrapper } from './nats-wrapper';
 import { OrderCreatedListener } from './events/listeners/order-created-listener';
 import { OrderCancelledListener } from './events/listeners/order-cancelled-listener';
+import { sequelize } from './sequelize';
+
+import dotenv from 'dotenv';
+dotenv.config();
 
 const start = async () => {
   if (!process.env.JWT_KEY) {
@@ -32,13 +36,19 @@ const start = async () => {
       process.exit();
     });
     process.on('SIGINT', () => natsWrapper.client.close());
-    process.on('SIGTERM', () => natsWrapper.client.close());
+    process.on('SIGTERM', () => natsWrapper.client.close());    
 
+    // await mongoose.connect(process.env.MONGO_URI);
+    // console.log('Connected to MongoDB');
+    await sequelize.authenticate();
+    console.log('Connected to SQL database');
+
+    await sequelize.sync();
+
+    // Start listening for events
     new OrderCreatedListener(natsWrapper.client).listen();
     new OrderCancelledListener(natsWrapper.client).listen();
-
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log('Connected to MongoDB');
+    
   } catch (err) {
     console.error(err);
   }

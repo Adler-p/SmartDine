@@ -16,14 +16,14 @@ const CartHeader = () => {
     return (
         <header className={styles.header}>
             <div className={styles.leftButtons}>
-                <Link href="/customer">
+                <Link href="/menu">
                     <a>
                         <button className={styles.button}>Menu</button>
                     </a>
                 </Link>
             </div>
             <div className={styles.title}>
-                <Link href="/customer">
+                <Link href="/menu">
                     <a><span>SmartDine</span></a>
                 </Link>
             </div>
