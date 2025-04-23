@@ -18,9 +18,10 @@ export class PaymentCreatedListener extends Listener<PaymentCreatedEvent> {
       return;
     }
 
+    //! Doesn't make sense for order status to be 'COMPLETED' immediately after payment has been created (Creation of payment does not mean payment has been successful). Also, what about the other order statuses? (AWAITING_PREPARATION, IN_PREPARATION etc). 
     // Update order status to complete
-    order.orderStatus = OrderStatus.COMPLETED;
-    await order.save();
+    // order.orderStatus = OrderStatus.COMPLETED;
+    // await order.save();
 
     msg.ack();
   }

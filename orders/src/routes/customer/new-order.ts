@@ -6,6 +6,7 @@ import { Order, OrderItem } from '../../sequelize';
 import { redis } from '../../redis-client';
 import { natsWrapper } from '../../nats-wrapper';
 import { body } from 'express-validator';
+import axios from 'axios';
 
 const router: Router = express.Router();
 
