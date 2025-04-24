@@ -3,6 +3,14 @@ name: Deploy to EC2
 on:
   push:
     branches: [main]
+    paths:
+    - 'auth/**'
+    - 'common/**'
+    - 'menu/**'
+    - 'orders/**'
+    - 'payments/**'
+    - '.github/workflows/deploy.yml'
+  workflow_dispatch:
 
 jobs:
   deploy:
