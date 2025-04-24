@@ -16,7 +16,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
-          script: 
+          script: |
             if [ ! -d "SmartDine" ]; then
               git clone https://Adler-p:${{ secrets.GH_TOKEN }}@github.com/Adler-p/SmartDine.git
             else
@@ -25,7 +25,6 @@ jobs:
             fi
 
             cd ~/SmartDine
-
             docker-compose down
             docker-compose build
             docker-compose up -d
