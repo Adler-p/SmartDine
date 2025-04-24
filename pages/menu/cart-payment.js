@@ -19,16 +19,21 @@ const CartPaymentPage = () => {
     const [cardNumber, setCardNumber] = useState('');
     const [cvv, setCvv] = useState('');
     const [expiryDate, setExpiryDate] = useState('');
-    const tableId = sessionStorage.getItem('tableId'); // Uncomment to use sessionStorage
 
+    const [tableId, setTableId] = useState('');
 
     useEffect(() => {
-        const storedItems = sessionStorage.getItem('checkoutItems');
-        if (storedItems) {
-          const parsedItems = JSON.parse(storedItems);
-          setOrders(parsedItems); // assuming you use useState
-        }
-      }, []);
+    const storedItems = sessionStorage.getItem('checkoutItems');
+    if (storedItems) {
+        const parsedItems = JSON.parse(storedItems);
+        setOrders(parsedItems);
+    }
+
+    const savedTableId = sessionStorage.getItem('tableId');
+    if (savedTableId) {
+        setTableId(savedTableId);
+    }
+    }, []);
 
     // useEffect(() => {
     //     const fetchCart = async () => {
