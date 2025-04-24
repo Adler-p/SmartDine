@@ -65,8 +65,8 @@ const CartDetailPage = () => {
         });
     };
 
-    const handleQuantityChange = async (orderId, itemIndex, change) => {
-        const selectedItem = orders.find(order => order.orderId === orderId)?.items[itemIndex];
+    const handleQuantityChange = async (itemId, itemIndex, change) => {
+        const selectedItem = orders.find(order => order.itemId === itemId);
         
         if (!selectedItem) {
             console.error('Item not found');
@@ -78,7 +78,7 @@ const CartDetailPage = () => {
 
         // If the updated quantity is 0, call handleDeleteItem
         if (updatedQuantity === 0) {
-            await handleDeleteItem(orderId, itemIndex); // Delete the item if quantity is 0
+            await handleDeleteItem(itemId, itemIndex); // Delete the item if quantity is 0
             return; // Exit early as we don't need to update the quantity
         }
 
@@ -95,24 +95,18 @@ const CartDetailPage = () => {
         }
 
         // If the backend update is successful, update the local state
-        setOrders(prevOrders => prevOrders.map(order => {
-            if (order.orderId === orderId) {
-                const updatedOrder = { ...order };
-                updatedOrder.items = updatedOrder.items.map((item, idx) => {
-                    if (idx === itemIndex) {
-                        return { ...item, quantity: updatedQuantity };
-                    }
-                    return item;
-                });
-                return updatedOrder;
-            }
-            return order;
-        }));
+        setOrders(prevOrders =>
+            prevOrders.map(order =>
+                order.itemId === itemId
+                    ? { ...order, quantity: updatedQuantity }
+                    : order
+            )
+        );
     };
 
 
-    const handleDeleteItem = async (orderId, itemIndex) => {
-        const itemToDelete = orders.find(order => order.orderId === orderId)?.items[itemIndex];
+    const handleDeleteItem = async (itemId, itemIndex) => {
+        const itemToDelete = orders.find(order => order.itemId === itemId);
         
         if (!itemToDelete) {
             console.error('Item not found');
@@ -130,19 +124,36 @@ const CartDetailPage = () => {
         }
 
         // Update the local state after the request is successful
-        setOrders(prevOrders => prevOrders.map(order => {
-            if (order.orderId === orderId) {
-                return {
-                    ...order,
-                    items: order.items.filter((_, idx) => idx !== itemIndex)
-                };
-            }
-            return order;
-        }));
+        setOrders(prev => prev.filter(item => item.itemId !== itemId));
     };
 
-    const handleProceedToPayment = () => {
-        router.push('/menu/card-payment');  // Redirect to /menu/card-payment route
+    
+    const handleProceedToPayment = async () => {
+        try {
+        const response = await fetch('/api/checkout', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ items: orders }), // assuming orders is your cart
+        });
+    
+        const result = await response.json();
+    
+        if (response.ok) {
+            // Option 1: Pass items via sessionStorage
+            sessionStorage.setItem('checkoutItems', JSON.stringify(result.items));
+    
+            // Redirect
+            router.push('/menu/card-payment');
+        } else {
+            console.error('Checkout failed:', result.message);
+            // Optionally show user error
+        }
+        } catch (error) {
+        console.error('Error during checkout:', error);
+        // Optionally show user error
+        }
     };
 
     if (loading) {
@@ -183,11 +194,11 @@ const CartDetailPage = () => {
                                     <tbody>
                                         {order.items.map((item, index) => (
                                             <tr key={index}>
-                                                <td>{item.name}</td>
+                                                <td>{item.itemName}</td>
                                                 <td>
                                                     <button 
                                                         className={styles.btn} 
-                                                        onClick={() => handleQuantityChange(order.orderId, index, -1)}
+                                                        onClick={() => handleQuantityChange(item.itemId, index, -1)}
                                                         disabled={item.quantity <= 1} // Prevent quantity going below 1
                                                     >
                                                         -
@@ -195,14 +206,14 @@ const CartDetailPage = () => {
                                                     <span className={styles.quantity}>{item.quantity}</span>
                                                     <button 
                                                         className={styles.btn} 
-                                                        onClick={() => handleQuantityChange(order.orderId, index, 1)}
+                                                        onClick={() => handleQuantityChange(item.itemId, index, 1)}
                                                     >
                                                         +
                                                     </button>
                                                 </td>
-                                                <td>{`$${(item.quantity * item.price).toFixed(2)}`}</td>
+                                                <td>{`$${(item.quantity * item.unitPrice).toFixed(2)}`}</td>
                                                 <td>
-                                                    <DeleteItemButton onDelete={() => handleDeleteItem(order.orderId, index)} />
+                                                    <DeleteItemButton onDelete={() => handleDeleteItem(item.itemId, index)} />
                                                 </td>
                                             </tr>
                                         ))}
