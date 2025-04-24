@@ -9,6 +9,7 @@ on:
     - 'menu/**'
     - 'orders/**'
     - 'payments/**'
+    - 'docker-compose.yml'
     - '.github/workflows/deploy.yml'
   workflow_dispatch:
 
