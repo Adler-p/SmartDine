@@ -120,20 +120,11 @@ The system uses NATS Streaming for event communication:
    - Kubernetes (optional)
    - NATS Streaming Server
    - MongoDB
+   - postgreSQL
 
-2. Install dependencies:
-```bash
-pnpm install
-```
+2. run docker compose
+  docker-compose build && docker-compose up -d
 
-3. Start development environment:
-```bash
-pnpm start
-```
-
-4. Run tests:
-```bash
-pnpm test
 ```
 
 ## Environment Variables
