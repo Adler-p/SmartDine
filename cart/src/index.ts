@@ -1,5 +1,5 @@
 import { app } from './app';
-import { natsWrapper } from '../src/nats-wrapper';
+import { natsWrapper } from './nats-wrapper';
 import { redis } from './redis-client';
 
 import dotenv from 'dotenv';
@@ -42,12 +42,13 @@ const start = async () => {
     process.on('SIGINT', () => natsWrapper.client.close());
     process.on('SIGTERM', () => natsWrapper.client.close());    
 
-    await redis.connect(); 
+    // await redis.connect(); 
 
     // Start listening for session:created events
     new SessionCreatedListener(natsWrapper.client).listen();
   } catch (err) {
     console.error(err);
+    process.exit(1); 
   }
 
   app.listen(3000, () => {

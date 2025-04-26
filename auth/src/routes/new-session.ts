@@ -36,7 +36,8 @@ router.get('/api/session/create', async (req: Request, res: Response) => {
     });
 
     // Redirect user back to frontend with session ID as query parameter 
-    const frontendUrl = `http://smartdine.com/menu?tableId=${tableId}&sessionId=${sessionId}`;
+    // const frontendUrl = `http://smartdine.com/menu?tableId=${tableId}&sessionId=${sessionId}`;
+    const frontendUrl = `http://nus-iss-smart-dine.vercel.app/menu?tableId=${tableId}&sessionId=${sessionId}`;
     res.redirect(frontendUrl);
 }); 
 

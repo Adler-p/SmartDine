@@ -99,7 +99,7 @@ These events are consumed by other services that need to react to user-related c
 -   **Response Headers**: A new `refreshToken` is set as an HTTP-only, secure cookie in the `Set-Cookie` header. 
 
 ### New Session for Customer
--   **GET** `/api/session/create?role=customer&table=table123`
+-   **GET** `/api/session/create?role=customer&tableId=table123`
 -   **Description**: Creates a new session for a customer.
 -   **Query Parameters**:
     -   `role`: Role of the user (e.g., `"customer"`).
@@ -110,7 +110,7 @@ These events are consumed by other services that need to react to user-related c
 -   **Response**: Redirects to the frontend with the session ID in the query parameters.
     -   Example Redirect URL:
     ```json
-    http://smartdine.com/menu?tableId=table123&sessionId=session12345566
+    https://nus-iss-smart-dine.vercel.app/menu?tableId=table123&sessionId=session12345566
     ```
 
 ## Error Responses

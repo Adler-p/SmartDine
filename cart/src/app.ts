@@ -37,4 +37,14 @@ app.all('*', async (req, res) => {
 
 app.use(errorHandler);
 
+app.get('/test', async (req, res) => {
+  console.log('Test endpoint started');
+  
+  setTimeout(() => {
+      console.log('Timeout reached without response');
+  }, 5000);  // Timeout after 5 seconds if no response is sent
+
+  res.send('Test endpoint is working');
+});
+
 export { app };

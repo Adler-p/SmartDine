@@ -23,26 +23,27 @@ router.post(
   validateRequest,
   async (req: Request, res: Response) => {
     const { orderId, amount } = req.body;
+   
+   // 处理会话ID
+   let sessionId;
     
-    // 灵活处理会话ID，支持多种方式获取
-    let sessionId = req.sessionData?.sessionId;
-    
-    // 如果没有通过validateSession中间件获取会话，尝试从cookies或query中获取
-    if (!sessionId) {
-      sessionId = req.cookies?.session || req.query.sessionId as string;
-    }
-    
-    // 如果仍然没有sessionId，根据jwt中的userId创建一个
-    if (!sessionId && req.currentUser?.id) {
-      sessionId = req.currentUser.id;
-    }
-    
-    // 如果还是没有sessionId，生成一个新的
-    if (!sessionId) {
-      sessionId = uuidv4();
-    }
-    
-    const userId = req.currentUser?.id;
+   // 尝试从validateSession中间件获取
+   if (req.session && req.session.sessionId) {
+     sessionId = req.session.sessionId;
+   } 
+   // 尝试从cookie或req.currentUser获取
+   else if (req.cookies && req.cookies.session) {
+     sessionId = req.cookies.session;
+   } 
+   // 尝试从当前用户获取
+   else if (req.currentUser && req.currentUser.id) {
+     sessionId = req.currentUser.id;
+   }
+   
+   // 没有sessionId则返回错误
+   if (!sessionId) {
+     return res.status(400).send({ error: 'Session ID is required' });
+   }
 
     try {
       // Create a payment record
