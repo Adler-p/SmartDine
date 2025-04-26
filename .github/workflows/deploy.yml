@@ -1,0 +1,30 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: SSH Deploy to EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            if [ ! -d "SmartDine" ]; then
+              git clone https://Adler-p:${{ secrets.GH_TOKEN }}@github.com/Adler-p/SmartDine.git
+            else
+              cd SmartDine
+              git pull origin main
+            fi
+
+            cd ~/SmartDine
+            docker-compose down
+            docker-compose build
+            docker-compose up -d
