@@ -44,7 +44,24 @@ const IncomingOrders = () => {
                     credentials: 'include',
                 });
                 const data = await res.json();
-                setOrders(data);
+
+                // For each order, fetch payment
+                const enrichedOrders = await Promise.all(
+                    data.map(async (order) => {
+                        try {
+                            const paymentRes = await fetch(`/api/payments/staff/${order.orderId}`, {
+                                credentials: 'include',
+                            });
+                            const paymentData = await paymentRes.json();
+                            return { ...order, paymentStatus: paymentData.paymentStatus };
+                        } catch (err) {
+                            console.error('Error fetching payment for order:', order.orderId);
+                            return { ...order, paymentStatus: 'Unknown' };
+                        }
+                    })
+                );
+
+                setOrders(enrichedOrders);
             } catch (err) {
                 setError('Failed to load orders.');
                 console.error('Error fetching orders:', err);
@@ -54,7 +71,7 @@ const IncomingOrders = () => {
         };
 
         fetchOrders();
-    }, []); // Runs once on component mount
+    }, []);
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>{error}</p>;
@@ -87,7 +104,7 @@ const IncomingOrders = () => {
                                                 <tr key={index}>
                                                     <td>{item.name}</td>
                                                     <td>{item.quantity}</td>
-                                                    <td>{item.paymentStatus}</td>
+                                                    <td>{order.paymentStatus === 'successful' ? 'Paid' : 'Pending'}</td>
                                                     <td>{item.status}</td>
                                                 </tr>
                                             ))}
