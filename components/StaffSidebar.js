@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import styles from './StaffSidebar.module.css';
-import { BACKEND_IP } from '../../constants';
+import { BACKEND_IP } from '../constants';
 
 const StaffSidebar = () => {
     const [orders, setOrders] = useState([]);

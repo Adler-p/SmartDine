@@ -1,6 +1,6 @@
 ﻿import React from "react";
 import styles from "./StatusUpdateButton.module.css";
-import { BACKEND_IP } from '../../constants';
+import { BACKEND_IP } from '../constants';
 
 const StatusUpdateButton = ({ orderId, status, onStatusChange }) => {
     const handleStatusChange = async (newStatus) => {

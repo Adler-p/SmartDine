@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './StaffSidebarMenu.module.css';
-import { BACKEND_IP } from '../../constants';
+import { BACKEND_IP } from '../constants';
 
 const StaffSidebarMenu = ({ selected, onSelect }) => {
     const [categories, setCategories] = useState([]);

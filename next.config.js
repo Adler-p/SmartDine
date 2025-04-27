@@ -1,5 +1,5 @@
 module.exports = {
     eslint: {
-      ignoreDuringBuilds: true,  // Or false, based on your needs
+      ignoreDuringBuilds: false,  // Or false, based on your needs
     },
   };

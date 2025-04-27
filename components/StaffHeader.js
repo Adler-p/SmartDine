@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import styles from './StaffHeader.module.css';
-import { BACKEND_IP } from '../../constants';
+import { BACKEND_IP } from '../constants';
 
 const StaffHeader = () => {
     const router = useRouter();
