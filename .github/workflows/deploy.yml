@@ -1,41 +1,54 @@
-name: Deploy to EC2
+name: Next.js CI/CD Pipeline
 
 on:
   push:
-    branches: [main]
-    paths:
-    - 'auth/**'
-    - 'common/**'
-    - 'menu/**'
-    - 'orders/**'
-    - 'payments/**'
-    - 'docker-compose.yml'
-    - '.github/workflows/deploy.yml'
-  workflow_dispatch:
+    branches:
+      - frontend
+  pull_request:
+    branches:
+      - frontend
 
 jobs:
-  deploy:
-    name: SSH Deploy to EC2
+  build-and-lint:
+    name: Build and Lint
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          timeout: 10m
-          command_timeout: 20m
-          script: |
-            if [ ! -d "SmartDine" ]; then
-              git clone https://Adler-p:${{ secrets.GH_TOKEN }}@github.com/Adler-p/SmartDine.git
-            else
-              cd SmartDine
-              git pull origin main
-            fi
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-            cd ~/SmartDine
-            docker compose down
-            docker compose build
-            docker compose up -d
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Use Node 20, works great for Next.js
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Linter
+        run: npm run lint
+
+      - name: Run Prettier Check
+        run: npm run format:check
+
+      - name: Next.js Build
+        run: npm run build
+
+  deploy:
+    name: Deploy to Vercel
+    needs: build-and-lint
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/frontend'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./
+          prod: true
