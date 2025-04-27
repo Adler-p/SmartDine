@@ -4,6 +4,7 @@ import styles from './OrderDetailPage.module.css';
 import StaffHeader from '../../components/StaffHeader';
 import StaffSidebar from '../../components/StaffSidebar';
 import StatusUpdateButton from '../../components/StatusUpdateButton';
+import { BACKEND_IP } from '../../constants';
 
 const OrderDetailPage = () => {
     const router = useRouter();
@@ -17,7 +18,7 @@ const OrderDetailPage = () => {
             if (!id) return;
 
             try {
-                const response = await fetch(`/api/staff/orders/${id}`);
+                const response = await fetch(BACKEND_IP + `/api/staff/orders/${id}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch order details');
                 }
@@ -35,7 +36,7 @@ const OrderDetailPage = () => {
 
     const handleStatusChange = async (orderId, newStatus) => {
         try {
-            const response = await fetch(`/api/staff/orders/${orderId}/status`, {
+            const response = await fetch(BACKEND_IP + `/api/staff/orders/${orderId}/status`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',

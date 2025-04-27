@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './StaffSidebarMenu.module.css';
+import { BACKEND_IP } from '../../constants';
 
 const StaffSidebarMenu = ({ selected, onSelect }) => {
     const [categories, setCategories] = useState([]);
@@ -10,7 +11,7 @@ const StaffSidebarMenu = ({ selected, onSelect }) => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await fetch('/api/menu'); // Fetch all menu items
+                const response = await fetch(BACKEND_IP + '/api/menu'); // Fetch all menu items
                 if (!response.ok) {
                     throw new Error('Failed to fetch menu items');
                 }

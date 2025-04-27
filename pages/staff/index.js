@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import styles from './StaffPage.module.css';
 import StaffHeader from '../../components/StaffHeader';
 import StaffSidebar from '../../components/StaffSidebar';
+import { BACKEND_IP } from '../../constants';
 
 const IncomingOrders = () => {
     const [user, setUser] = useState(null);
@@ -15,12 +16,12 @@ const IncomingOrders = () => {
         // Fetch current user and ensure they are staff
         const fetchUser = async () => {
             try {
-                const res = await fetch('/api/users/currentuser', {
+                const res = await fetch(BACKEND_IP + '/api/users/currentuser', {
                     credentials: 'include',
                 });
                 const data = await res.json();
                 if (!data.currentUser || data.currentUser.role !== 'staff') {
-                    router.push('/auth/staff-login');
+                    router.push(BACKEND_IP + '/auth/staff-login');
                 } else {
                     setUser(data.currentUser);
                 }
@@ -40,7 +41,7 @@ const IncomingOrders = () => {
         const fetchOrders = async () => {
             setLoading(true);
             try {
-                const res = await fetch('/api/orders/incoming', {
+                const res = await fetch(BACKEND_IP + '/api/orders/incoming', {
                     credentials: 'include',
                 });
                 const data = await res.json();
@@ -49,7 +50,7 @@ const IncomingOrders = () => {
                 const enrichedOrders = await Promise.all(
                     data.map(async (order) => {
                         try {
-                            const paymentRes = await fetch(`/api/payments/staff/${order.orderId}`, {
+                            const paymentRes = await fetch(BACKEND_IP + `/api/payments/staff/${order.orderId}`, {
                                 credentials: 'include',
                             });
                             const paymentData = await paymentRes.json();

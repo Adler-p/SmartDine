@@ -1,11 +1,12 @@
 ﻿import React from "react";
 import styles from "./StatusUpdateButton.module.css";
+import { BACKEND_IP } from '../../constants';
 
 const StatusUpdateButton = ({ orderId, status, onStatusChange }) => {
     const handleStatusChange = async (newStatus) => {
         try {
             // Call the backend API to update the order status
-            const response = await fetch(`/api/orders/${orderId}/status`, {
+            const response = await fetch(BACKEND_IP + `/api/orders/${orderId}/status`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
