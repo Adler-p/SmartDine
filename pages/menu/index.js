@@ -1,5 +1,5 @@
 // pages/customer/index.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import CustomerHeader from '../../components/customer/CustomerHeader';
 import StaffSidebarMenu from '../../components/StaffSidebarMenu';

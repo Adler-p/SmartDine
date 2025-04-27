@@ -1,5 +1,7 @@
 import { AppDataSource } from '../config/typeorm.config';
 import { UserRole } from '../models/user';
+import request from 'supertest';
+import { app } from '../app';
 
 declare global {
   var signin: () => Promise<string[]>;

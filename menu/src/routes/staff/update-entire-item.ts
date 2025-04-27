@@ -5,11 +5,13 @@ import {
   validateRequest,
   requireRole,
   NotFoundError,
-  UserRole
+  UserRole,
+  BadRequestError
 } from '@smartdine/common'
 import { MenuItem } from '../../models/menu-item'
 import { MenuItemUpdatedPublisher } from '../../events/publishers/menu-item-updated-publisher'
 import { natsWrapper } from '../../nats-wrapper'
+import mongoose from 'mongoose'
 
 const router = express.Router()
 
@@ -49,47 +51,89 @@ router.put(
   ],
   validateRequest,
   async (req: Request, res: Response) => {
-    const menuItem = await MenuItem.findById(req.params.id)
-
-    if (!menuItem) {
-      throw new NotFoundError()
-    }
-
-    const { name, description, price, category, imageUrl, availability } = req.body
-
-    // Update only provided fields
-    if (name) menuItem.set('name', name)
-    if (description) menuItem.set('description', description)
-    if (price) {
-      // Use the updatePrice method from the model
-      menuItem.updatePrice(price)
-    }
-    if (category) menuItem.set('category', category)
-    if (imageUrl !== undefined) menuItem.set('imageUrl', imageUrl)
-    if (availability !== undefined) {
-      if (availability === 'out_of_stock') {
-        // Use the markAsOutOfStock method from the model
-        menuItem.markAsOutOfStock()
-      } else {
-        menuItem.set('availability', availability)
+    const { id } = req.params;
+    
+    try {
+      // 检查ID是否是有效的MongoDB ObjectId
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        console.log('Invalid ID format:', id);
+        return res.status(400).send({ error: 'Invalid ID format' });
       }
+
+      console.log('Finding menu item to update, ID:', id);
+      const menuItem = await MenuItem.findById(id)
+
+      if (!menuItem) {
+        console.log('Menu item not found with ID:', id);
+        throw new NotFoundError()
+      }
+
+      const { name, description, price, category, imageUrl, availability } = req.body
+
+      // 验证至少有一个字段需要更新
+      if (!name && !description && !price && !category && imageUrl === undefined && availability === undefined) {
+        throw new BadRequestError('At least one field must be provided for update');
+      }
+
+      console.log('Updating menu item:', { name, description, price, category, imageUrl, availability });
+      
+      // Update only provided fields
+      if (name) menuItem.set('name', name)
+      if (description) menuItem.set('description', description)
+      if (price) {
+        // Use the updatePrice method from the model
+        menuItem.updatePrice(price)
+      }
+      if (category) menuItem.set('category', category)
+      if (imageUrl !== undefined) menuItem.set('imageUrl', imageUrl)
+      if (availability !== undefined) {
+        if (availability === 'out_of_stock') {
+          // Use the markAsOutOfStock method from the model
+          menuItem.markAsOutOfStock()
+        } else {
+          menuItem.set('availability', availability)
+        }
+      }
+
+      await menuItem.save()
+      console.log('Menu item saved with updated values');
+
+      // 使用超时处理事件发布
+      try {
+        console.log('Publishing menu item updated event');
+        const publishPromise = new MenuItemUpdatedPublisher(natsWrapper.client).publish({
+          id: menuItem.id,
+          name: menuItem.name,
+          description: menuItem.description,
+          price: menuItem.price,
+          category: menuItem.category,
+          imageUrl: menuItem.imageUrl,
+          availability: menuItem.availability,
+          version: menuItem.version
+        });
+        
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('Event publish timeout')), 1500);
+        });
+        
+        await Promise.race([publishPromise, timeoutPromise])
+          .catch(error => {
+            console.warn('Event publishing error or timeout:', error.message);
+            // 继续执行，不阻塞响应
+          });
+      } catch (publishError) {
+        console.error('Error preparing to publish update event:', publishError);
+        // 继续执行，不阻塞响应
+      }
+
+      return res.status(200).send(menuItem)
+    } catch (error) {
+      if (error instanceof NotFoundError || error instanceof BadRequestError) {
+        throw error;
+      }
+      console.error('Error updating menu item:', error);
+      return res.status(500).send({ error: 'Failed to update menu item' });
     }
-
-    await menuItem.save()
-
-    // Publish event with all relevant data
-    await new MenuItemUpdatedPublisher(natsWrapper.client).publish({
-      id: menuItem.id,
-      name: menuItem.name,
-      description: menuItem.description,
-      price: menuItem.price,
-      category: menuItem.category,
-      imageUrl: menuItem.imageUrl,
-      availability: menuItem.availability,
-      version: menuItem.version
-    })
-
-    res.send(menuItem)
   }
 )
 

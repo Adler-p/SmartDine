@@ -9,7 +9,6 @@ export interface PaymentCreatedEvent {
     orderId: string;
     amount: number;
     paymentStatus: PaymentStatus;
-    sessionId: string;
     version: number;
   };
 }

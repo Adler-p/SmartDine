@@ -15,16 +15,23 @@ router.get('/api/menu',
   async (req: Request, res: Response) => {
   const { category } = req.query; 
 
-  const query: any = {}; 
+  const queryFilter: any = {}; 
   if (category) {
-    query.category = category; 
+    queryFilter.category = category; 
   }
 
-  const menuItems = await MenuItem.find({query});
-  if (!menuItems) {
-    return res.status(404).send({ error: 'No menu items found' });
+  try {
+    console.log('Finding menu items with filter:', queryFilter);
+    const menuItems = await MenuItem.find(queryFilter);
+    console.log('Found menu items:', menuItems);
+    if (!menuItems || menuItems.length === 0) {
+      return res.status(404).send({ error: 'No menu items found' });
+    }
+    return res.status(200).send(menuItems);
+  } catch (error) {
+    console.error('Error finding menu items:', error);
+    return res.status(500).send({ error: 'Failed to retrieve menu items' });
   }
-  res.send(menuItems)
 })
 
 export { router as indexMenuRouter } 

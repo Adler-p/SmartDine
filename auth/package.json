@@ -21,7 +21,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@smartdine/common": "link:../common",
+    "@smartdine/common": "file:../common",
     "@types/body-parser": "^1.19.2",
     "@types/cookie-session": "^2.0.44",
     "@types/jsonwebtoken": "^9.0.2",

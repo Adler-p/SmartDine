@@ -1,16 +1,16 @@
 import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
 import jwt from 'jsonwebtoken';
-import { validateRequest, BadRequestError } from '@smartdine/common';
+import { BadRequestError } from '@smartdine/common';
+const { validateRequest } = require('@smartdine/common');
 import { Password } from '../services/password';
-import { initUserModel } from '../models/user';
+import { User, initUserModel } from '../models/user';
 import { sequelize } from '../sequelize';
 import { generateRefreshToken } from '../services/generate-refresh-token';
 
 
 const router: express.Router = express.Router();
-const userModel = initUserModel(sequelize);
-
+initUserModel(sequelize);
 
 router.post(
   '/api/users/signin',
@@ -27,9 +27,7 @@ router.post(
   async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
-    const existingUser = await userModel.findOne({ where: { email } });
-    const userRepository = AppDataSource.getRepository(User);
-    const existingUser = await userRepository.findOne({ where: { email } });
+    const existingUser = await User.findOne({ where: { email } });
     
     if (!existingUser) {
       throw new BadRequestError('Invalid user');

@@ -1,5 +1,5 @@
 import { OrderStatus } from '@smartdine/common';
-import { Order } from '../models/order';
+import { Order } from '../sequelize';
 import { natsWrapper } from '../nats-wrapper';
 import { OrderCancelledPublisher } from '../events/publishers/order-cancelled-publisher';
 import { Op } from 'sequelize';

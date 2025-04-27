@@ -1,8 +1,9 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import 'express-async-errors';
 import bodyParser from 'body-parser';
 import cookieSession from 'cookie-session';
-import { errorHandler, NotFoundError } from '@smartdine/common';
+import { NotFoundError } from '@smartdine/common';
+const { errorHandler } = require('@smartdine/common');
 
 import { currentUserRouter } from './routes/current-user';
 import { signinRouter } from './routes/signin';

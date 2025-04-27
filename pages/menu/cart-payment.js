@@ -1,3 +1,5 @@
+'use client'; // This is mandatory
+
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import styles from './CartPaymentPage.module.css';
@@ -18,43 +20,58 @@ const CartPaymentPage = () => {
     const [cvv, setCvv] = useState('');
     const [expiryDate, setExpiryDate] = useState('');
 
+    const [tableId, setTableId] = useState('');
+
     useEffect(() => {
-        const fetchCart = async () => {
-            setLoading(true);
-            try {
-                // const sessionId = localStorage.getItem('customerSessionId'); // Uncomment to use localStorage
-                // const sessionId = sessionStorage.getItem('customerSessionId'); // Uncomment to use sessionStorage
+    const storedItems = sessionStorage.getItem('checkoutItems');
+    if (storedItems) {
+        const parsedItems = JSON.parse(storedItems);
+        setOrders(parsedItems);
+    }
 
-                // Temporary for debugging:
-                const sessionId = "dummySessionId"; // This is just for now, remove after implementation
-
-                if (!sessionId) {
-                    setError('Session ID is missing.');
-                    return;
-                }
-
-                const response = await axios.get('/api/cart', {
-                    headers: {
-                        'x-session-id': sessionId,
-                    }
-                });
-
-                if (response.data.cart) {
-                    setOrders(response.data.cart);
-                } else {
-                    setOrders([]);
-                }
-
-                setError(null);
-            } catch (err) {
-                setError('Failed to fetch cart data.');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchCart();
+    const savedTableId = sessionStorage.getItem('tableId');
+    if (savedTableId) {
+        setTableId(savedTableId);
+    }
     }, []);
+
+    // useEffect(() => {
+    //     const fetchCart = async () => {
+    //         setLoading(true);
+    //         try {
+    //             // const sessionId = localStorage.getItem('customerSessionId'); // Uncomment to use localStorage
+    //             // const sessionId = sessionStorage.getItem('customerSessionId'); // Uncomment to use sessionStorage
+
+    //             // Temporary for debugging:
+    //             const sessionId = "dummySessionId"; // This is just for now, remove after implementation
+
+    //             if (!sessionId) {
+    //                 setError('Session ID is missing.');
+    //                 return;
+    //             }
+
+    //             const response = await axios.get('/api/cart', {
+    //                 headers: {
+    //                     'x-session-id': sessionId,
+    //                 }
+    //             });
+
+    //             if (response.data.cart) {
+    //                 setOrders(response.data.cart);
+    //             } else {
+    //                 setOrders([]);
+    //             }
+
+    //             setError(null);
+    //         } catch (err) {
+    //             setError('Failed to fetch cart data.');
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     };
+
+    //     fetchCart();
+    // }, []);
 
 
     const handleConfirmPayment = async () => {
@@ -125,10 +142,10 @@ const CartPaymentPage = () => {
                     </div>
                     {orders.length > 0 ? (
                         orders.map(order => (
-                            <div key={order.orderId}>
+                            <div key={order.itemId}>
                                 <div className={styles.orderDetails}>
-                                    <h3>Table: {order.table}</h3>
-                                    <h3>Order ID: {order.orderId}</h3>
+                                    <h3>Table: {tableId ?? '-'}</h3>
+                                    <h3>Order ID: {order?.itemId || '-'}</h3>
                                 </div>
                                 <p>Items in Cart</p>
 
@@ -145,7 +162,7 @@ const CartPaymentPage = () => {
                                             <tr key={index}>
                                                 <td>{item.name}</td>
                                                 <td>{item.quantity}</td>
-                                                <td>{`$${(item.quantity * item.price).toFixed(2)}`}</td>
+                                                <td>{`$${(item.quantity * item.unitPrice).toFixed(2)}`}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -155,7 +172,7 @@ const CartPaymentPage = () => {
                                     <h3>
                                         Total Amount: $
                                         {order.items
-                                            .reduce((sum, item) => sum + item.price * item.quantity, 0)
+                                            .reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
                                             .toFixed(2)}
                                     </h3>
                                 </div>

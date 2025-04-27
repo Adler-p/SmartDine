@@ -234,6 +234,32 @@ All endpoints may return the following error responses:
     }
     ```
 
+### `cart:finalised`
+-   **Description**: Listens for this event from the Cart service. Upon receiving it, the Orders service creates a new order in its database using the cart details provided in the event.
+-   **Event Listener**: [CartFinalisedListener]
+-   **Event Data**: 
+    ```json
+    {
+      "sessionId": "user-session-uuid",
+      "tableId": "table-uuid",
+      "items": [
+        {
+          "itemId": "menu-item-uuid-1",
+          "itemName": "Item Name 1",
+          "unitPrice": 10.99,
+          "quantity": 1
+        },
+        {
+          "itemId": "menu-item-uuid-2",
+          "itemName": "Item Name 2",
+          "unitPrice": 5.50,
+          "quantity": 2
+        }
+        // ... more items from the cart
+      ]
+    }
+    ```
+
 ## Order Status Flow
 
 ```

@@ -5,7 +5,7 @@ export default function Home() {
     const router = useRouter();
 
     const handleCustomerLogin = () => {
-        router.push('/customer');  // Replace with your customer page URL
+        router.push('/menu');  // Replace with your customer page URL
     };
 
     return (

@@ -10,6 +10,7 @@ import { removeItemRouter } from './routes/remove-item';
 import { viewCartRouter } from './routes/view-cart';
 import { updateCartQuantityRouter } from './routes/update-quantity';
 import { clearCartRouter } from './routes/clear-cart';
+import { checkoutCartRouter } from './routes/checkout';
 
 const app = express();
 app.set('trust proxy', true);
@@ -28,6 +29,7 @@ app.use(removeItemRouter);
 app.use(viewCartRouter);
 app.use(updateCartQuantityRouter);
 app.use(clearCartRouter);
+app.use(checkoutCartRouter);
 
 app.all('*', async (req, res) => {
   throw new NotFoundError();

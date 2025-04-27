@@ -1,5 +1,4 @@
 import { DataTypes, Model, Sequelize } from 'sequelize';
-import { Order } from './order'; // Import the Order model
 
 // Interface for OrderItem attributes
 interface OrderItemAttributes {
@@ -12,6 +11,7 @@ interface OrderItemAttributes {
     subtotal: number;
 }
 
+// Interface for OrderItem Creation Attributes
 interface OrderItemCreationAttributes extends Omit<OrderItemAttributes, 'orderItemId'> {}
 
 export class OrderItem extends Model<OrderItemAttributes, OrderItemCreationAttributes> implements OrderItemAttributes {
@@ -26,14 +26,6 @@ export class OrderItem extends Model<OrderItemAttributes, OrderItemCreationAttri
     // Timestamps (provided by Sequelize)
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
-
-    public static associate(models: any) {
-        // Define association with Order model
-        OrderItem.belongsTo(models.Order, {
-            foreignKey: 'orderId',
-            as: 'order'
-        });
-    }
 }
 
 export const initOrderItemModel = (sequelize: Sequelize) => {
@@ -48,7 +40,7 @@ export const initOrderItemModel = (sequelize: Sequelize) => {
                 type: DataTypes.UUID,
                 allowNull: false,
                 references: {
-                    model: Order, 
+                    model: 'orders', 
                     key: 'orderId'
                 }
             },
@@ -79,4 +71,6 @@ export const initOrderItemModel = (sequelize: Sequelize) => {
             timestamps: true
         }
     );
+
+    return OrderItem;
 }

@@ -6,6 +6,9 @@ The Cart Service is responsible for managing shopping carts for customer session
 -   Initializes an empty cart upon receiving a `session:created` event from the Auth service.
 -   Allows adding of items, updating quantity of items, removal of items, and viewing of the cart.
 -   Persists cart data in Redis, associated with the customer's `sessionId`.
+-   Provides an endpoint to finalize the cart and initiate the order creation process.
+-   Publishes a `cart:finalized` event upon successful cart finalization.
+
 
 ## API Endpoints
 
@@ -133,6 +136,38 @@ The Cart Service is responsible for managing shopping carts for customer session
         }
         ```
 
+### Checkout
+-   **POST** `/api/cart/checkout`
+-   **Description**: Finalizes the user's cart and triggers the order creation process in the Orders service by publishing a `cart:finalized` event. Requires a valid `sessionId` cookie.
+-   **Request Body**: 
+    ```json
+    {
+      "tableId": "table-uuid"
+    }
+    ```
+    -   **tableId**: (Required) The ID of the table for which the order is being placed.
+-   **Response**: `200 OK`
+    ```json
+    {
+      "message": "Checkout successful",
+      "items": [
+        {
+          "itemId": "menu-item-uuid-1",
+          "itemName": "Item Name 1",
+          "unitPrice": 10.99,
+          "quantity": 1
+        },
+        {
+          "itemId": "menu-item-uuid-2",
+          "itemName": "Item Name 2",
+          "unitPrice": 5.50,
+          "quantity": 2
+        }
+        // ... more items from the cart
+      ]
+    }
+    ```
+
 ## Events
 
 ## Events Consumed
@@ -175,6 +210,32 @@ The Cart Service is responsible for managing shopping carts for customer session
         ],
         "totalItems": 5,
         "totalPrice": 20
+    }
+    ```
+
+### `cart:finalised`
+-   **Description**: Published once cart has been confirmed from frontend. 
+-   **Event Publisher**: [CartFinalisedPublisher]
+-   **Event Data:**
+    ```json
+    {
+        "sessionId": "user-session-uuid",
+        "tableId": "table-uuid",
+        "items": [
+        {
+            "itemId": "menu-item-uuid-1",
+            "itemName": "Item Name 1",
+            "unitPrice": 10.99,
+            "quantity": 1
+        },
+        {
+            "itemId": "menu-item-uuid-2",
+            "itemName": "Item Name 2",
+            "unitPrice": 5.50,
+            "quantity": 2
+        }
+        // ... more items from the cart
+        ]
     }
     ```
 
