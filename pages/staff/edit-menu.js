@@ -32,10 +32,17 @@ const EditMenu = () => {
     const toggleAvailability = async (id) => {
         try {
             const item = menuItems.find(item => item.id === id);
-            await axios.put(`/api/menu/${id}/out-of-stock`, {}, { headers: { Authorization: `Bearer ${yourToken}` } });
+            const updatedAvailability = item.availability === 'available' ? 'out_of_stock' : 'available';
+
+            await axios.put(`/api/menu/${id}`, {
+                availability: updatedAvailability
+            }, {
+                withCredentials: true,
+            });
+
             setMenuItems(prev =>
                 prev.map(item =>
-                    item.id === id ? { ...item, availability: 'out_of_stock' } : item
+                    item.id === id ? { ...item, availability: updatedAvailability } : item
                 )
             );
         } catch (error) {
