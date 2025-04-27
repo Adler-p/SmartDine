@@ -6,6 +6,7 @@ import StaffSidebarMenu from '../../components/StaffSidebarMenu';
 import styles from './CustomerPage.module.css';
 import Modal from 'react-modal';
 import axios from 'axios';
+import { BACKEND_IP } from '../../constants';
 
 const Menu = () => {
     const router = useRouter();
@@ -33,7 +34,7 @@ const Menu = () => {
 
             if (!existingSession) {
                 try {
-                    const res = await axios.get('/api/session/create', {
+                    const res = await axios.get(BACKEND_IP + '/api/session/create', {
                         params: { role: 'customer', tableId },
                     });
 
@@ -58,7 +59,7 @@ const Menu = () => {
     const fetchMenuItems = async () => {
         setLoading(true);
         try {
-            const response = await axios.get('/api/menu', {
+            const response = await axios.get(BACKEND_IP + '/api/menu', {
                 params: { category: selectedCategory !== 'All' ? selectedCategory : undefined },
             });
             setMenuItems(response.data);
@@ -84,7 +85,7 @@ const Menu = () => {
     
         try {
             // Call the Add to Cart endpoint
-            await axios.get('/api/cart/add', {
+            await axios.get(BACKEND_IP + '/api/cart/add', {
                 // headers: {
                 //     'x-session-id': sessionId
                 // },

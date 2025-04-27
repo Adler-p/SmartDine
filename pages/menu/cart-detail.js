@@ -5,6 +5,7 @@ import DeleteItemButton from '../../components/customer/DeleteItemButton';
 import { ShoppingCart } from "lucide-react";
 import axios from 'axios';
 import { useRouter } from 'next/router';  // Import useRouter from next/router
+import { BACKEND_IP } from '../../constants';
 
 const CartDetailPage = () => {
     const [orders, setOrders] = useState([]);
@@ -29,7 +30,7 @@ const CartDetailPage = () => {
                     return;
                 }
 
-                const response = await axios.get('/api/cart', {
+                const response = await axios.get(BACKEND_IP + '/api/cart', {
                     headers: {
                         'x-session-id': sessionId, // Send the sessionId in the header
                     }
@@ -84,7 +85,7 @@ const CartDetailPage = () => {
 
         // First, update the backend with the new quantity
         try {
-            await axios.post('/api/cart/update-quantity', {
+            await axios.post(BACKEND_IP + '/api/cart/update-quantity', {
                 itemId: selectedItem.itemId, // Assuming item has itemId property
                 quantity: updatedQuantity
             });
@@ -115,7 +116,7 @@ const CartDetailPage = () => {
 
         // Send the DELETE request to remove the item from the cart
         try {
-            await axios.post('/api/cart/remove', {
+            await axios.post(BACKEND_IP + '/api/cart/remove', {
                 itemId: itemToDelete.itemId, // Assuming item has itemId property
             });
             console.log('Item removed successfully');

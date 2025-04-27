@@ -3,6 +3,7 @@ import StaffHeader from '../../components/StaffHeader';
 import StaffSidebarMenu from '../../components/StaffSidebarMenu';
 import styles from './EditMenu.module.css';
 import axios from 'axios';
+import { BACKEND_IP } from '../../constants';
 
 const EditMenu = () => {
     const [selectedCategory, setSelectedCategory] = useState('All');
@@ -14,7 +15,7 @@ const EditMenu = () => {
         const fetchMenuItems = async () => {
             setLoading(true);
             try {
-                const response = await axios.get('/api/menu', {
+                const response = await axios.get(BACKEND_IP + '/api/menu', {
                     params: { category: selectedCategory !== 'All' ? selectedCategory : undefined },
                 });
                 setMenuItems(response.data);
@@ -34,7 +35,7 @@ const EditMenu = () => {
             const item = menuItems.find(item => item.id === id);
             const updatedAvailability = item.availability === 'available' ? 'out_of_stock' : 'available';
 
-            await axios.put(`/api/menu/${id}`, {
+            await axios.put(BACKEND_IP + `/api/menu/${id}`, {
                 availability: updatedAvailability
             }, {
                 withCredentials: true,

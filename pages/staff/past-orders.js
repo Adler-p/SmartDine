@@ -4,6 +4,7 @@ import styles from './PastOrdersPage.module.css';
 import StaffHeader from '../../components/StaffHeader';
 import StaffSidebar from '../../components/StaffSidebar';
 import axios from 'axios';
+import { BACKEND_IP } from '../../constants';
 
 const PastOrdersPage = () => {
     const [pastOrders, setPastOrders] = useState([]);
@@ -14,7 +15,7 @@ const PastOrdersPage = () => {
         // Fetching past orders from the backend
         const fetchPastOrders = async () => {
             try {
-                const response = await axios.get('/api/staff/orders', {
+                const response = await axios.get(BACKEND_IP + '/api/staff/orders', {
                     params: { orderStatus: 'completed' }, // Fetching orders with status 'completed'
                 });
                 setPastOrders(response.data);

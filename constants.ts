@@ -1,0 +1,1 @@
+export const BACKEND_IP = '54.206.228.57'
