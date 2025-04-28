@@ -1,16 +1,30 @@
 import React from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/router'; 
+import { useRouter } from 'next/router';
 import styles from './StaffHeader.module.css';
 
 const StaffHeader = () => {
-    const router = useRouter(); 
+    const router = useRouter();
 
     // Function to handle logout
-    const handleLogout = () => {
-        // Can add any logout logic here if necessary (e.g., clearing cookies, tokens, etc.)
-        // Redirect to the main page (home page)
-        router.push('/'); // Redirects to the main page (/pages/index.js)
+    const handleLogout = async () => {
+        try {
+            // Send a POST request to the logout API
+            const res = await fetch('/api/users/signout', {
+                method: 'POST',
+                credentials: 'include',
+            });
+
+            if (res.ok) {
+                // If logout is successful, redirect to the login page
+                router.push('/auth/staff-login');
+            } else {
+                alert('Logout failed');
+            }
+        } catch (err) {
+            console.error('Error logging out:', err);
+            alert('Error logging out');
+        }
     };
 
     return (

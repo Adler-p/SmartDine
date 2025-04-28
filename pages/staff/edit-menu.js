@@ -1,49 +1,48 @@
-// pages/staff/edit-menu.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import StaffHeader from '../../components/StaffHeader';
 import StaffSidebarMenu from '../../components/StaffSidebarMenu';
 import styles from './EditMenu.module.css';
-
-const mockMenu = [
-    // Chicken
-    { id: 1, name: "Grilled Chicken", category: "Chicken", price: 10.00, img: "/chicken1.jpg", available: true },
-    { id: 2, name: "Spicy Fried Chicken", category: "Chicken", price: 13.00, img: "/chicken2.jpg", available: true },
-
-    // Fish
-    { id: 3, name: "Fish & Chips", category: "Fish", price: 13.00, img: "/fish1.jpg", available: false },
-    { id: 4, name: "Grilled Salmon", category: "Fish", price: 15.00, img: "/fish2.jpg", available: true },
-
-    // Steak
-    { id: 5, name: "Sirloin Steak", category: "Steak", price: 21.00, img: "/steak1.jpg", available: true },
-    { id: 6, name: "Ribeye Steak", category: "Steak", price: 25.00, img: "/steak2.jpg", available: true },
-
-    // Burger
-    { id: 7, name: "Classic Beef Burger", category: "Burger", price: 12.00, img: "/burger1.jpg", available: true },
-    { id: 8, name: "Chicken Burger", category: "Burger", price: 10.00, img: "/burger2.jpg", available: false },
-
-    // Spaghetti
-    { id: 9, name: "Spaghetti Carbonara", category: "Spaghetti", price: 15.00, img: "/spaghetti1.jpg", available: true },
-    { id: 10, name: "Spaghetti Bolognese", category: "Spaghetti", price: 15.00, img: "/spaghetti2.jpg", available: true },
-
-    // Drinks
-    { id: 11, name: "Iced Lemon Tea", category: "Drinks", price: 2.50, img: "/drink1.jpg", available: true },
-    { id: 12, name: "Coca-Cola", category: "Drinks", price: 2.50, img: "/drink2.jpg", available: true },
-    { id: 12, name: "Ice Water", category: "Drinks", price: 1.50, img: "/drink2.jpg", available: true },
-
-    // Add more...
-];
+import axios from 'axios';
 
 const EditMenu = () => {
     const [selectedCategory, setSelectedCategory] = useState('All');
-    const [menuItems, setMenuItems] = useState(mockMenu);
+    const [menuItems, setMenuItems] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-    const toggleAvailability = (id) => {
-        setMenuItems(prev =>
-            prev.map(item =>
-                item.id === id ? { ...item, available: !item.available } : item
-            )
-        );
+    useEffect(() => {
+        const fetchMenuItems = async () => {
+            setLoading(true);
+            try {
+                const response = await axios.get('/api/menu', {
+                    params: { category: selectedCategory !== 'All' ? selectedCategory : undefined },
+                });
+                setMenuItems(response.data);
+                setError(null); // Clear any previous error
+            } catch (err) {
+                setError('Failed to load menu items.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchMenuItems();
+    }, [selectedCategory]);
+
+    const toggleAvailability = async (id) => {
+        try {
+            const item = menuItems.find(item => item.id === id);
+            await axios.put(`/api/menu/${id}/out-of-stock`, {}, { headers: { Authorization: `Bearer ${yourToken}` } });
+            setMenuItems(prev =>
+                prev.map(item =>
+                    item.id === id ? { ...item, availability: 'out_of_stock' } : item
+                )
+            );
+        } catch (error) {
+            console.error('Error updating item availability', error);
+        }
     };
+
 
     const filteredItems = selectedCategory === 'All'
         ? menuItems
@@ -56,17 +55,19 @@ const EditMenu = () => {
                 <StaffSidebarMenu selected={selectedCategory} onSelect={setSelectedCategory} />
                 <div className={styles.content}>
                     <h2>Edit Menu</h2>
+                    {loading && <p>Loading menu items...</p>}
+                    {error && <p>{error}</p>}
                     <div className={styles.grid}>
                         {filteredItems.map(item => (
                             <div key={item.id} className={styles.card}>
-                                <img src={item.img} alt={item.name} className={styles.image} />
+                                <img src={item.imageUrl} alt={item.name} className={styles.image} />
                                 <h3>{item.name}</h3>
                                 <p>${item.price.toFixed(2)}</p>
                                 <button
                                     onClick={() => toggleAvailability(item.id)}
-                                    className={item.available ? styles.unavailableBtn : styles.availableBtn}
+                                    className={item.availability === 'available' ? styles.unavailableBtn : styles.availableBtn}
                                 >
-                                    {item.available ? "Mark as Unavailable" : "Mark as Available"}
+                                    {item.availability === 'available' ? "Mark as Unavailable" : "Mark as Available"}
                                 </button>
                             </div>
                         ))}
