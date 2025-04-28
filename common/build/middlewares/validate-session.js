@@ -3,15 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.validateSession = void 0;
 const validateSession = (redisClient) => {
     return async (req, res, next) => {
+        var _a, _b;
         console.log('Reached validateSession middleware');
-        let sessionId = req.query.sessionId || undefined;
-        if (!sessionId && req.cookies) {
-            sessionId = req.cookies.sessionId || (req.cookies.session && req.cookies.session.sessionId);
-        }
-        // 检查session中的sessionId
-        if (!sessionId && req.session) {
-            sessionId = req.session.sessionId;
-        }
+        const sessionId = req.query.sessionId || ((_a = req.cookies) === null || _a === void 0 ? void 0 : _a.session.sessionId) || ((_b = req.session) === null || _b === void 0 ? void 0 : _b.sessionId);
         console.log('Session ID:', sessionId);
         if (!sessionId) {
             return res.status(400).send({ error: 'Session ID is required' });
