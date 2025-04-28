@@ -23,14 +23,18 @@ router.post(
   async (req: Request, res: Response) => {
     const { itemId, quantity } = req.body;
 
-    if (!req.sessionData) {
+    if (!req.session.sessionId) {
         return res.status(400).send({ error: 'Session data is missing' });
     }
-    const sessionId = req.sessionData.sessionId;
-    const sessionData = req.sessionData;
+    const sessionId = req.session.sessionId;
 
-    sessionData.cart = sessionData.cart || [];
-    const itemIndex = sessionData.cart.findIndex((cartItem: any) => cartItem.itemId === itemId);
+    // Retrieve cart items from Redis using sessionId
+    const sessionKey = `session:${sessionId}`;
+    const sessionDataString = await redis.get(sessionKey);
+    const sessionData = sessionDataString ? JSON.parse(sessionDataString) : {};
+    const cartItems = sessionData.cart || [];
+
+    const itemIndex = cartItems.findIndex((cartItem: any) => cartItem.itemId === itemId);
 
     if (itemIndex === -1) {
         return res.status(404).send({ error: 'Item not found in cart' });
@@ -38,22 +42,22 @@ router.post(
 
     if (quantity === 0) {
         // Remove the item if quantity is set to zero
-        sessionData.cart.splice(itemIndex, 1);
+        cartItems.splice(itemIndex, 1);
     } else {
         // Update the quantity of the existing item
-        sessionData.cart[itemIndex].quantity = quantity;
+        cartItems[itemIndex].quantity = quantity;
     }
 
     // Update Redis & reset expiration
     await redis.set(`session:${sessionId}`, JSON.stringify(sessionData), 'EX', 15 * 60); // 15 minutes in seconds
 
     // Publish CartUpdatedEvent
-    const totalItems = sessionData.cart.reduce((sum: number, cartItem: CartItem) => sum + cartItem.quantity, 0);
-    const totalPrice = sessionData.cart.reduce((sum: number, cartItem: CartItem) => sum + (cartItem.unitPrice * cartItem.quantity), 0);
+    const totalItems = cartItems.reduce((sum: number, cartItem: CartItem) => sum + cartItem.quantity, 0);
+    const totalPrice = cartItems.reduce((sum: number, cartItem: CartItem) => sum + (cartItem.unitPrice * cartItem.quantity), 0);
 
     await new CartUpdatedPublisher(natsWrapper.client).publish({
         sessionId: sessionId,
-        items: sessionData.cart.map((cartItem: CartItem) => ({
+        items: cartItems.map((cartItem: CartItem) => ({
             itemId: cartItem.itemId,
             itemName: cartItem.itemName,
             unitPrice: cartItem.unitPrice,
@@ -66,7 +70,7 @@ router.post(
     res.status(200).send({ 
       message: 'Cart updated', 
       sessionId: sessionId,
-      cart: sessionData.cart 
+      cart: cartItems 
     });
   }
 );

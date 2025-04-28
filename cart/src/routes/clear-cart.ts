@@ -7,11 +7,11 @@ import { natsWrapper } from '../nats-wrapper';
 const router = express.Router();
 
 router.post('/api/cart/clear', validateSession(redis), async (req: Request, res: Response) => {
-    if (!req.sessionData) {
+    if (!req.session.sessionId) {
         return res.status(400).send({ error: 'Session data is missing' });
     }
-    const sessionId = req.sessionData.sessionId;
-    const sessionData = req.sessionData;
+    const sessionId = req.session.sessionId;
+    const sessionData = req.session;
 
     // Clear the cart by setting it to an empty array
     sessionData.cart = [];

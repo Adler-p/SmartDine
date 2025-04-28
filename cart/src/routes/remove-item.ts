@@ -13,11 +13,11 @@ router.post('/api/cart/remove', validateSession(redis), async (req: Request, res
     if (!itemId) {
         return res.status(400).send({ error: 'Item ID is required' });
     }
-    if (!req.sessionData) {
+    if (!req.session.sessionId) {
         return res.status(400).send({ error: 'Session data is missing' });
     }
-    const sessionId = req.sessionData.sessionId;
-    const sessionData = req.sessionData;
+    const sessionId = req.session.sessionId;
+    const sessionData = req.session;
 
     const initialCartLength = sessionData.cart ? sessionData.cart.length : 0;
     sessionData.cart = (sessionData.cart || []).filter((item: any) => item.itemId !== itemId);

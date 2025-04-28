@@ -1,4 +1,3 @@
-// cart/src/app.ts
 import express from 'express';
 import 'express-async-errors';
 import { json } from 'body-parser';
@@ -11,8 +10,10 @@ import { viewCartRouter } from './routes/view-cart';
 import { updateCartQuantityRouter } from './routes/update-quantity';
 import { clearCartRouter } from './routes/clear-cart';
 import { checkoutCartRouter } from './routes/checkout';
+import { redis } from './redis-client';
+import cors from 'cors';
 
-const app = express();
+const app: express.Application = express();
 app.set('trust proxy', true);
 app.use(json());
 app.use(cookieParser());
@@ -22,7 +23,14 @@ app.use(
     secure: false,
   })
 );
-app.use(currentUser);
+
+// Use CORS middleware
+app.use(cors());  // This will allow all domains
+
+app.use(currentUser(redis));
+
+// app.use(deleteOrderRouter);
+// app.use(indexOrderRouter);
 
 app.use(addItemRouter);
 app.use(removeItemRouter);
@@ -30,12 +38,6 @@ app.use(viewCartRouter);
 app.use(updateCartQuantityRouter);
 app.use(clearCartRouter);
 app.use(checkoutCartRouter);
-
-app.all('*', async (req, res) => {
-  throw new NotFoundError();
-});
-
-app.use(errorHandler);
 
 app.get('/test', async (req, res) => {
   console.log('Test endpoint started');
@@ -46,5 +48,13 @@ app.get('/test', async (req, res) => {
 
   res.send('Test endpoint is working');
 });
+
+app.all('*', async (req, res) => {
+  throw new NotFoundError();
+});
+
+app.use(errorHandler);
+
+
 
 export { app };

@@ -1,4 +1,3 @@
-# Build stage
 FROM node:18-alpine AS builder
 
 WORKDIR /app
@@ -19,7 +18,6 @@ WORKDIR /app/cart
 COPY cart/ ./
 # 使用npm install会自动解析file:../common路径
 RUN npm install
-# 添加构建步骤
 RUN npm run build
 
 # 生产环境镜像
