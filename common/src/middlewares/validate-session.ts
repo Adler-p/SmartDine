@@ -26,7 +26,11 @@ export const validateSession = (redisClient: Redis) => {
         return res.status(401).send({ error: 'Invalid or expired session ID' });
       }
   
-      req.sessionData = JSON.parse(sessionData);
+      // 解析sessionData并添加sessionId
+      const parsedSessionData = JSON.parse(sessionData);
+      parsedSessionData.sessionId = sessionId; // 确保sessionId在sessionData中可用
+      
+      req.sessionData = parsedSessionData;
       next();
     };
   };
