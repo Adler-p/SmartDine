@@ -4,11 +4,13 @@ exports.validateSession = void 0;
 const validateSession = (redisClient) => {
     return async (req, res, next) => {
         console.log('Reached validateSession middleware');
-        // 修复获取sessionId的方式
         let sessionId = req.query.sessionId || undefined;
-        // 检查cookies中的sessionId
         if (!sessionId && req.cookies) {
             sessionId = req.cookies.sessionId || (req.cookies.session && req.cookies.session.sessionId);
+        }
+        // 检查session中的sessionId
+        if (!sessionId && req.session) {
+            sessionId = req.session.sessionId;
         }
         console.log('Session ID:', sessionId);
         if (!sessionId) {

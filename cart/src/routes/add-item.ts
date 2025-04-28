@@ -5,7 +5,7 @@ import { CartUpdatedPublisher } from '../events/publishers/cart-updated-publishe
 import { natsWrapper } from '../nats-wrapper';
 import { CartItem } from '../models/cart-item';
 
-const router = express.Router();
+const router: express.Router = express.Router();
 
 router.post('/api/cart/add', validateSession(redis), async (req: Request, res: Response) => {
     const { item } = req.body;
@@ -13,11 +13,11 @@ router.post('/api/cart/add', validateSession(redis), async (req: Request, res: R
     if (!item) {
         return res.status(400).send({ error: 'Item is required' });
     }
-    if (!req.sessionData) {
+    if (!req.session.sessionId) {
         return res.status(400).send({ error: 'Session data is missing' });
     }
-    const sessionId = req.sessionData.sessionId;
-    const sessionData = req.sessionData;
+    const sessionId = req.session.sessionId;
+    const sessionData = req.session;
 
     // Add item to cart 
     sessionData.cart = sessionData.cart || [];

@@ -13,6 +13,7 @@ export const validateSession = (redisClient: Redis) => {
         sessionId = req.cookies.sessionId || (req.cookies.session && req.cookies.session.sessionId);
       }
       
+      const sessionId = req.query.sessionId || req.cookies?.session.sessionId || req.session?.sessionId;
       console.log('Session ID:', sessionId);
   
       if (!sessionId) {

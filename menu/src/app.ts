@@ -10,6 +10,7 @@ import { indexMenuRouter } from './routes/index'
 import { updateMenuItemRouter } from './routes/staff/update-entire-item'
 import { updateMenuItemPriceRouter } from './routes/staff/update-price'
 import { markMenuItemOutOfStockRouter } from './routes/staff/mark-out-of-stock'
+import cors from 'cors'; 
 
 // 创建一个mock redis客户端
 const mockRedisClient = {
@@ -27,6 +28,9 @@ app.use(
     secure: false
   })
 )
+
+// Use CORS middleware
+app.use(cors());  // This will allow all domains
 
 // 添加请求日志
 app.use((req, res, next) => {

@@ -1,18 +1,20 @@
+// import mongoose from 'mongoose';
 import { app } from './app';
 import { natsWrapper } from './nats-wrapper';
-import { redis } from './redis-client';
 
 import dotenv from 'dotenv';
+
 import { SessionCreatedListener } from './events/listeners/session-created-listener';
+
 dotenv.config();
 
 const start = async () => {
   if (!process.env.JWT_KEY) {
     throw new Error('JWT_KEY must be defined');
   }
-//   if (!process.env.MONGO_URI) {
-//     throw new Error('MONGO_URI must be defined');
-//   }
+  // if (!process.env.SQL_URI) {
+  //   throw new Error('SQL_URI must be defined');
+  // }
   if (!process.env.NATS_CLIENT_ID) {
     throw new Error('NATS_CLIENT_ID must be defined');
   }
@@ -22,33 +24,35 @@ const start = async () => {
   if (!process.env.NATS_CLUSTER_ID) {
     throw new Error('NATS_CLUSTER_ID must be defined');
   }
-  if (!process.env.REDIS_HOST) {
-    throw new Error('REDIS_HOST must be defined');
-  }
-  if (!process.env.REDIS_PORT) {
-    throw new Error('REDIS_PORT must be defined');
-  }
 
   try {
+    // // 首先连接到数据库
+    // await sequelize.authenticate();
+    // console.log('Connected to PostgreSQL database');
+
+    // // 同步数据库模型 (强制重建表)
+    // await sequelize.sync({ force: true });
+    // console.log('Database tables recreated and synced');
+
+    // 连接到NATS
     await natsWrapper.connect(
       process.env.NATS_CLUSTER_ID,
       process.env.NATS_CLIENT_ID,
       process.env.NATS_URL
     );
+    
     natsWrapper.client.on('close', () => {
       console.log('NATS connection closed!');
       process.exit();
     });
     process.on('SIGINT', () => natsWrapper.client.close());
-    process.on('SIGTERM', () => natsWrapper.client.close());    
-
-    // await redis.connect(); 
+    process.on('SIGTERM', () => natsWrapper.client.close());
 
     // Start listening for session:created events
     new SessionCreatedListener(natsWrapper.client).listen();
+
   } catch (err) {
-    console.error(err);
-    process.exit(1); 
+    console.error('Error starting service:', err);
   }
 
   app.listen(3000, () => {
