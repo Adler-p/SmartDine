@@ -6,7 +6,7 @@ import { param } from 'express-validator';
 const router = express.Router();
 
 router.get(
-  '/api/payments/:orderId',
+  '/api/payments/staff/:orderId',
   requireAuth,
   requireRole([UserRole.STAFF]),
   [
@@ -17,9 +17,11 @@ router.get(
   validateRequest,
   async (req: Request, res: Response) => {
     const { orderId } = req.params;
+    console.log('orderId:', orderId);
 
     try{
         const payment = await Payment.findOne({ where: { orderId } });
+        console.log('Payment:', payment);
         if (!payment) {
             return res.status(404).send({ error: 'Payment not found for this order ID' });
         }

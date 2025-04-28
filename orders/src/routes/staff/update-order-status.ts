@@ -27,7 +27,7 @@ router.put(
     let sessionId;
     
     // 尝试从validateSession中间件获取
-    if (req.sessionData && req.sessionData.sessionId) {
+    if (req.session && req.session.sessionId) {
       sessionId = req.sessionData.sessionId;
     } 
     // 尝试从cookie或req.currentUser获取

@@ -2,6 +2,7 @@ import express from 'express';
 import 'express-async-errors';
 import { json } from 'body-parser';
 import cookieSession from 'cookie-session';
+import cookieParser from 'cookie-parser';
 import { errorHandler, NotFoundError, currentUser } from '@smartdine/common';
 import { customerUpdatePaymentStatusRouter } from './routes/customer/customer-update-payment-status';
 import { createPaymentRouter } from './routes/customer/create-payment';
@@ -15,6 +16,7 @@ import { redis } from './redis-client';
 const app: express.Application = express();
 app.set('trust proxy', true);
 app.use(json());
+app.use(cookieParser()); 
 app.use(
   cookieSession({
     signed: false,

@@ -16,13 +16,13 @@ router.get(
   validateRequest,
   async (req: Request, res: Response) => {
     const { orderId } = req.params;
-    
+
     // 处理会话ID
     let sessionId;
     
     // 尝试从validateSession中间件获取
-    if (req.sessionData && req.sessionData.sessionId) {
-      sessionId = req.sessionData.sessionId;
+    if (req.session && req.session.sessionId) {
+      sessionId = req.session.sessionId;
     } 
     // 尝试从cookie或req.currentUser获取
     else if (req.cookies && req.cookies.session) {

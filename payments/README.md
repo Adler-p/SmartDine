@@ -81,7 +81,7 @@ The Payment Service is responsible for managing payment records associated with 
     ```
 
 ### View Payment by Order ID (Staff)
--   **GET** `/api/payments/:orderId`
+-   **GET** `/api/payments/staff/:orderId`
 -   **Description**: Retrieves a specific payment record based on its associated `orderId`. Requires staff authentication.
 -   **Requires**: Authentication as a staff user.
 -   **Path Parameter**:

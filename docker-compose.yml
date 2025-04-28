@@ -34,28 +34,29 @@ services:
     environment:
       - MONGO_URI=mongodb://menu-mongo:27017/menu
       - JWT_KEY=your_jwt_key
-      - NATS_CLIENT_ID=menu-${HOSTNAME}
+      - NATS_CLIENT_ID=menu-${HOSTNAME:-menu1}
       - NATS_URL=http://nats-streaming:4222
       - NATS_CLUSTER_ID=smartdine
     depends_on:
       - menu-mongo
       - nats-streaming
 
-  # cart:
-  #   build:
-  #     context: .
-  #     dockerfile: cart/Dockerfile
-  #   ports:
-  #     - "3004:3000"
-  #   environment:
-  #     - REDIS_HOST=redis
-  #     - REDIS_PORT=6379
-  #     - NATS_CLIENT_ID=cart-${HOSTNAME}
-  #     - NATS_URL=http://nats-streaming:4222
-  #     - NATS_CLUSTER_ID=smartdine
-  #   depends_on:
-  #     - redis
-  #     - nats-streaming
+  cart:
+    build:
+      context: .
+      dockerfile: cart/Dockerfile
+    ports:
+      - "3004:3000"
+    environment:
+      - JWT_KEY=your_jwt_key
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - NATS_CLIENT_ID=cart-${HOSTNAME:-cart1}
+      - NATS_URL=http://nats-streaming:4222
+      - NATS_CLUSTER_ID=smartdine
+    depends_on:
+      - redis
+      - nats-streaming
 
   orders:
     build:
@@ -66,7 +67,7 @@ services:
     environment:
       - SQL_URI=postgres://postgres:postgres@orders-postgres:5432/orders
       - JWT_KEY=your_jwt_key
-      - NATS_CLIENT_ID=orders-${HOSTNAME}
+      - NATS_CLIENT_ID=orders-${HOSTNAME:-orders1}
       - NATS_URL=http://nats-streaming:4222
       - NATS_CLUSTER_ID=smartdine
       - REDIS_HOST=redis
@@ -88,7 +89,7 @@ services:
       - STRIPE_KEY=your_stripe_key
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - NATS_CLIENT_ID=payments-${HOSTNAME}
+      - NATS_CLIENT_ID=payments-${HOSTNAME:-payments1}
       - NATS_URL=http://nats-streaming:4222
       - NATS_CLUSTER_ID=smartdine
     depends_on:
@@ -114,7 +115,7 @@ services:
   auth-postgres:
     image: postgres:latest
     ports:
-      - "5432:5432"
+      - "5435:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
