@@ -4,7 +4,7 @@ import Redis from 'ioredis';
 export const validateSession = (redisClient: Redis) => {
     return async (req: Request, res: Response, next: NextFunction) => {
       console.log('Reached validateSession middleware');
-      const sessionId = req.query.sessionId || req.cookies?.session.sessionId;
+      const sessionId = req.query.sessionId || req.cookies?.session.sessionId || req.session?.sessionId;
       console.log('Session ID:', sessionId);
   
       if (!sessionId) {

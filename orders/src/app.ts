@@ -9,6 +9,7 @@ import { staffViewOrderRouter } from './routes/staff/view-order';
 import { staffViewAllOrdersRouter } from './routes/staff/view-all-orders';
 import { updateOrderStatusRouter } from './routes/staff/update-order-status';
 import { redis } from './redis-client';
+import cors from 'cors';
 
 const app: express.Application = express();
 app.set('trust proxy', true);
@@ -19,6 +20,10 @@ app.use(
     secure: false,
   })
 );
+
+// Use CORS middleware
+app.use(cors());  // This will allow all domains
+
 app.use(currentUser(redis));
 
 // app.use(deleteOrderRouter);
