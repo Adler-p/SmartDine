@@ -1,1 +1,1 @@
-export const BACKEND_IP = 'https://54.206.228.57'
+export const BACKEND_IP = 'https://54.206.228.57:3000'
