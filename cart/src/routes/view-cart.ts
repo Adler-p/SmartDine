@@ -5,18 +5,12 @@ import { validateSession } from '@smartdine/common';
 const router = express.Router();
 
 router.get('/api/cart', validateSession(redis), async (req: Request, res: Response) => {
-    if (!req.session.sessionId) {
+    if (!req.sessionData) {
         return res.status(400).send({ error: 'Session data is missing' });
     }
-    const sessionId = req.session.sessionId;
+    const sessionData = req.sessionData;
 
-    // Retrieve cart items from Redis using sessionId
-    const sessionKey = `session:${sessionId}`;
-    const sessionDataString = await redis.get(sessionKey);
-    const sessionData = sessionDataString ? JSON.parse(sessionDataString) : {};
-    const cartItems = sessionData.cart || [];
-
-    res.status(200).send({ cart: cartItems });
+    res.status(200).send({ cart: sessionData.cart || [] });
 })
 
 export { router as viewCartRouter };

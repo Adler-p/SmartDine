@@ -13,11 +13,11 @@ router.post('/api/cart/add', validateSession(redis), async (req: Request, res: R
     if (!item) {
         return res.status(400).send({ error: 'Item is required' });
     }
-    if (!req.session.sessionId) {
+    if (!req.sessionData) {
         return res.status(400).send({ error: 'Session data is missing' });
     }
-    const sessionId = req.session.sessionId;
-    const sessionData = req.session;
+    const sessionId = req.sessionData.sessionId;
+    const sessionData = req.sessionData;
 
     // Add item to cart 
     sessionData.cart = sessionData.cart || [];
