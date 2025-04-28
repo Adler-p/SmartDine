@@ -11,6 +11,7 @@ import { viewCartRouter } from './routes/view-cart';
 import { updateCartQuantityRouter } from './routes/update-quantity';
 import { clearCartRouter } from './routes/clear-cart';
 import { checkoutCartRouter } from './routes/checkout';
+import { redis } from './redis-client';
 
 const app = express();
 app.set('trust proxy', true);
@@ -22,7 +23,20 @@ app.use(
     secure: false,
   })
 );
-app.use(currentUser);
+app.use(currentUser(redis));
+
+// 添加请求日志中间件
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
+
+// 添加测试路由 - 放在通配符路由前面
+app.get('/test', (req, res) => {
+  console.log('Test endpoint hit: starting response');
+  res.status(200).send('Test endpoint is working');
+  console.log('Test endpoint: response sent');
+});
 
 app.use(addItemRouter);
 app.use(removeItemRouter);
@@ -36,15 +50,5 @@ app.all('*', async (req, res) => {
 });
 
 app.use(errorHandler);
-
-app.get('/test', async (req, res) => {
-  console.log('Test endpoint started');
-  
-  setTimeout(() => {
-      console.log('Timeout reached without response');
-  }, 5000);  // Timeout after 5 seconds if no response is sent
-
-  res.send('Test endpoint is working');
-});
 
 export { app };
