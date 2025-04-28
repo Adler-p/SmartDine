@@ -6,14 +6,13 @@ export const validateSession = (redisClient: Redis) => {
       console.log('Reached validateSession middleware');
       
       // 修复获取sessionId的方式
-      let sessionId = req.query.sessionId as string || undefined;
+      let sessionId = req.query.sessionId as string || req.cookies?.session.sessionId || req.session?.sessionId || undefined;
       
       // 检查cookies中的sessionId
       if (!sessionId && req.cookies) {
         sessionId = req.cookies.sessionId || (req.cookies.session && req.cookies.session.sessionId);
       }
       
-      const sessionId = req.query.sessionId || req.cookies?.session.sessionId || req.session?.sessionId;
       console.log('Session ID:', sessionId);
   
       if (!sessionId) {

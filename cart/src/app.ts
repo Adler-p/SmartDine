@@ -1,3 +1,4 @@
+// cart/src/app.ts
 import express from 'express';
 import 'express-async-errors';
 import { json } from 'body-parser';
@@ -11,9 +12,8 @@ import { updateCartQuantityRouter } from './routes/update-quantity';
 import { clearCartRouter } from './routes/clear-cart';
 import { checkoutCartRouter } from './routes/checkout';
 import { redis } from './redis-client';
-import cors from 'cors';
 
-const app: express.Application = express();
+const app = express();
 app.set('trust proxy', true);
 app.use(json());
 app.use(cookieParser());
@@ -23,14 +23,20 @@ app.use(
     secure: false,
   })
 );
-
-// Use CORS middleware
-app.use(cors());  // This will allow all domains
-
 app.use(currentUser(redis));
 
-// app.use(deleteOrderRouter);
-// app.use(indexOrderRouter);
+// 添加请求日志中间件
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
+
+// 添加测试路由 - 放在通配符路由前面
+app.get('/test', (req, res) => {
+  console.log('Test endpoint hit: starting response');
+  res.status(200).send('Test endpoint is working');
+  console.log('Test endpoint: response sent');
+});
 
 app.use(addItemRouter);
 app.use(removeItemRouter);
@@ -39,22 +45,10 @@ app.use(updateCartQuantityRouter);
 app.use(clearCartRouter);
 app.use(checkoutCartRouter);
 
-app.get('/test', async (req, res) => {
-  console.log('Test endpoint started');
-  
-  setTimeout(() => {
-      console.log('Timeout reached without response');
-  }, 5000);  // Timeout after 5 seconds if no response is sent
-
-  res.send('Test endpoint is working');
-});
-
 app.all('*', async (req, res) => {
   throw new NotFoundError();
 });
 
 app.use(errorHandler);
-
-
 
 export { app };
