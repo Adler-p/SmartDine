@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import { app } from './app';
 import { natsWrapper } from './nats-wrapper';
 import dotenv from 'dotenv';
-
+import fs from 'fs';
 dotenv.config();
 
 // Set up process event handlers
@@ -72,15 +72,21 @@ const start = async () => {
 
     // Connect to MongoDB
     console.log(`Connecting to MongoDB at ${process.env.MONGO_URI}...`);
+    // await mongoose.connect(process.env.MONGO_URI!,{
+    //   ssl: true,
+    //   sslCA: '/app/menu//global-bundle.pem',
+    // });
     await mongoose.connect(process.env.MONGO_URI!);
     console.log('Successfully connected to MongoDB');
   } catch (err) {
     console.error('Error during service initialization:', err);
     throw err;
   }
-
+  app.get('/health', (req, res) => {
+    res.status(200).send('OK');
+  });
   // Start server
-  app.listen(3000, () => {
+  app.listen(3000,'0.0.0.0', () => {
     console.log('Menu service listening on port 3000');
   });
 };

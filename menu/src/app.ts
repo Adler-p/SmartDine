@@ -10,6 +10,7 @@ import { indexMenuRouter } from './routes/index'
 import { updateMenuItemRouter } from './routes/staff/update-entire-item'
 import { updateMenuItemPriceRouter } from './routes/staff/update-price'
 import { markMenuItemOutOfStockRouter } from './routes/staff/mark-out-of-stock'
+import cors from 'cors'; 
 
 // 创建一个mock redis客户端
 const mockRedisClient = {
@@ -19,6 +20,13 @@ const mockRedisClient = {
 };
 
 const app = express()
+const corsOptions = {
+  origin: ['http://localhost:3000', 'https://nus-iss-smart-dine.vercel.app'],
+  credentials: true
+};
+
+app.use(cors(corsOptions));  
+app.options('*', cors(corsOptions))
 app.set('trust proxy', true)
 app.use(json())
 app.use(
@@ -37,11 +45,8 @@ app.use((req, res, next) => {
   }
   next();
 });
-
-// 健康检查端点 - 不需要身份验证
-app.get('/api/menu/health', (req, res) => {
-  console.log('Health check endpoint called');
-  res.status(200).send({ status: 'ok' });
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
 });
 
 // 使用currentUser中间件，传入mock redis客户端

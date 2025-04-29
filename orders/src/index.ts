@@ -15,9 +15,6 @@ const start = async () => {
   if (!process.env.JWT_KEY) {
     throw new Error('JWT_KEY must be defined');
   }
-  if (!process.env.SQL_URI) {
-    throw new Error('SQL_URI must be defined');
-  }
   if (!process.env.NATS_CLIENT_ID) {
     throw new Error('NATS_CLIENT_ID must be defined');
   }
@@ -64,7 +61,10 @@ const start = async () => {
     console.error('Error starting service:', err);
   }
 
-  app.listen(3000, () => {
+  app.get('/health', (req, res) => {
+    res.status(200).send('OK');
+  });
+  app.listen(3000,'0.0.0.0', () => {
     console.log('Listening on port 3000!');
   });
 };

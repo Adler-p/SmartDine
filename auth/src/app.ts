@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import cookieSession from 'cookie-session';
 import { NotFoundError } from '@smartdine/common';
 const { errorHandler } = require('@smartdine/common');
+import cors from 'cors';
 
 import { currentUserRouter } from './routes/current-user';
 import { signinRouter } from './routes/signin';
@@ -13,6 +14,13 @@ import { sessionRouter } from './routes/new-session';
 import { refreshTokenRouter } from './routes/refresh-token';
 
 const app: express.Application = express();
+const corsOptions = {
+  origin: ['http://localhost:3000', 'https://nus-iss-smart-dine.vercel.app'],
+  credentials: true
+};
+
+app.use(cors(corsOptions));  
+app.options('*', cors(corsOptions))
 app.set('trust proxy', true);
 app.use(bodyParser.json());
 app.use(
@@ -21,6 +29,12 @@ app.use(
     secure: false
   })
 );
+
+// Use CORS middleware
+
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
 
 app.use(currentUserRouter);
 app.use(signinRouter);

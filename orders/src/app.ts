@@ -9,8 +9,16 @@ import { staffViewOrderRouter } from './routes/staff/view-order';
 import { staffViewAllOrdersRouter } from './routes/staff/view-all-orders';
 import { updateOrderStatusRouter } from './routes/staff/update-order-status';
 import { redis } from './redis-client';
+import cors from 'cors';
 
 const app: express.Application = express();
+const corsOptions = {
+  origin: ['http://localhost:3000', 'https://nus-iss-smart-dine.vercel.app'],
+  credentials: true
+};
+
+app.use(cors(corsOptions));  
+app.options('*', cors(corsOptions))
 app.set('trust proxy', true);
 app.use(json());
 app.use(
@@ -19,6 +27,10 @@ app.use(
     secure: false,
   })
 );
+
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+}); 
 app.use(currentUser(redis));
 
 // app.use(deleteOrderRouter);

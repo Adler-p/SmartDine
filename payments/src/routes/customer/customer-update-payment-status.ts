@@ -21,7 +21,7 @@ router.post(
   validateRequest,
   async (req: Request, res: Response) => {
     const { orderId, paymentStatus } = req.body;
-    const sessionId = req.sessionData.sessionId;
+    const sessionId = req.session.sessionId;
 
     try {
       const payment = await Payment.findOne({ where: { orderId } });

@@ -9,9 +9,11 @@ on:
     - 'menu/**'
     - 'orders/**'
     - 'payments/**'
+    - 'cart/**'
     - 'docker-compose.yml'
     - '.github/workflows/deploy.yml'
   workflow_dispatch:
+  # 添加一个触发器，当有新的提交时，自动部署
 
 jobs:
   deploy:
@@ -28,14 +30,14 @@ jobs:
           timeout: 10m
           command_timeout: 20m
           script: |
-            if [ ! -d "SmartDine" ]; then
-              git clone https://Adler-p:${{ secrets.GH_TOKEN }}@github.com/Adler-p/SmartDine.git
-            else
+            if [ -d "SmartDine/.git" ]; then
               cd SmartDine
               git pull origin main
+            else
+              rm -rf SmartDine
+              git clone https://Adler-p:${{ secrets.GH_TOKEN }}@github.com/Adler-p/SmartDine.git
+              cd SmartDine
             fi
-
-            cd ~/SmartDine
-            docker compose down
-            docker compose build
-            docker compose up -d
+            docker-compose down
+            docker-compose build
+            docker-compose up -d

@@ -20,10 +20,10 @@ router.post(
     async (req: Request, res: Response) => {
         const { tableId } = req.body;
     
-        if (!req.sessionData) {
+        if (!req.session.sessionId) {
             return res.status(400).send({ error: 'Session data is missing' });
         }
-        const sessionId = req.sessionData.sessionId;
+        const sessionId = req.session.sessionId;
 
         // Retrieve cart items from Redis using sessionId
         const sessionKey = `session:${sessionId}`;
@@ -31,12 +31,6 @@ router.post(
         const sessionData = sessionDataString ? JSON.parse(sessionDataString) : {};
         const cartItems = sessionData.cart || [];
 
-
-        // const sessionData = req.sessionData;
-    
-        // sessionData.cart = sessionData.cart || [];
-        // const cartItems = sessionData.cart;
-    
         if (!cartItems || cartItems.length === 0) {
             return res.status(400).send({ error: 'Cart is empty' });
         }
