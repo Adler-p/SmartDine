@@ -1,66 +1,66 @@
 .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #d1e7c5;
-    padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #d1e7c5;
+  padding: 10px 20px;
 }
 
 .logout {
-    background-color: #ff6b6b;
-    color: black;
-    border: none;
-    padding: 8px 12px;
-    cursor: pointer;
-    border-radius: 5px;
-    font-family: inherit;
+  background-color: #ff6b6b;
+  color: black;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-family: inherit;
 }
 
-    .logout:hover {
-        background-color: #ff4c4c;
-    }
+.logout:hover {
+  background-color: #ff4c4c;
+}
 
 .title {
-    font-size: 24px;
-    font-weight: bold;
-    color: #333;
-    cursor: pointer;
-    transition: color 0.3s ease;
-    text-decoration: none;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  text-decoration: none;
 }
 
-    .title:hover {
-        color: #5a8f2f;
-    }
+.title:hover {
+  color: #5a8f2f;
+}
 
-    .title a {
-        text-decoration: none;
-        color: inherit;
-    }
+.title a {
+  text-decoration: none;
+  color: inherit;
+}
 
 .leftButtons {
-    display: flex;
-    gap: 10px;
+  display: flex;
+  gap: 10px;
 }
 
 .button {
-    padding: 8px 12px;
-    background-color: #80e27e;
-    color: black;
-    font-size: 16px;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-    font-family: inherit;
+  padding: 8px 12px;
+  background-color: #80e27e;
+  color: black;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+  font-family: inherit;
 }
 
 .button:hover {
-    background-color: #66c66c;
+  background-color: #66c66c;
 }
 
 .cartIcon {
-    width: 32px;
-    height: 32px;
-    color: #333; /* Adjust color */
+  width: 32px;
+  height: 32px;
+  color: #333; /* Adjust color */
 }

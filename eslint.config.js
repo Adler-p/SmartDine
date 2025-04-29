@@ -1,16 +1,18 @@
-import { defineConfig } from 'eslint-config-next';
+// eslint.config.js
+import next from 'eslint-plugin-next';
 
-export default defineConfig({
-  extends: ['next', 'next/core-web-vitals'],
-  rules: {
-    // Your custom rules can go here
+export default [
+  {
+    ignores: ['node_modules/**', '.next/**'],
   },
-  overrides: [
-    {
-      files: ['*.ts', '*.tsx'],
-      rules: {
-        // TypeScript-specific rules can go here
-      },
+  {
+    files: ['**/*.{js,ts,jsx,tsx}'],
+    plugins: {
+      next,
     },
-  ],
-});
+    rules: {
+      ...next.configs.recommended.rules,
+      // Add your custom rules here
+    },
+  },
+];

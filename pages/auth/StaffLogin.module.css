@@ -1,76 +1,76 @@
 .page-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-    background-color: #f4f4f4;
-    flex-direction: column; /* Ensures items are centered vertically and horizontally */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  background-color: #f4f4f4;
+  flex-direction: column; /* Ensures items are centered vertically and horizontally */
 }
 
 .page-content {
-    text-align: center;
-    padding: 20px;
-    max-width: 600px;
-    width: 100%;
+  text-align: center;
+  padding: 20px;
+  max-width: 600px;
+  width: 100%;
 }
 
 .headerTitle {
-    color: #333;
-    margin-bottom: 30px;
-    font-size: 2rem;
-    font-weight: bold;
-    text-align: center;
-    width: 100%;
+  color: #333;
+  margin-bottom: 30px;
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
 }
 
 .loginContainer {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    max-width: 400px;
-    margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 .inputBox {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 20px;
 }
 
 .inputField {
-    width: 100%;
-    padding: 12px;
-    border: 2px solid #b0dbb2;
-    border-radius: 15px;
-    font-size: 1rem;
-    outline: none;
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #b0dbb2;
+  border-radius: 15px;
+  font-size: 1rem;
+  outline: none;
 }
 
-    .inputField:focus {
-        border-color: #98c8a0;
-    }
+.inputField:focus {
+  border-color: #98c8a0;
+}
 
 .button {
-    background-color: #80e27e;
-    color: black;
-    font-size: 1rem;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin: 10px 0;
-    transition: background-color 0.3s ease;
-    font-family: inherit;
+  background-color: #80e27e;
+  color: black;
+  font-size: 1rem;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 10px 0;
+  transition: background-color 0.3s ease;
+  font-family: inherit;
 }
 
-    .button:hover {
-        background-color: #66c66c;
-    }
+.button:hover {
+  background-color: #66c66c;
+}
 
 .loginContainer button + button {
-    margin-top: 20px;
+  margin-top: 20px;
 }
