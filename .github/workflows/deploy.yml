@@ -32,9 +32,14 @@ jobs:
           script: |
             if [ ! -d "SmartDine" ]; then
               git clone https://Adler-p:${{ secrets.GH_TOKEN }}@github.com/Adler-p/SmartDine.git
-            else
-              cd SmartDine
-              git pull origin main
+              if [ -d "SmartDine/.git" ]; then
+                cd SmartDine
+                git pull origin main
+              else
+                rm -rf SmartDine  # 清除空壳或非git目录
+                git clone https://Adler-p:${{ secrets.GH_TOKEN }}@github.com/Adler-p/SmartDine.git
+                cd SmartDine
+              fi
             fi
 
             cd ~/SmartDine
