@@ -54,7 +54,9 @@ const start = async () => {
   } catch (err) {
     console.error('Error starting service:', err);
   }
-
+  app.get('/health', (req, res) => {
+    res.status(200).send('OK');
+  });
   app.listen(3000, () => {
     console.log('Listening on port 3000!');
   });

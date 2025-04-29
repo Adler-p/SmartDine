@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import cookieSession from 'cookie-session';
 import { NotFoundError } from '@smartdine/common';
 const { errorHandler } = require('@smartdine/common');
+import cors from 'cors';
 
 import { currentUserRouter } from './routes/current-user';
 import { signinRouter } from './routes/signin';
@@ -21,6 +22,12 @@ app.use(
     secure: false
   })
 );
+
+// Use CORS middleware
+app.use(cors());  // This will allow all domains
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
 
 app.use(currentUserRouter);
 app.use(signinRouter);
