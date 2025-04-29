@@ -62,7 +62,7 @@ jobs:
 
       # Deploy to Vercel (make sure to set up your Vercel project for GitHub integration)
       - name: Deploy to Vercel
-        run: npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
+        run: npx vercel --prod --yes --token ${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}  # Set your Vercel token as a GitHub secret
 
