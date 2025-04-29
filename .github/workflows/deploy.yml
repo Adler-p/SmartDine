@@ -28,7 +28,7 @@ jobs:
 
       # Run Prettier to format the code
       - name: Run Prettier
-        run: npm run prettier --write .
+        run: npm run format
 
       # Run linting
       - name: Run Lint
