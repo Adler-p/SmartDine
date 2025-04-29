@@ -30,7 +30,12 @@ app.use(
 )
 
 // Use CORS middleware
-app.use(cors());  // This will allow all domains
+app.use(cors(
+  {
+  origin: ['http://localhost:3000', 'https://smartdinehttps://nus-iss-smart-dine.vercel.app'],
+  credentials: true
+  }
+));
 
 // 添加请求日志
 app.use((req, res, next) => {

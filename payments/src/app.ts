@@ -23,7 +23,12 @@ app.use(
     secure: false,
   })
 );
-app.use(cors());  // This will allow all domains
+app.use(cors(
+  {
+  origin: ['http://localhost:3000', 'https://smartdinehttps://nus-iss-smart-dine.vercel.app'],
+  credentials: true
+  }
+));   // This will allow all domains
 app.get('/health', (req, res) => {
   res.status(200).send('OK');
 });
