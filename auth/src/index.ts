@@ -40,7 +40,9 @@ const start = async () => {
     console.error('Error starting the application:', err);
     process.exit(1);
   }
-
+  app.get('/health', (req, res) => {
+    res.status(200).send('OK');
+  });
   app.listen(3000, () => {
     console.log('Auth service listening on port 3000');
   });

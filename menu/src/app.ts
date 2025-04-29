@@ -41,11 +41,8 @@ app.use((req, res, next) => {
   }
   next();
 });
-
-// 健康检查端点 - 不需要身份验证
-app.get('/api/menu/health', (req, res) => {
-  console.log('Health check endpoint called');
-  res.status(200).send({ status: 'ok' });
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
 });
 
 // 使用currentUser中间件，传入mock redis客户端

@@ -12,7 +12,7 @@ import { updateCartQuantityRouter } from './routes/update-quantity';
 import { clearCartRouter } from './routes/clear-cart';
 import { checkoutCartRouter } from './routes/checkout';
 import { redis } from './redis-client';
-
+import cors from 'cors';
 const app = express();
 app.set('trust proxy', true);
 app.use(json());
@@ -23,6 +23,10 @@ app.use(
     secure: false,
   })
 );
+app.use(cors());  // This will allow all domains
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
 app.use(currentUser(redis));
 
 // 添加请求日志中间件

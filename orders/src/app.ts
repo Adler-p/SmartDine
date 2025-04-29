@@ -23,7 +23,9 @@ app.use(
 
 // Use CORS middleware
 app.use(cors());  // This will allow all domains
-
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+}); 
 app.use(currentUser(redis));
 
 // app.use(deleteOrderRouter);
