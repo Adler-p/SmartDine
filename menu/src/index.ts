@@ -72,10 +72,11 @@ const start = async () => {
 
     // Connect to MongoDB
     console.log(`Connecting to MongoDB at ${process.env.MONGO_URI}...`);
-    await mongoose.connect(process.env.MONGO_URI!,{
-      ssl: true,
-      sslCA: '/app/menu//global-bundle.pem',
-    });
+    // await mongoose.connect(process.env.MONGO_URI!,{
+    //   ssl: true,
+    //   sslCA: '/app/menu//global-bundle.pem',
+    // });
+    await mongoose.connect(process.env.MONGO_URI!);
     console.log('Successfully connected to MongoDB');
   } catch (err) {
     console.error('Error during service initialization:', err);
