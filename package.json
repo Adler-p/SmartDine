@@ -10,7 +10,9 @@
     "start": "next start",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "next lint",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run"
   },
   "author": "",
   "license": "ISC",
@@ -26,6 +28,8 @@
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.2",
+    "@types/react": "19.1.2",
+    "cypress": "^14.3.2",
     "del-cli": "^5.0.0",
     "eslint": "^8.57.1",
     "eslint-config-next": "^13.4.2",

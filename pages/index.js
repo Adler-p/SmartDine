@@ -13,28 +13,28 @@ export default function Home() {
     router.push('/menu'); // Replace with your customer page URL
   };
 
-  useEffect(() => {
-    const fetchCart = async () => {
-      try {
-        const response = await axios.get(BACKEND_IP + '/api/users/currentUser');
+  // useEffect(() => {
+  //   const fetchCart = async () => {
+  //     try {
+  //       const response = await axios.get(BACKEND_IP + '/api/users/currentUser');
 
-        // Log response status and data
-        console.log('Response Status:', response.status);
-        console.log('Response Data:', response.data);
+  //       // Log response status and data
+  //       console.log('Response Status:', response.status);
+  //       console.log('Response Data:', response.data);
 
-        // You can handle different statuses here if needed
-        if (response.status === 200) {
-          console.log('Request was successful');
-        } else {
-          console.log('Request failed with status:', response.status);
-        }
-      } catch (err) {
-        console.error('Error fetching cart data:', err);
-      }
-    };
+  //       // You can handle different statuses here if needed
+  //       if (response.status === 200) {
+  //         console.log('Request was successful');
+  //       } else {
+  //         console.log('Request failed with status:', response.status);
+  //       }
+  //     } catch (err) {
+  //       console.error('Error fetching cart data:', err);
+  //     }
+  //   };
 
-    fetchCart(); // Execute the fetchCart function when component mounts
-  }, []); // The effect runs only once, similar to componentDidMount
+  //   fetchCart(); // Execute the fetchCart function when component mounts
+  // }, []); // The effect runs only once, similar to componentDidMount
 
   return (
     <div className="page-container">
