@@ -31,7 +31,6 @@ jobs:
           command_timeout: 20m
           script: |
             if [ ! -d "SmartDine" ]; then
-              git clone https://Adler-p:${{ secrets.GH_TOKEN }}@github.com/Adler-p/SmartDine.git
               if [ -d "SmartDine/.git" ]; then
                 cd SmartDine
                 git pull origin main
