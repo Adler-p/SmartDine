@@ -14,13 +14,13 @@ import { checkoutCartRouter } from './routes/checkout';
 import { redis } from './redis-client';
 import cors from 'cors';
 const app = express();
-app.use(cors(
-  {
+const corsOptions = {
   origin: ['http://localhost:3000', 'https://nus-iss-smart-dine.vercel.app'],
   credentials: true
-  }
-));
-app.options('*', cors())
+};
+
+app.use(cors(corsOptions));  
+app.options('*', cors(corsOptions))
 app.set('trust proxy', true);
 app.use(json());
 app.use(cookieParser());
