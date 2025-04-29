@@ -1,4 +1,3 @@
-// cart/src/app.ts
 import express from 'express';
 import 'express-async-errors';
 import { json } from 'body-parser';
@@ -13,6 +12,7 @@ import { clearCartRouter } from './routes/clear-cart';
 import { checkoutCartRouter } from './routes/checkout';
 import { redis } from './redis-client';
 import cors from 'cors';
+
 const app = express();
 const corsOptions = {
   origin: ['http://localhost:3000', 'https://nus-iss-smart-dine.vercel.app'],
@@ -30,7 +30,6 @@ app.use(
     secure: false,
   })
 );
-
 app.get('/health', (req, res) => {
   res.status(200).send('OK');
 });
@@ -61,5 +60,7 @@ app.all('*', async (req, res) => {
 });
 
 app.use(errorHandler);
+
+
 
 export { app };

@@ -23,10 +23,10 @@ router.post(
   async (req: Request, res: Response) => {
     const { itemId, quantity } = req.body;
 
-    if (!req.sessionData.sessionId) {
+    if (!req.session.sessionId) {
         return res.status(400).send({ error: 'Session data is missing' });
     }
-    const sessionId = req.sessionData.sessionId;
+    const sessionId = req.session.sessionId;
 
     // Retrieve cart items from Redis using sessionId
     const sessionKey = `session:${sessionId}`;
