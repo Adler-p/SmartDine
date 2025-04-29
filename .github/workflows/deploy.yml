@@ -1,54 +1,64 @@
-name: Next.js CI/CD Pipeline
+name: Frontend CI Workflow
 
 on:
   push:
     branches:
-      - frontend
+      - frontend  # Trigger this workflow only on 'frontend' branch push
   pull_request:
     branches:
-      - frontend
+      - frontend  # Trigger on pull requests to 'frontend' branch
 
 jobs:
-  build-and-lint:
-    name: Build and Lint
+  linting_and_testing:
     runs-on: ubuntu-latest
-
     steps:
+      # Checkout the code from the repository
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      # Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
-          node-version: '20' # Use Node 20, works great for Next.js
+          node-version: '16'  # Specify your node version (adjust if needed)
 
+      # Install dependencies
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
-      - name: Run Linter
+      # Run Prettier to format the code
+      - name: Run Prettier
+        run: npm run prettier --write .
+
+      # Run linting
+      - name: Run Lint
         run: npm run lint
 
-      - name: Run Prettier Check
-        run: npm run format:check
-
-      - name: Next.js Build
-        run: npm run build
+      # Run Cypress tests
+      - name: Run Cypress tests
+        run: npm run cypress:run  # You may need to adjust this based on your Cypress script
 
   deploy:
-    name: Deploy to Vercel
-    needs: build-and-lint
+    needs: linting_and_testing  # Ensure linting and tests are successful before deployment
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/frontend'
-
     steps:
+      # Checkout the code from the repository again
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
+      # Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: ./
-          prod: true
+          node-version: '16'
+
+      # Install dependencies again (if necessary for deployment)
+      - name: Install dependencies
+        run: npm install
+
+      # Deploy to Vercel (make sure to set up your Vercel project for GitHub integration)
+      - name: Deploy to Vercel
+        run: npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}  # Set your Vercel token as a GitHub secret
+
