@@ -39,6 +39,7 @@ app.use(
     name: 'session', // You can specify a name for the cookie
     domain: 'localhost', // This should work as a top-level option
     path: '/', // This should also work as a top-level option
+    sameSite: 'none'
   })
 );
 

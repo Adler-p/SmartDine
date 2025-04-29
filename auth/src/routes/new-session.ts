@@ -25,6 +25,11 @@ router.get('/api/session/create', async (req: Request, res: Response) => {
 
     await redis.set(`session:${sessionId}`, JSON.stringify(sessionData), 'EX', 15 * 60); // 15 minutes in seconds
 
+    // // Manually set the sessionId cookie in the response headers
+    // res.setHeader('Set-Cookie', [
+    //     `sessionId=${sessionId}; Path=/; HttpOnly; Max-Age=${15 * 60}; Domain=localhost; SameSite=Lax`,
+    // ]);
+
     // Set the session ID in the cookie
     req.session = { sessionId };
 
@@ -38,6 +43,7 @@ router.get('/api/session/create', async (req: Request, res: Response) => {
     // Redirect user back to frontend with session ID as query parameter 
     // const frontendUrl = `http://smartdine.com/menu?tableId=${tableId}&sessionId=${sessionId}`;
     const frontendUrl = `http://nus-iss-smart-dine.vercel.app/menu?tableId=${tableId}&sessionId=${sessionId}`;
+    
     res.redirect(frontendUrl);
 }); 
 
