@@ -34,9 +34,13 @@ jobs:
       - name: Run Lint
         run: npm run lint
 
-      # Run Cypress tests
-      - name: Run Cypress tests
-        run: npm run cypress:run  # You may need to adjust this based on your Cypress script
+      # Cypress Tests
+      - name: Cypress Tests
+        uses: cypress-io/github-action@v3
+        with:
+          browser: chrome
+          start: npm run dev
+          wait-on: "http://localhost:3000"
 
   deploy:
     needs: linting_and_testing  # Ensure linting and tests are successful before deployment
