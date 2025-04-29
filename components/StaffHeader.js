@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import styles from './StaffHeader.module.css';
-import { BACKEND_IP } from '../constants';
+import { AUTH_IP } from '../constants';
 
 const StaffHeader = () => {
   const router = useRouter();
@@ -11,14 +11,14 @@ const StaffHeader = () => {
   const handleLogout = async () => {
     try {
       // Send a POST request to the logout API
-      const res = await fetch(BACKEND_IP + '/api/users/signout', {
+      const res = await fetch(AUTH_IP + '/api/users/signout', {
         method: 'POST',
         credentials: 'include',
       });
 
       if (res.ok) {
         // If logout is successful, redirect to the login page
-        router.push(BACKEND_IP + '/auth/staff-login');
+        router.push(AUTH_IP + '/auth/staff-login');
       } else {
         alert('Logout failed');
       }

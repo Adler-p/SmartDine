@@ -6,7 +6,7 @@ import StaffSidebarMenu from '../../components/StaffSidebarMenu';
 import styles from './CustomerPage.module.css';
 import Modal from 'react-modal';
 import axios from 'axios';
-import { BACKEND_IP } from '../../constants';
+import { AUTH_IP, MENU_IP, CART_IP } from '../../constants';
 import Image from 'next/image';
 
 const Menu = () => {
@@ -35,7 +35,7 @@ const Menu = () => {
 
       if (!existingSession) {
         try {
-          const res = await axios.get(BACKEND_IP + '/api/session/create', {
+          const res = await axios.get(AUTH_IP + '/api/session/create', {
             params: { role: 'customer', tableId },
           });
 
@@ -60,7 +60,7 @@ const Menu = () => {
   const fetchMenuItems = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(BACKEND_IP + '/api/menu', {
+      const response = await axios.get(MENU_IP + '/api/menu', {
         params: { category: selectedCategory !== 'All' ? selectedCategory : undefined },
       });
       setMenuItems(response.data);
@@ -87,7 +87,7 @@ const Menu = () => {
 
     try {
       // Call the Add to Cart endpoint
-      await axios.get(BACKEND_IP + '/api/cart/add', {
+      await axios.get(CART_IP + '/api/cart/add', {
         // headers: {
         //     'x-session-id': sessionId
         // },
@@ -129,15 +129,15 @@ const Menu = () => {
           <div className={styles.grid}>
             {filteredItems.map((item) => (
               <div key={item.id} className={styles.card}>
-                <Image
+                {/* <Image
                   src={item.imageUrl}
                   alt={item.name}
                   className={styles.image}
                   width={500} // required
                   height={300} // required
                   priority // optional: eager load for LCP images
-                />
-                {/* <img src={item.imageUrl} alt={item.name} className={styles.image} /> */}
+                /> */}
+                <img src={item.imageUrl} alt={item.name} className={styles.image} />
                 <h3>{item.name}</h3>
                 <p>${item.price.toFixed(2)}</p>
                 <button

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import styles from './StaffSidebar.module.css';
-import { BACKEND_IP } from '../constants';
+import { AUTH_IP } from '../constants';
 
 const StaffSidebar = () => {
   const [orders, setOrders] = useState([]);
@@ -11,7 +11,7 @@ const StaffSidebar = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await fetch(BACKEND_IP + '/api/staff/orders?orderStatus=awaiting:preparation', {
+        const res = await fetch(AUTH_IP + '/api/staff/orders?orderStatus=awaiting:preparation', {
           credentials: 'include',
         });
         if (!res.ok) {

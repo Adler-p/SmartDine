@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 import Link from 'next/link';
 import styles from './StaffLogin.module.css';
-import { BACKEND_IP } from '../../constants';
+import { AUTH_IP } from '../../constants';
 
 export default function StaffLogin() {
   const router = useRouter();
@@ -12,7 +12,7 @@ export default function StaffLogin() {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch(BACKEND_IP + '/api/users/signin', {
+      const response = await fetch(AUTH_IP + '/api/users/signin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -22,6 +22,7 @@ export default function StaffLogin() {
       });
 
       if (response.ok) {
+        console.log('innn:');
         const data = await response.json();
         console.log('Login success:', data);
         router.push('/staff');
