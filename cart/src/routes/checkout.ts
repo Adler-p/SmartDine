@@ -31,12 +31,6 @@ router.post(
         const sessionData = sessionDataString ? JSON.parse(sessionDataString) : {};
         const cartItems = sessionData.cart || [];
 
-
-        // const sessionData = req.sessionData;
-    
-        // sessionData.cart = sessionData.cart || [];
-        // const cartItems = sessionData.cart;
-    
         if (!cartItems || cartItems.length === 0) {
             return res.status(400).send({ error: 'Cart is empty' });
         }

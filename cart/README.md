@@ -13,7 +13,7 @@ The Cart Service is responsible for managing shopping carts for customer session
 ## API Endpoints
 
 ### **Add Item to Cart**
--   **GET** `/api/cart/add`
+-   **POST** `/api/cart/add`
 -   **Description**: Adds a new item to the cart
 -   **Requires**: Valid `sessionId` from cookie
 -   **Request Body**:
