@@ -14,6 +14,12 @@ import { sessionRouter } from './routes/new-session';
 import { refreshTokenRouter } from './routes/refresh-token';
 
 const app: express.Application = express();
+app.use(cors(
+  {
+  origin: ['http://localhost:3000', 'https://nus-iss-smart-dine.vercel.app'],
+  credentials: true
+  }
+));  
 app.set('trust proxy', true);
 app.use(bodyParser.json());
 app.use(
@@ -24,12 +30,7 @@ app.use(
 );
 
 // Use CORS middleware
-app.use(cors(
-    {
-    origin: ['http://localhost:3000', 'https://smartdinehttps://nus-iss-smart-dine.vercel.app'],
-    credentials: true
-    }
-));  
+
 app.get('/health', (req, res) => {
   res.status(200).send('OK');
 });

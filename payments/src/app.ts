@@ -14,6 +14,12 @@ import { healthCheckRouter } from './routes/healthcheck';
 import { redis } from './redis-client';
 import cors from 'cors';
 const app: express.Application = express();
+app.use(cors(
+  {
+  origin: ['http://localhost:3000', 'https://nus-iss-smart-dine.vercel.app'],
+  credentials: true
+  }
+));  
 app.set('trust proxy', true);
 app.use(json());
 app.use(cookieParser()); 
@@ -23,12 +29,6 @@ app.use(
     secure: false,
   })
 );
-app.use(cors(
-  {
-  origin: ['http://localhost:3000', 'https://smartdinehttps://nus-iss-smart-dine.vercel.app'],
-  credentials: true
-  }
-));   // This will allow all domains
 app.get('/health', (req, res) => {
   res.status(200).send('OK');
 });

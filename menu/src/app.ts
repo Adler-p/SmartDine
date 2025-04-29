@@ -20,6 +20,12 @@ const mockRedisClient = {
 };
 
 const app = express()
+app.use(cors(
+  {
+  origin: ['http://localhost:3000', 'https://nus-iss-smart-dine.vercel.app'],
+  credentials: true
+  }
+));
 app.set('trust proxy', true)
 app.use(json())
 app.use(
@@ -29,13 +35,6 @@ app.use(
   })
 )
 
-// Use CORS middleware
-app.use(cors(
-  {
-  origin: ['http://localhost:3000', 'https://smartdinehttps://nus-iss-smart-dine.vercel.app'],
-  credentials: true
-  }
-));
 
 // 添加请求日志
 app.use((req, res, next) => {
