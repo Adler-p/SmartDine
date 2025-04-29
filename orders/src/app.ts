@@ -17,7 +17,8 @@ app.use(cors(
   origin: ['http://localhost:3000', 'https://nus-iss-smart-dine.vercel.app'],
   credentials: true
   }
-));  
+));
+app.options('*', cors())
 app.set('trust proxy', true);
 app.use(json());
 app.use(
