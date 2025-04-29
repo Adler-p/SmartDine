@@ -40,8 +40,6 @@ jobs:
                 cd SmartDine
               fi
             fi
-
-            cd ~/SmartDine
             docker-compose down
             docker-compose build
             docker-compose up -d
