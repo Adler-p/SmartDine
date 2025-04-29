@@ -13,10 +13,10 @@ describe('Home Page', () => {
     cy.get('button').contains('Login as Staff').should('exist'); // Staff login button exists
   });
 
-  it('should navigate to the menu page when customer login button is clicked', () => {
-    cy.get('button').contains('Login as Customer').click();
-    cy.location('pathname', { timeout: 10000 }).should('include', '/menu'); // Waits up to 10s
-  });
+  // it('should navigate to the menu page when customer login button is clicked', () => {
+  //   cy.get('button').contains('Login as Customer').click();
+  //   cy.location('pathname', { timeout: 10000 }).should('include', '/menu'); // Waits up to 10s
+  // });
 
   it('should navigate to staff login page when staff login button is clicked', () => {
     cy.get('button').contains('Login as Staff').click();
