@@ -30,15 +30,13 @@ jobs:
           timeout: 10m
           command_timeout: 20m
           script: |
-            if [ ! -d "SmartDine" ]; then
-              if [ -d "SmartDine/.git" ]; then
-                cd SmartDine
-                git pull origin main
-              else
-                rm -rf SmartDine  # 清除空壳或非git目录
-                git clone https://Adler-p:${{ secrets.GH_TOKEN }}@github.com/Adler-p/SmartDine.git
-                cd SmartDine
-              fi
+            if [ -d "SmartDine/.git" ]; then
+              cd SmartDine
+              git pull origin main
+            else
+              rm -rf SmartDine
+              git clone https://Adler-p:${{ secrets.GH_TOKEN }}@github.com/Adler-p/SmartDine.git
+              cd SmartDine
             fi
             docker-compose down
             docker-compose build
