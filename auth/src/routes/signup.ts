@@ -7,6 +7,8 @@ import { User, UserRole, initUserModel } from '../models/user';
 import { UserCreatedPublisher } from '../events/publishers/user-created-publisher';
 import { natsWrapper } from '../nats-wrapper';
 import { sequelize } from '../sequelize';
+import { Password } from '../services/password'; // Import Password hashing service
+
 
 const router: express.Router = express.Router();
 initUserModel(sequelize);
@@ -39,7 +41,10 @@ router.post(
       throw new BadRequestError('Email in use');
     }
 
-    const user = await User.create({ email, password, name, role });
+    // Hash the password
+    const hashedPassword = await Password.toHash(password);
+
+    const user = await User.create({ email, password: hashedPassword, name, role });
 
     // Generate JWT
     const userJwt = jwt.sign(
@@ -65,7 +70,16 @@ router.post(
       version: 0
     });
 
-    res.status(201).send(user);
+    // res.status(201).send(user);
+    // Do not send password in response
+    res.status(201).send({
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt
+    });
   }
 );
 
