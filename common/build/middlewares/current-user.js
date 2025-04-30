@@ -6,8 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.currentUser = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const currentUser = (redisClient) => async (req, res, next) => {
-    var _a;
-    if (!((_a = req.session) === null || _a === void 0 ? void 0 : _a.jwt)) {
+    const token = typeof req.session === 'string' ? req.session : req.session?.jwt;
+    if (!token) {
         return next(); // No token, proceed without attaching currentUser
     }
     try {
@@ -16,7 +16,7 @@ const currentUser = (redisClient) => async (req, res, next) => {
         // if (isBlacklisted) {
         //   return next(); // Token is blacklisted, treat as no user
         // }
-        const payload = jsonwebtoken_1.default.verify(req.session.jwt, process.env.JWT_KEY);
+        const payload = jsonwebtoken_1.default.verify(token, process.env.JWT_KEY);
         req.currentUser = payload;
     }
     catch (err) {
