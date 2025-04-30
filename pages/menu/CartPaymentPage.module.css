@@ -1,189 +1,189 @@
 .container {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .content {
-    display: flex;
-    flex-grow: 1;
+  display: flex;
+  flex-grow: 1;
 }
 
 .main {
-    flex-grow: 1;
-    padding: 20px;
+  flex-grow: 1;
+  padding: 20px;
 }
 
 .heading {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 .table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px; 
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
 }
 
-    .table th,
-    .table td {
-        border: 1px solid #ddd; 
-        padding: 8px; 
-        text-align: left;
-    }
+.table th,
+.table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
 
-    .table th {
-        background: #4CAF50; 
-        color: white; 
-    }
+.table th {
+  background: #4caf50;
+  color: white;
+}
 
-    .table tr:nth-child(even) {
-        background: #f2f2f2; 
-    }
+.table tr:nth-child(even) {
+  background: #f2f2f2;
+}
 
 .statusButton {
-    padding: 5px 10px;
-    cursor: pointer;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
 }
 
-    .statusButton:hover {
-        background-color: #45a049;
-    }
+.statusButton:hover {
+  background-color: #45a049;
+}
 
 .btn {
-    background-color: #ddd;
-    border: none;
-    padding: 5px 10px;
-    margin: 0 5px;
-    cursor: pointer;
-    font-size: 16px;
+  background-color: #ddd;
+  border: none;
+  padding: 5px 10px;
+  margin: 0 5px;
+  cursor: pointer;
+  font-size: 16px;
 }
 
 .btn:hover {
-    background-color: #bbb;
+  background-color: #bbb;
 }
 
 .quantity {
-    min-width: 30px;
-    display: inline-block;
-    text-align: center;
-    font-size: 16px;
+  min-width: 30px;
+  display: inline-block;
+  text-align: center;
+  font-size: 16px;
 }
-    
+
 .orderDetails {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 10px;
 }
 
 .header {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px; /* Space between icon and text */
-    /* margin-bottom: 20px; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px; /* Space between icon and text */
+  /* margin-bottom: 20px; */
 }
 
 .cartIcon {
-    width: 32px;
-    height: 32px;
-    color: #333; /* Adjust color */
+  width: 32px;
+  height: 32px;
+  color: #333; /* Adjust color */
 }
 
 /* Total amount */
 .totalAmount {
-    font-size: 20px;
-    font-weight: bold;
-    text-align: right;
-    margin: 10px 0;
+  font-size: 20px;
+  font-weight: bold;
+  text-align: right;
+  margin: 10px 0;
 }
 
 /* Payment button */
 .paymentButton {
-    width: 100%;
-    background-color: #ff6600;
-    color: white;
-    border: none;
-    padding: 12px;
-    font-size: 18px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background 0.3s ease;
+  width: 100%;
+  background-color: #ff6600;
+  color: white;
+  border: none;
+  padding: 12px;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background 0.3s ease;
 }
 
 .paymentButton:hover {
-    background-color: #e65c00;
+  background-color: #e65c00;
 }
 
 /* Modal overlay */
 .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Modal content */
 .modal {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-    width: 300px;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  width: 300px;
 }
 
 .modal h3 {
-    margin-bottom: 15px;
-    font-size: 20px;
+  margin-bottom: 15px;
+  font-size: 20px;
 }
 
 /* Input fields */
 .modal input {
-    width: 100%;
-    padding: 10px;
-    margin: 5px 0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 16px;
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
 }
 
 /* Modal buttons */
 .modalButtons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 15px;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
 }
 
 .modalButtons button {
-    padding: 10px 15px;
-    font-size: 16px;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
+  padding: 10px 15px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
 }
 
 .modalButtons button:first-child {
-    background-color: #ccc;
+  background-color: #ccc;
 }
 
 .modalButtons button:first-child:hover {
-    background-color: #bbb;
+  background-color: #bbb;
 }
 
 .modalButtons button:last-child {
-    background-color: #ff6600;
-    color: white;
+  background-color: #ff6600;
+  color: white;
 }
 
 .modalButtons button:last-child:hover {
-    background-color: #e65c00;
+  background-color: #e65c00;
 }

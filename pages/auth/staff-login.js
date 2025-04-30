@@ -67,6 +67,9 @@ export default function StaffLogin() {
                     <Link href="/">
                         <button className={styles.button}>Back to Login</button>
                     </Link>
+                    <Link href="/staff/staff-signup">
+                        <button className="button">Sign Up Staff Account</button>
+                    </Link>
                 </div>
             </div>
         </div>

@@ -4,116 +4,117 @@ import styles from './OrderDetailPage.module.css';
 import StaffHeader from '../../components/StaffHeader';
 import StaffSidebar from '../../components/StaffSidebar';
 import StatusUpdateButton from '../../components/StatusUpdateButton';
+import { BACKEND_IP } from '../../constants';
 
 const OrderDetailPage = () => {
-    const router = useRouter();
-    const { id } = router.query;
-    const [order, setOrder] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const router = useRouter();
+  const { id } = router.query;
+  const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const fetchOrderDetails = async () => {
-            if (!id) return;
+  useEffect(() => {
+    const fetchOrderDetails = async () => {
+      if (!id) return;
 
-            try {
-                const response = await fetch(`/api/staff/orders/${id}`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch order details');
-                }
-                const data = await response.json();
-                setOrder(data);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchOrderDetails();
-    }, [id]);
-
-    const handleStatusChange = async (orderId, newStatus) => {
-        try {
-            const response = await fetch(`/api/staff/orders/${orderId}/status`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    orderStatus: newStatus,  // Send the updated status here
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to update order status');
-            }
-
-            const updatedOrder = await response.json();
-            setOrder(updatedOrder);  // Update local state with the new order data
-        } catch (err) {
-            setError(err.message);
+      try {
+        const response = await fetch(BACKEND_IP + `/api/staff/orders/${id}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch order details');
         }
+        const data = await response.json();
+        setOrder(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    if (loading) {
-        return <p>Loading...</p>;
+    fetchOrderDetails();
+  }, [id]);
+
+  const handleStatusChange = async (orderId, newStatus) => {
+    try {
+      const response = await fetch(BACKEND_IP + `/api/staff/orders/${orderId}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          orderStatus: newStatus, // Send the updated status here
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update order status');
+      }
+
+      const updatedOrder = await response.json();
+      setOrder(updatedOrder); // Update local state with the new order data
+    } catch (err) {
+      setError(err.message);
     }
+  };
 
-    if (error) {
-        return <p>Error: {error}</p>;
-    }
+  if (loading) {
+    return <p>Loading...</p>;
+  }
 
-    return (
-        <div className={styles.container}>
-            <StaffHeader />
-            <div className={styles.content}>
-                <StaffSidebar />
-                <div className={styles.main}>
-                    <h2 className={styles.title}>Order Detail</h2>
-                    {order ? (
-                        <>
-                            <h3>Order ID: {order.orderId}</h3>
-                            <p>Time Ordered: {order.createdAt}</p>
-                            <p>Table: {order.tableId}</p>
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
 
-                            <table className={styles.table}>
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Quantity</th>
-                                        <th>Payment</th>
-                                        <th>Status</th>
-                                        <th>Update Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {order.orderItems.map((item, index) => (
-                                        <tr key={index}>
-                                            <td>{item.itemName}</td>
-                                            <td>{item.quantity}</td>
-                                            <td>{item.paymentStatus}</td>
-                                            <td>{item.status}</td>
-                                            <td>
-                                                <StatusUpdateButton
-                                                    status={item.status}
-                                                    onStatusChange={(newStatus) =>
-                                                        handleStatusChange(order.orderId, newStatus)  // Pass updated status
-                                                    }
-                                                />
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </>
-                    ) : (
-                        <p>Order not found</p>
-                    )}
-                </div>
-            </div>
+  return (
+    <div className={styles.container}>
+      <StaffHeader />
+      <div className={styles.content}>
+        <StaffSidebar />
+        <div className={styles.main}>
+          <h2 className={styles.title}>Order Detail</h2>
+          {order ? (
+            <>
+              <h3>Order ID: {order.orderId}</h3>
+              <p>Time Ordered: {order.createdAt}</p>
+              <p>Table: {order.tableId}</p>
+
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Quantity</th>
+                    <th>Payment</th>
+                    <th>Status</th>
+                    <th>Update Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {order.orderItems.map((item, index) => (
+                    <tr key={index}>
+                      <td>{item.itemName}</td>
+                      <td>{item.quantity}</td>
+                      <td>{item.paymentStatus}</td>
+                      <td>{item.status}</td>
+                      <td>
+                        <StatusUpdateButton
+                          status={item.status}
+                          onStatusChange={
+                            (newStatus) => handleStatusChange(order.orderId, newStatus) // Pass updated status
+                          }
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
+          ) : (
+            <p>Order not found</p>
+          )}
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default OrderDetailPage;
