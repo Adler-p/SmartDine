@@ -53,7 +53,9 @@ export const currentUser = (redisClient: any) => async (
     }
   
     console.error('Unexpected error:', err);
-    res.status(500).send({ error: 'Something went wrong',req: req });
+    res.status(500).send({
+      errors: [{ message: 'Something went wrong',req: req }]
+    });
   }
 
   next();
