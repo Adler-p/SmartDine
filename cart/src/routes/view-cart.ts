@@ -4,7 +4,7 @@ import { validateSession } from '@smartdine/common';
 
 const router = express.Router();
 
-router.get('/api/cart', 
+router.post('/api/cart', 
     // validateSession(redis), 
 async (req: Request, res: Response) => {
 
