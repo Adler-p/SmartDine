@@ -6,7 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.currentUser = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const currentUser = (redisClient) => async (req, res, next) => {
-    const token = typeof req.session === 'string' ? req.session : req.session?.jwt;
+    var _a;
+    const token = typeof req.session === 'string' ? req.session : (_a = req.session) === null || _a === void 0 ? void 0 : _a.jwt;
     if (!token) {
         return next(); // No token, proceed without attaching currentUser
     }
