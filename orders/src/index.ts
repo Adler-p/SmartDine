@@ -31,7 +31,8 @@ const start = async () => {
     console.log('Connected to PostgreSQL database');
 
     // 同步数据库模型 (强制重建表)
-    await sequelize.sync({ force: true });
+    // await sequelize.sync({ force: true });
+    await sequelize.sync();
     console.log('Database tables recreated and synced');
 
     // 连接到NATS
