@@ -69,22 +69,31 @@ router.post(
     // Generate and Store Refresh Token
     const refreshToken = await generateRefreshToken(existingUser.id);
 
-    // Store Access Token in Session 
-    req.session = {
-      jwt: accessToken
-    };
+    // 不使用 req.session，而是直接设置 cookie
+    // req.session = {
+    //   jwt: accessToken
+    // };
     
-    console.log('Session set:', req.session);
-    console.log('Cookies being set:', res.getHeader('Set-Cookie'));
+    // 直接设置两个 cookie，确保它们有相同的配置
+    // Send Access Token as a cookie
+    res.cookie('session', { jwt: accessToken }, {
+      httpOnly: true,
+      secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
+      sameSite: 'none',
+      path: '/',
+      maxAge: 15 * 60 * 1000
+    });
 
     // Send Refresh Token as HTTP-only, Secure Cookie
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
       sameSite: 'none',
-      path: '/', // 确保路径一致
+      path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000 
     }); 
+
+    console.log('Cookies being set:', res.getHeader('Set-Cookie'));
 
     res.status(200).send({ user: { id: existingUser.id, email: existingUser.email, role: existingUser.role, name: existingUser.name } });
   }

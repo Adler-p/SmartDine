@@ -37,7 +37,6 @@ app.use(
     httpOnly: true,
     maxAge: 15 * 60 * 1000,
     name: 'session',
-    // domain: 'localhost',
     path: '/',
     sameSite: 'none'
   })
