@@ -33,7 +33,8 @@ const start = async () => {
     console.log('Connected to SQL database');
 
     // Sync models with the database - force:true will drop tables and recreate them
-    await sequelize.sync({ force: true });
+    // await sequelize.sync({ force: true });
+    await sequelize.sync();
     console.log('Database tables synced');
     
   } catch (err) {

@@ -64,7 +64,7 @@ router.post(
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
-      sameSite: 'strict',
+      sameSite: 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000 
     }); 
 
