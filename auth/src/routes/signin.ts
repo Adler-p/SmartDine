@@ -12,6 +12,14 @@ import { generateRefreshToken } from '../services/generate-refresh-token';
 const router: express.Router = express.Router();
 initUserModel(sequelize);
 
+// 添加测试路由用于验证 cookie
+router.get('/api/users/test-cookies', (req, res) => {
+  console.log('Test cookie route');
+  console.log('Current session:', req.session);
+  console.log('Request cookies:', req.headers.cookie);
+  res.send({ session: req.session, cookies: req.headers.cookie });
+});
+
 router.post(
   '/api/users/signin',
   [
@@ -25,6 +33,12 @@ router.post(
   ],
   validateRequest,
   async (req: Request, res: Response) => {
+    console.log('Request headers:', {
+      host: req.headers.host,
+      origin: req.headers.origin,
+      referer: req.headers.referer
+    });
+    
     const { email, password } = req.body;
 
     const existingUser = await User.findOne({ where: { email } });
@@ -59,12 +73,16 @@ router.post(
     req.session = {
       jwt: accessToken
     };
+    
+    console.log('Session set:', req.session);
+    console.log('Cookies being set:', res.getHeader('Set-Cookie'));
 
     // Send Refresh Token as HTTP-only, Secure Cookie
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
       sameSite: 'none',
+      path: '/', // 确保路径一致
       maxAge: 7 * 24 * 60 * 60 * 1000 
     }); 
 
