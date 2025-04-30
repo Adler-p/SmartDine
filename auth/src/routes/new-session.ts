@@ -25,21 +25,8 @@ router.get('/api/session/create', async (req: Request, res: Response) => {
 
     await redis.set(`session:${sessionId}`, JSON.stringify(sessionData), 'EX', 15 * 60); // 15 minutes in seconds
 
-    // // Manually set the sessionId cookie in the response headers
-    // res.setHeader('Set-Cookie', [
-    //     `sessionId=${sessionId}; Path=/; HttpOnly; Max-Age=${15 * 60}; Domain=localhost; SameSite=Lax`,
-    // ]);
-
     // Set the session ID in the cookie
-    req.session = { sessionId };
-
-    // // Explicitly set the sessionId cookie using res.cookie()
-    // res.cookie('sessionId', sessionId, {
-    //     httpOnly: true,
-    //     secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
-    //     sameSite: 'strict',
-    //     maxAge: 15 * 60 * 1000, // Match Redis expiration
-    // });
+    // req.session = { sessionId };
 
     // Publish session:created event
     await new SessionCreatedPublisher(natsWrapper.client).publish({
