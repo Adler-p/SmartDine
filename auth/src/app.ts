@@ -34,11 +34,10 @@ app.use(
   cookieSession({
     signed: false,
     secure: false,
-    httpOnly: true, // This is a top-level option in cookieSession
-    maxAge: 15 * 60 * 1000, // This is also a top-level option
-    name: 'session', // You can specify a name for the cookie
-    // domain: 'localhost', // This should work as a top-level option
-    // path: '/', // This should also work as a top-level option
+    httpOnly: true,
+    maxAge: 15 * 60 * 1000,
+    name: 'session',
+    path: '/',
     sameSite: 'none'
   })
 );
