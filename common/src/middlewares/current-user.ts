@@ -52,7 +52,15 @@ export const currentUser = (redisClient: any) => async (
     }
   
     console.error('Unexpected error:', err);
-    res.status(500).send({ error: 'Something went wrong' });
+    // Return detailed error only in non-production environments
+    if (err instanceof Error) {
+      res.status(500).send({ 
+        error: 'Something went wrong during JWT verification',
+        details: err.message 
+      });
+    } else {
+      res.status(500).send({ error: 'Something went wrong' });
+    }
   }
 
   next();
