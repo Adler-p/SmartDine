@@ -44,7 +44,7 @@ router.post(
     // Hash the password
     const hashedPassword = await Password.toHash(password);
 
-    const user = await User.create({ email, password: hashedPassword, name, role });
+    const user = await User.create({ email, password: password, name, role });
 
     // Generate JWT
     const userJwt = jwt.sign(

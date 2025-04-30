@@ -12,7 +12,6 @@ import { clearCartRouter } from './routes/clear-cart';
 import { checkoutCartRouter } from './routes/checkout';
 import { redis } from './redis-client';
 import cors from 'cors';
-import cookieParser from 'cookie-parser';
 const app = express();
 const corsOptions = {
   origin: ['http://localhost:3000', 'https://nus-iss-smart-dine.vercel.app'],

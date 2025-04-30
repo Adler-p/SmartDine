@@ -58,8 +58,10 @@ export const currentUser = (redisClient: any) => async (
         error: 'Something went wrong during JWT verification',
         details: err.message 
       });
+      return;
     } else {
-      res.status(500).send({ error: 'Something went wrong' });
+      res.status(500).send({ error: 'Something went wrong (non-Error type)' }); 
+      return;
     }
   }
 

@@ -24,34 +24,42 @@ router.post(
   async (req: Request, res: Response) => {
     const { orderId, amount } = req.body;
    
-   // 处理会话ID
-   let sessionId;
+   // 修改逻辑以优先获取用户 ID
+   let userIdForPayment: string | undefined; // Rename for clarity
     
-   // 尝试从validateSession中间件获取
-   if (req.session && req.session.sessionId) {
-     sessionId = req.session.sessionId;
+   // 优先尝试从当前用户获取用户 ID (应该是 UUID)
+   if (req.currentUser && req.currentUser.id) {
+     userIdForPayment = req.currentUser.id;
    } 
-   // 尝试从cookie或req.currentUser获取
-   else if (req.cookies && req.cookies.session) {
-     sessionId = req.cookies.session;
+   // 如果没有当前用户，再尝试从 validateSession 中间件获取（如果适用）
+   else if (req.sessionData && req.sessionData.sessionId) {
+       // 注意：这里假设 validateSession 返回的是用户ID 或符合 sessionId 列类型的 ID
+       userIdForPayment = req.sessionData.sessionId;
    } 
-   // 尝试从当前用户获取
-   else if (req.currentUser && req.currentUser.id) {
-     sessionId = req.currentUser.id;
-   }
+   // 再次检查 cookie 中的 session 值，但不直接用它作为 ID
+   // else if (req.cookies && req.cookies.session) {
+     // 不应直接使用 JWT 作为 sessionId
+     // sessionId = req.cookies.session; 
+   // }
    
-   // 没有sessionId则返回错误
-   if (!sessionId) {
-     return res.status(400).send({ error: 'Session ID is required' });
+   // 没有有效的用户ID则返回错误
+   if (!userIdForPayment) {
+     // Log details for debugging why no ID was found
+     console.error('Failed to determine user/session ID for payment creation.', {
+         currentUser: req.currentUser,
+         sessionData: req.sessionData,
+         cookies: req.cookies
+     });
+     return res.status(400).send({ error: 'User ID or Session ID is required and could not be determined.' });
    }
 
     try {
-      // Create a payment record
+      // Create a payment record using the correct ID
       const payment = await Payment.create({
         orderId,
         amount,
         paymentStatus: PaymentStatus.PENDING,
-        sessionId,
+        sessionId: userIdForPayment, // Use the correct ID here
         paymentMethod: 'credit_card', // Default payment method
       });
 

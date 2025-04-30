@@ -162,7 +162,7 @@ RESPONSE=$(curl -s -w "\n%{http_code}" -H "Cookie: session=$CUSTOMER_SESSION" -X
     "tableId": "table-123",
     "items": [
       {
-        "menuItemId": "65f2b89c52f810b88c95c123",
+        "menuItemId": "6805e7e17368b78d33e3a385",
         "name": "Test Dish",
         "price": 1000,
         "quantity": 2

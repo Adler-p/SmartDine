@@ -21,7 +21,25 @@ router.post(
   validateRequest,
   async (req: Request, res: Response) => {
     const { orderId, paymentStatus } = req.body;
-    const sessionId = req.session.sessionId;
+    // const sessionId = req.session.sessionId; // Old logic
+
+    // 修改逻辑以优先获取用户 ID
+    let userIdForLookup: string | undefined; // Rename for clarity
+    
+    // 优先尝试从当前用户获取用户 ID (应该是 UUID)
+    if (req.currentUser && req.currentUser.id) {
+      userIdForLookup = req.currentUser.id;
+    } 
+    // 如果没有当前用户，再尝试从 validateSession 中间件获取（如果适用 - 保留以防万一，但优先currentUser）
+    else if (req.sessionData && req.sessionData.sessionId) {
+        userIdForLookup = req.sessionData.sessionId;
+    } 
+    
+    // 没有有效的用户ID则返回错误
+    if (!userIdForLookup) {
+      console.error('Failed to determine user/session ID for updating payment status.', { currentUser: req.currentUser, sessionData: req.sessionData });
+      return res.status(401).send({ error: 'Authentication required and could not be verified.' });
+    }
 
     try {
       const payment = await Payment.findOne({ where: { orderId } });
@@ -30,9 +48,9 @@ router.post(
         return res.status(404).send({ error: 'Payment record not found' });
       }
 
-      // Check if sessionId matches the payment record
-      if (sessionId !== payment.sessionId) {
-        return res.status(403).send({ error: 'Session ID does not match payment record' });
+      // Check if sessionId matches the payment record (using the correct ID)
+      if (userIdForLookup !== payment.sessionId) {
+        return res.status(403).send({ error: 'User ID does not match payment record' });
       }
 
       payment.paymentStatus = paymentStatus;
