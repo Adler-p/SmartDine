@@ -21,11 +21,10 @@ export const currentUser = (redisClient: any) => async (
   res: Response,
   next: NextFunction
 ) => {
-
-  let token = typeof req.session === 'string' ? req.session : req.session?.jwt;
   if (req.cookies.session) {
-    token = req.cookies.session;
+    req.session = { jwt: req.cookies.session };
   }
+  let token = typeof req.session === 'string' ? req.session : req.session?.jwt;
   if (!token) {
     return next();  // No token, proceed without attaching currentUser
   }
@@ -53,9 +52,7 @@ export const currentUser = (redisClient: any) => async (
     }
   
     console.error('Unexpected error:', err);
-    res.status(500).send({
-      errors: [{ message: 'Something went wrong',req: req }]
-    });
+    res.status(500).send({ error: 'Something went wrong' });
   }
 
   next();
