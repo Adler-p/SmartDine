@@ -21,7 +21,11 @@ export const currentUser = (redisClient: any) => async (
   res: Response,
   next: NextFunction
 ) => {
-  const token = typeof req.session === 'string' ? req.session : req.session?.jwt;
+
+  let token = typeof req.session === 'string' ? req.session : req.session?.jwt;
+  if (req.cookies.session) {
+    token = req.cookies.session;
+  }
   if (!token) {
     return next();  // No token, proceed without attaching currentUser
   }
