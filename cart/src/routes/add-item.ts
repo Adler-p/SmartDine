@@ -11,12 +11,13 @@ router.post('/api/cart/add',
     // validateSession(redis), 
 async (req: Request, res: Response) => {
     const { sessionId, item } = req.body;
+    console.log('sessionId in request body:', sessionId);
 
     if (!item) {
         return res.status(400).send({ error: 'Item is required' });
     }
     if (!sessionId) {
-        return res.status(400).send({ error: 'Session ID is required' });
+        return res.status(400).send({ error: 'Session ID is required from request body' });
     }
     // const sessionId = req.session.sessionId;
 
