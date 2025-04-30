@@ -37,6 +37,8 @@ const Menu = () => {
         try {
           const res = await axios.get(AUTH_IP + '/api/session/create', {
             params: { role: 'customer', tableId },
+          },{
+            withCredentials: true,
           });
 
           const urlParams = new URLSearchParams(res.request.responseURL.split('?')[1]);
@@ -62,6 +64,8 @@ const Menu = () => {
     try {
       const response = await axios.get(MENU_IP + '/api/menu', {
         params: { category: selectedCategory !== 'All' ? selectedCategory : undefined },
+      },{
+        withCredentials: true,
       });
       setMenuItems(response.data);
       setError(null);
@@ -85,24 +89,25 @@ const Menu = () => {
       return;
     }
 
+    const existingSession = sessionStorage.getItem('customerSessionId');
+
     try {
       // Call the Add to Cart endpoint
-      await axios.get(CART_IP + '/api/cart/add', {
-        // headers: {
-        //     'x-session-id': sessionId
-        // },
-        params: {
-          item: JSON.stringify({
-            itemId: selectedItem.id,
-            itemName: selectedItem.name,
-            unitPrice: selectedItem.price,
-            quantity: 1,
-          }),
-        },
+      await axios.post(CART_IP + '/api/cart/add', {
+        "item": {
+          "itemId": selectedItem.id,
+          "itemName": selectedItem.name,
+          "unitPrice": selectedItem.price,
+          "quantity": 1,
+          "sessionId": existingSession
+        }
+      }, 
+      {
+        withCredentials: true // allows browser to send cookies automatically
       });
 
       // Fetch the updated menu items from the backend
-      await fetchMenuItems(); // Wait for the menu items to be updated
+      // await fetchMenuItems(); // Wait for the menu items to be updated
 
       // Show success modal
       setIsSuccessModalOpen(true);
@@ -142,10 +147,10 @@ const Menu = () => {
                 <p>${item.price.toFixed(2)}</p>
                 <button
                   onClick={() => handleConfirmPayment(item.id)}
-                  className={item.availability ? styles.availableBtn : styles.unavailableBtn}
-                  disabled={!item.availability}
+                  className={item.availability === "available" ? styles.availableBtn : styles.unavailableBtn}
+                  disabled={item.availability !== "available"}
                 >
-                  {item.availability ? 'Add to Cart' : 'Unavailable'}
+                  {item.availability === "available" ? 'Add to Cart' : 'Unavailable'}
                 </button>
               </div>
             ))}

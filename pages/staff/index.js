@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import styles from './StaffPage.module.css';
 import StaffHeader from '../../components/StaffHeader';
 import StaffSidebar from '../../components/StaffSidebar';
-import { AUTH_IP } from '../../constants';
+import { AUTH_IP, ORDER_IP, PAYMENT_IP } from '../../constants';
 
 const IncomingOrders = () => {
   const [user, setUser] = useState(null);
@@ -41,7 +41,7 @@ const IncomingOrders = () => {
     const fetchOrders = async () => {
       setLoading(true);
       try {
-        const res = await fetch(AUTH_IP + '/api/staff/orders?orderStatus=created', {
+        const res = await fetch(ORDER_IP + '/api/staff/orders?orderStatus=created', {
           credentials: 'include',
         });
         const data = await res.json();
@@ -50,7 +50,7 @@ const IncomingOrders = () => {
         const enrichedOrders = await Promise.all(
           data.map(async (order) => {
             try {
-              const paymentRes = await fetch(AUTH_IP + `/api/payments/staff/${order.orderId}`, {
+              const paymentRes = await fetch(PAYMENT_IP + `/api/payments/staff/${order.orderId}`, {
                 credentials: 'include',
               });
               const paymentData = await paymentRes.json();

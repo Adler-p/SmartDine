@@ -3,7 +3,7 @@ import StaffHeader from '../../components/StaffHeader';
 import StaffSidebarMenu from '../../components/StaffSidebarMenu';
 import styles from './EditMenu.module.css';
 import axios from 'axios';
-import { BACKEND_IP } from '../../constants';
+import { MENU_IP } from '../../constants';
 import Image from 'next/image';
 
 const EditMenu = () => {
@@ -16,8 +16,10 @@ const EditMenu = () => {
     const fetchMenuItems = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(BACKEND_IP + '/api/menu', {
+        const response = await axios.get(MENU_IP + '/api/menu', {
           params: { category: selectedCategory !== 'All' ? selectedCategory : undefined },
+        },{
+          withCredentials: true,
         });
         setMenuItems(response.data);
         setError(null); // Clear any previous error
@@ -37,7 +39,7 @@ const EditMenu = () => {
       const updatedAvailability = item.availability === 'available' ? 'out_of_stock' : 'available';
 
       await axios.put(
-        BACKEND_IP + `/api/menu/${id}`,
+        MENU_IP + `/api/menu/${id}`,
         {
           availability: updatedAvailability,
         },
@@ -71,15 +73,15 @@ const EditMenu = () => {
           <div className={styles.grid}>
             {filteredItems.map((item) => (
               <div key={item.id} className={styles.card}>
-                <Image
+                {/* <Image
                   src={item.imageUrl}
                   alt={item.name}
                   className={styles.image}
                   width={500} // required
                   height={300} // required
                   priority // optional: eager load for LCP images
-                />
-                {/* <img src={item.imageUrl} alt={item.name} className={styles.image} /> */}
+                /> */}
+                <img src={item.imageUrl} alt={item.name} className={styles.image} /> 
                 <h3>{item.name}</h3>
                 <p>${item.price.toFixed(2)}</p>
                 <button

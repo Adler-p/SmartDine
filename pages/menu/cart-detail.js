@@ -20,10 +20,10 @@ const CartDetailPage = () => {
       try {
         // Retrieve sessionId from localStorage (or sessionStorage)
         // const sessionId = localStorage.getItem('customerSessionId'); // Uncomment to use localStorage
-        // const sessionId = sessionStorage.getItem('customerSessionId'); // Uncomment to use sessionStorage
+        const sessionId = sessionStorage.getItem('customerSessionId'); // Uncomment to use sessionStorage
 
         // Temporary for debugging:
-        const sessionId = 'dummySessionId'; // This is just for now, remove after implementation
+        // const sessionId = 'dummySessionId'; // This is just for now, remove after implementation
 
         if (!sessionId) {
           setError('Session ID is missing.');
@@ -32,7 +32,7 @@ const CartDetailPage = () => {
 
         const response = await axios.get(CART_IP + '/api/cart', {
           headers: {
-            'x-session-id': sessionId, // Send the sessionId in the header
+            'Cookie': `session=${sessionId}`,  // <-- this is where you set the cookie manually
           },
         });
 
@@ -88,7 +88,14 @@ const CartDetailPage = () => {
       await axios.post(CART_IP + '/api/cart/update-quantity', {
         itemId: selectedItem.itemId, // Assuming item has itemId property
         quantity: updatedQuantity,
-      });
+      },
+      {
+        headers: {
+          Cookie: `session=${sessionId}`, // manually set the cookie
+        },
+        withCredentials: true, // include cookies in cross-origin requests if needed
+      }
+    );
       console.log('Quantity updated successfully in backend');
     } catch (error) {
       console.error('Error updating quantity:', error);
