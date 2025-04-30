@@ -24,12 +24,19 @@ app.options('*', cors(corsOptions))
 app.set('trust proxy', true);
 app.use(json());
 app.use(cookieParser()); 
-app.use(
-  cookieSession({
-    signed: false,
-    secure: false,
-  })
-);
+// app.use(
+//   cookieSession({
+//     signed: false,
+//     secure: false,
+//   })
+// );
+app.use((req, res, next) => {
+  const token = req.cookies?.session;
+  if (token) {
+    req.session = { jwt: token }; 
+  }
+  next();
+});
 app.get('/health', (req, res) => {
   res.status(200).send('OK');
 });

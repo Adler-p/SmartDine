@@ -12,7 +12,7 @@ import { signoutRouter } from './routes/signout';
 import { signupRouter } from './routes/signup';
 import { sessionRouter } from './routes/new-session';
 import { refreshTokenRouter } from './routes/refresh-token';
-
+import cookieParser from 'cookie-parser';
 const app: express.Application = express();
 const corsOptions = {
   origin: ['http://localhost:3000', 'https://nus-iss-smart-dine.vercel.app'],
@@ -23,6 +23,7 @@ app.use(cors(corsOptions));
 app.options('*', cors(corsOptions))
 app.set('trust proxy', true);
 app.use(bodyParser.json());
+app.use(cookieParser());
 // app.use(
 //   cookieSession({
 //     signed: false,
@@ -30,17 +31,25 @@ app.use(bodyParser.json());
 //   })
 // );
 
-app.use(
-  cookieSession({
-    signed: false,
-    secure: false,
-    httpOnly: true,
-    maxAge: 15 * 60 * 1000,
-    name: 'session',
-    path: '/',
-    sameSite: 'none'
-  })
-);
+// app.use(
+//   cookieSession({
+//     signed: false,
+//     secure: false,
+//     httpOnly: true,
+//     maxAge: 15 * 60 * 1000,
+//     name: 'session',
+//     path: '/',
+//     sameSite: 'none'
+//   })
+// );
+
+app.use((req, res, next) => {
+  const token = req.cookies?.session;
+  if (token) {
+    req.session = { jwt: token }; 
+  }
+  next();
+});
 
 // Use CORS middleware
 

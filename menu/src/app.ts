@@ -11,7 +11,7 @@ import { updateMenuItemRouter } from './routes/staff/update-entire-item'
 import { updateMenuItemPriceRouter } from './routes/staff/update-price'
 import { markMenuItemOutOfStockRouter } from './routes/staff/mark-out-of-stock'
 import cors from 'cors'; 
-
+import cookieParser from 'cookie-parser';
 // 创建一个mock redis客户端
 const mockRedisClient = {
   get: async () => null, // 始终返回null，表示token没有被加入黑名单
@@ -29,12 +29,20 @@ app.use(cors(corsOptions));
 app.options('*', cors(corsOptions))
 app.set('trust proxy', true)
 app.use(json())
-app.use(
-  cookieSession({
-    signed: false,
-    secure: false
-  })
-)
+app.use(cookieParser());
+app.use((req, res, next) => {
+  const token = req.cookies?.session;
+  if (token) {
+    req.session = { jwt: token }; 
+  }
+  next();
+});
+// app.use(
+//   cookieSession({
+//     signed: false,
+//     secure: false
+//   })
+// )
 
 // 添加请求日志
 app.use((req, res, next) => {

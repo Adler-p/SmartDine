@@ -10,7 +10,7 @@ import { staffViewAllOrdersRouter } from './routes/staff/view-all-orders';
 import { updateOrderStatusRouter } from './routes/staff/update-order-status';
 import { redis } from './redis-client';
 import cors from 'cors';
-
+import cookieParser from 'cookie-parser';
 const app: express.Application = express();
 const corsOptions = {
   origin: ['http://localhost:3000', 'https://nus-iss-smart-dine.vercel.app'],
@@ -21,13 +21,20 @@ app.use(cors(corsOptions));
 app.options('*', cors(corsOptions))
 app.set('trust proxy', true);
 app.use(json());
-app.use(
-  cookieSession({
-    signed: false,
-    secure: false,
-  })
-);
-
+// app.use(
+//   cookieSession({
+//     signed: false,
+//     secure: false,
+//   })
+// );
+app.use(cookieParser());
+app.use((req, res, next) => {
+  const token = req.cookies?.session;
+  if (token) {
+    req.session = { jwt: token }; 
+  }
+  next();
+});
 app.get('/health', (req, res) => {
   res.status(200).send('OK');
 }); 

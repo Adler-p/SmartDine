@@ -12,7 +12,7 @@ import { clearCartRouter } from './routes/clear-cart';
 import { checkoutCartRouter } from './routes/checkout';
 import { redis } from './redis-client';
 import cors from 'cors';
-
+import cookieParser from 'cookie-parser';
 const app = express();
 const corsOptions = {
   origin: ['http://localhost:3000', 'https://nus-iss-smart-dine.vercel.app'],
@@ -24,12 +24,19 @@ app.options('*', cors(corsOptions))
 app.set('trust proxy', true);
 app.use(json());
 app.use(cookieParser());
-app.use(
-  cookieSession({
-    signed: false,
-    secure: false,
-  })
-);
+app.use((req, res, next) => {
+  const token = req.cookies?.session;
+  if (token) {
+    req.session = { jwt: token }; 
+  }
+  next();
+});
+// app.use(
+//   cookieSession({
+//     signed: false,
+//     secure: false,
+//   })
+// );
 app.get('/health', (req, res) => {
   res.status(200).send('OK');
 });
