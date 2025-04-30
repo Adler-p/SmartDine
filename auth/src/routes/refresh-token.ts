@@ -53,9 +53,9 @@ router.post(
         const newRefreshToken = await generateRefreshToken(refreshTokenRecord.user.id);
 
         // Update session with new access token
-        req.session = {
-            jwt: accessToken
-        };
+        // req.session = {
+        //     jwt: accessToken
+        // };
 
         // Send new refresh token as HTTP-only, secure cookie
         res.cookie('refreshToken', newRefreshToken, {
@@ -63,7 +63,14 @@ router.post(
             secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
             sameSite: 'none',
             maxAge: 7 * 24 * 60 * 60 * 1000 
-          }); 
+          });
+        // Send new access token as a cookie
+        res.cookie('session', accessToken, {
+            httpOnly: true,
+            secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
+            sameSite: 'none',
+            maxAge: 7 * 24 * 15 * 60 * 1000
+          });
         
         res.status(200).send({ accessToken });
     }

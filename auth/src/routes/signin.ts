@@ -76,12 +76,12 @@ router.post(
     
     // 直接设置两个 cookie，确保它们有相同的配置
     // Send Access Token as a cookie
-    res.cookie('session', { jwt: accessToken }, {
+    res.cookie('session', accessToken, {
       httpOnly: true,
       secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
       sameSite: 'none',
       path: '/',
-      maxAge: 15 * 60 * 1000
+      maxAge: 7*24*15 * 60 * 1000
     });
 
     // Send Refresh Token as HTTP-only, Secure Cookie
