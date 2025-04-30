@@ -6,11 +6,16 @@ import { natsWrapper } from '../nats-wrapper';
 
 const router = express.Router();
 
-router.post('/api/cart/clear', validateSession(redis), async (req: Request, res: Response) => {
-    if (!req.session.sessionId) {
-        return res.status(400).send({ error: 'Session data is missing' });
+router.post('/api/cart/clear', 
+    // validateSession(redis), 
+async (req: Request, res: Response) => {
+
+    const { sessionId } = req.body;
+
+    if (!sessionId) {
+        return res.status(400).send({ error: 'Session ID is required from request body' });
     }
-    const sessionId = req.session.sessionId;
+    // const sessionId = req.session.sessionId;
     
     try {
         // 1. Retrieve existing session data from Redis

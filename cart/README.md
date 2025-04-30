@@ -19,12 +19,13 @@ The Cart Service is responsible for managing shopping carts for customer session
 -   **Request Body**:
     ```json
     {
-      "item": {
-        "itemId": "product_id",
-        "itemName": "Product Name",
-        "unitPrice": 10.99,
-        "quantity": 2
-      }
+        "sessionId": "c3c592a8-8751-4cab-ba29-2985585f856e",
+        "item": {
+            "itemId": "product_id",
+            "itemName": "Product Name",
+            "unitPrice": 10.99,
+            "quantity": 10
+        }
     }
     ```
 -   **Validation**:
@@ -49,7 +50,12 @@ The Cart Service is responsible for managing shopping carts for customer session
 -   **POST** `/api/cart/clear`
 -   **Description**: Clears all items from the customer's cart
 -   **Requires**: Valid `sessionId` from cookie
--   **Request Body**: None
+-   **Request Body**: 
+    ```json
+    {
+        "sessionId": "c3c592a8-8751-4cab-ba29-2985585f856e"
+    }
+    ```
 -   **Response**:
     -   `200 OK`: Returns a success message and the empty cart
         ```json
@@ -66,6 +72,7 @@ The Cart Service is responsible for managing shopping carts for customer session
 -   **Request Body**:
     ```json
     {
+        "sessionId": "c3c592a8-8751-4cab-ba29-2985585f856e",
         "itemId": "product_id", 
         "quantity": "2"
     }
@@ -96,7 +103,8 @@ The Cart Service is responsible for managing shopping carts for customer session
 -   **Request Body**:
     ```json
     {
-      "itemId": "product_id"
+        "sessionId": "c3c592a8-8751-4cab-ba29-2985585f856e",
+        "itemId": "product_id"
     }
     ```
 -   **Validation**:
@@ -117,7 +125,12 @@ The Cart Service is responsible for managing shopping carts for customer session
 -   **GET** `/api/cart`
 -   **Description**: Retrieves the contents of the customer's cart.
 -   **Requires**: Valid `sessionId` (typically from a cookie).
--   **Request Body**: None.
+-   **Request Body**: 
+    ```json
+    {
+        "sessionId": "c3c592a8-8751-4cab-ba29-2985585f856e"
+    }
+    ```
 -   **Response**:
     -   `200 OK`: Returns the current cart. If the cart is empty, it returns an empty array.
         ```json
@@ -142,7 +155,8 @@ The Cart Service is responsible for managing shopping carts for customer session
 -   **Request Body**: 
     ```json
     {
-      "tableId": "table-uuid"
+        "sessionId": "c3c592a8-8751-4cab-ba29-2985585f856e", 
+        "tableId": "table-uuid"
     }
     ```
     -   **tableId**: (Required) The ID of the table for which the order is being placed.

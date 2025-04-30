@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.post(
     '/api/cart/checkout',
-    validateSession(redis),
+    // validateSession(redis),
     [
         body('tableId')
         .notEmpty()
@@ -18,12 +18,12 @@ router.post(
     ],
     validateRequest,
     async (req: Request, res: Response) => {
-        const { tableId } = req.body;
+        const { sessionId, tableId } = req.body;
     
-        if (!req.session.sessionId) {
-            return res.status(400).send({ error: 'Session data is missing' });
+        if (!sessionId) {
+            return res.status(400).send({ error: 'Session ID is required from request body' });
         }
-        const sessionId = req.session.sessionId;
+        // const sessionId = req.session.sessionId;
 
         // Retrieve cart items from Redis using sessionId
         const sessionKey = `session:${sessionId}`;
