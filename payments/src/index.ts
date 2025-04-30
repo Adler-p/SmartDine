@@ -39,6 +39,7 @@ const start = async () => {
     console.log('Connected to PostgreSQL database');
 
     // Sync database schema
+    // await sequelize.sync({ force: true });
     await sequelize.sync();
     console.log('Database schema synchronized');
 
