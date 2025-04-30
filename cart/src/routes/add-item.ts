@@ -7,16 +7,18 @@ import { CartItem } from '../models/cart-item';
 
 const router: express.Router = express.Router();
 
-router.post('/api/cart/add', validateSession(redis), async (req: Request, res: Response) => {
-    const { item } = req.body;
+router.post('/api/cart/add', 
+    // validateSession(redis), 
+async (req: Request, res: Response) => {
+    const { sessionId, item } = req.body;
 
     if (!item) {
         return res.status(400).send({ error: 'Item is required' });
     }
-    if (!req.session.sessionId) {
-        return res.status(400).send({ error: 'Session data is missing' });
+    if (!sessionId) {
+        return res.status(400).send({ error: 'Session ID is required' });
     }
-    const sessionId = req.session.sessionId;
+    // const sessionId = req.session.sessionId;
 
     try {
         // 1. Retrieve existing session data from Redis
