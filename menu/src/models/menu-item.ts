@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
+import { v4 as uuidv4 } from 'uuid';
 
 // Interface describing MenuItem attributes
 interface MenuItemAttrs {
@@ -18,6 +19,7 @@ interface MenuItemModel extends mongoose.Model<MenuItemDoc> {
 
 // Interface describing MenuItem Document
 interface MenuItemDoc extends mongoose.Document {
+  id: string; // Mongoose automatically adds _id field
   name: string;
   description: string;
   price: number;
@@ -33,6 +35,10 @@ interface MenuItemDoc extends mongoose.Document {
 
 // Mongoose schema for MenuItem
 const menuItemSchema = new mongoose.Schema({
+  _id: {
+    type: String,
+    default: uuidv4 // Generate UUID for _id
+  },
   name: {
     type: String,
     required: true
@@ -83,7 +89,7 @@ menuItemSchema.methods.markAsOutOfStock = function() {
 
 // Static method to build a new MenuItem
 menuItemSchema.statics.build = (attrs: MenuItemAttrs) => {
-  return new MenuItem(attrs);
+  return new MenuItem({ _id: uuidv4(), ...attrs }); // Generate UUID when building
 };
 
 // Create and export MenuItem model

@@ -8,7 +8,15 @@ export class PaymentUpdatedListener extends Listener<PaymentUpdatedEvent> {
   queueGroupName = queueGroupName;
 
   async onMessage(data: PaymentUpdatedEvent['data'], msg: Message) {
-    const { orderId, paymentStatus } = data;
+    console.log('Payment updated listener executed!');
+    const { orderId, paymentStatus, paymentId, amount, version } = data;
+    console.log('Payment updated data:', {
+        orderId,
+        paymentStatus,
+        paymentId,
+        amount,
+        version
+    });
 
     try {
         const order = await Order.findByPk(orderId);
@@ -56,6 +64,8 @@ export class PaymentUpdatedListener extends Listener<PaymentUpdatedEvent> {
                 }
             }
         }
+
+        msg.ack();
 
     } catch  (err) {
         console.error('Error handling payment:success event:', err);

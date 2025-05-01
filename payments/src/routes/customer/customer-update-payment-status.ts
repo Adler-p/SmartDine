@@ -33,6 +33,8 @@ router.post(
       return res.status(400).send({ error: 'Session ID does not match Checkout ID' });
     }
 
+    console.log('Checkout ID retrieved from frontend in customerUpdatePaymentStatus:', checkoutId);
+
     // // 修改逻辑以优先获取用户 ID
     // let userIdForLookup: string | undefined; // Rename for clarity
     
@@ -54,6 +56,7 @@ router.post(
     try {
       // 1. Retrieve the JSON string from Redis using the checkoutId
       const redisData = await redis.get(`checkoutId:${checkoutId}`);
+      console.log('Redis data for checkoutId inside customerUpdatePaymentStatus:', redisData);
 
       if (!redisData) {
           return res.status(404).send({ error: 'Order ID not found for this checkout' });

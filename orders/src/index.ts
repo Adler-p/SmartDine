@@ -1,8 +1,8 @@
 // import mongoose from 'mongoose';
 import { app } from './app';
 import { natsWrapper } from './nats-wrapper';
-import { ExpirationCompleteListener } from './events/listeners/expiration-complete-listener';
-import { PaymentCreatedListener } from './events/listeners/payment-created-listener';
+// import { ExpirationCompleteListener } from './events/listeners/expiration-complete-listener';
+// import { PaymentCreatedListener } from './events/listeners/payment-created-listener';
 import { sequelize } from './sequelize';
 import { checkAndCancelExpiredOrders } from './services/check-expired-orders';
 import { PaymentUpdatedListener } from './events/listeners/payment-updated-listener';
@@ -50,8 +50,8 @@ const start = async () => {
     process.on('SIGTERM', () => natsWrapper.client.close());
 
     // 启动所有事件监听器
-    new ExpirationCompleteListener(natsWrapper.client).listen();
-    new PaymentCreatedListener(natsWrapper.client).listen();
+    // new ExpirationCompleteListener(natsWrapper.client).listen();
+    // new PaymentCreatedListener(natsWrapper.client).listen();
     new PaymentUpdatedListener(natsWrapper.client).listen();
     new CartFinalisedListener(natsWrapper.client).listen();
 

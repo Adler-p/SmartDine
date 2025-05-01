@@ -21,22 +21,23 @@ export class ExpirationCompleteListener extends Listener<ExpirationCompleteEvent
       return;
     }
 
-    // If order is already complete or cancelled, just ack the message
-    if (order.orderStatus === OrderStatus.COMPLETED || 
-        order.orderStatus === OrderStatus.CANCELLED) {
+    // // If order is already complete or cancelled, just ack the message
+    // If order is still in CREATED status (still pending payment), we will cancel it
+    if (order.orderStatus === OrderStatus.CREATED) {
+      // Update order status to cancelled
+      order.orderStatus = OrderStatus.CANCELLED;
+      await order.save();
+
+      // Publish an event saying this order was cancelled -> to cancel payment 
+      await new OrderCancelledPublisher(natsWrapper.client).publish({
+        orderId: order.orderId
+      });
+
       msg.ack();
       return;
     }
 
-    // Update order status to cancelled
-    order.orderStatus = OrderStatus.CANCELLED;
-    await order.save();
-
-    // Publish an event saying this order was cancelled
-    await new OrderCancelledPublisher(natsWrapper.client).publish({
-      orderId: order.orderId
-    });
-
+    // For all other order statuses -> just acknowledge the message
     msg.ack();
   }
 } 

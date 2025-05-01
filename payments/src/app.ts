@@ -47,7 +47,7 @@ app.use(healthCheckRouter);
 
 // Customer endpoints
 app.use(customerUpdatePaymentStatusRouter); 
-app.use(createPaymentRouter);
+// app.use(createPaymentRouter);
 app.use(getPaymentRouter);
 
 // Staff endpoints

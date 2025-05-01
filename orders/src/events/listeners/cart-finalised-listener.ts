@@ -10,7 +10,13 @@ export class CartFinalisedListener extends Listener<CartFinalisedEvent> {
     queueGroupName = queueGroupName;
     
     async onMessage(data: CartFinalisedEvent['data'], msg: Message) {
+        console.log('Cart finalised listener executed!');
         const { sessionId, tableId, items } = data;
+        console.log('Cart finalised data:', {
+            sessionId,
+            tableId,
+            items
+        });
     
         try {
             // 2. Calculate total amount of order 
