@@ -81,7 +81,7 @@ router.post(
       secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
       sameSite: 'none',
       path: '/',
-      maxAge: 7*24*15 * 60 * 1000
+      maxAge: 7* 24* 60 * 60 * 1000
     });
 
     // Send Refresh Token as HTTP-only, Secure Cookie

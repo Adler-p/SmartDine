@@ -49,7 +49,7 @@ router.post(
     }
 
     // Update Redis & reset expiration
-    await redis.set(`session:${sessionId}`, JSON.stringify(sessionData), 'EX', 15 * 60); // 15 minutes in seconds
+    await redis.set(`session:${sessionId}`, JSON.stringify(sessionData), 'EX', 15 * 60 * 1000); // 15 minutes in seconds
 
     // Publish CartUpdatedEvent
     const totalItems = cartItems.reduce((sum: number, cartItem: CartItem) => sum + cartItem.quantity, 0);

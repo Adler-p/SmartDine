@@ -42,7 +42,7 @@ async (req: Request, res: Response) => {
 
         // 3. Update Redis with the modified cart and reset expiration
         existingSessionData.cart = cart;
-        await redis.set(`session:${sessionId}`, JSON.stringify(existingSessionData), 'EX', 15 * 60); // 15 minutes in seconds
+        await redis.set(`session:${sessionId}`, JSON.stringify(existingSessionData), 'EX', 15 * 60 * 1000); // 15 minutes in seconds
 
         // 4. Publish CartUpdatedEvent
         const totalItems = cart.reduce((sum: number, cartItem: CartItem) => sum + cartItem.quantity, 0);
