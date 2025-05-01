@@ -57,11 +57,11 @@ router.put(
     const { id } = req.body;
     
     try {
-      // 检查ID是否是有效的MongoDB ObjectId
-      if (!mongoose.Types.ObjectId.isValid(id)) {
-        console.log('Invalid ID format:', id);
-        return res.status(400).send({ error: 'Invalid ID format' });
-      }
+      // // 检查ID是否是有效的MongoDB ObjectId
+      // if (!mongoose.Types.ObjectId.isValid(id)) {
+      //   console.log('Invalid ID format:', id);
+      //   return res.status(400).send({ error: 'Invalid ID format' });
+      // }
 
       console.log('Finding menu item to update, ID:', id);
       const menuItem = await MenuItem.findById(id)
