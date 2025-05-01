@@ -15,9 +15,18 @@ const EditMenu = () => {
   useEffect(() => {
     const fetchMenuItems = async () => {
       setLoading(true);
+
+      const accessToken = sessionStorage.getItem('accessToken'); // Uncomment to use sessionStorage
+
+      if (!accessToken) {
+        setError('Access token is missing.');
+        return;
+      }
+
       try {
-        const response = await axios.get(MENU_IP + '/api/menu', {
-          params: { category: selectedCategory !== 'All' ? selectedCategory : undefined },
+        const response = await axios.post(MENU_IP + '/api/menu', {
+          accessToken,
+          category: selectedCategory !== 'All' ? selectedCategory : undefined ,
         },{
           withCredentials: true,
         });
@@ -34,6 +43,14 @@ const EditMenu = () => {
   }, [selectedCategory]);
 
   const toggleAvailability = async (id) => {
+
+    const accessToken = sessionStorage.getItem('accessToken'); // Uncomment to use sessionStorage
+
+    if (!accessToken) {
+      setError('Access token is missing.');
+      return;
+    }
+
     try {
       const item = menuItems.find((item) => item.id === id);
       const updatedAvailability = item.availability === 'available' ? 'out_of_stock' : 'available';
@@ -41,6 +58,7 @@ const EditMenu = () => {
       await axios.put(
         MENU_IP + `/api/menu/${id}`,
         {
+          accessToken,
           availability: updatedAvailability,
         },
         {

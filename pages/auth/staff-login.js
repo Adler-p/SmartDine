@@ -2,6 +2,7 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 import Link from 'next/link';
 import styles from './StaffLogin.module.css';
+import { AUTH_IP } from '../../constants';
 
 export default function StaffLogin() {
     const router = useRouter();
@@ -11,7 +12,7 @@ export default function StaffLogin() {
 
     const handleLogin = async () => {
         try {
-            const response = await fetch('/api/users/signin', {
+            const response = await fetch(AUTH_IP + '/api/users/signin', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -23,6 +24,8 @@ export default function StaffLogin() {
             if (response.ok) {
                 const data = await response.json();
                 console.log('Login success:', data);
+
+                sessionStorage.setItem('accessToken', data?.accessToken);
                 router.push('/staff');
             } else {
                 const errorData = await response.json();

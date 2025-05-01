@@ -94,12 +94,12 @@ const Menu = () => {
     try {
       // Call the Add to Cart endpoint
       await axios.post(CART_IP + '/api/cart/add', {
+        "sessionId": existingSession,
         "item": {
           "itemId": selectedItem.id,
           "itemName": selectedItem.name,
           "unitPrice": selectedItem.price,
-          "quantity": 1,
-          "sessionId": existingSession
+          "quantity": 1
         }
       }, 
       {

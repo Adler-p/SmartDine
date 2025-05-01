@@ -7,11 +7,13 @@ import PaymentHeader from '../../components/customer/PaymentHeader';
 import { ShoppingCart } from 'lucide-react';
 import Modal from 'react-modal';
 import axios from 'axios';
+import { PAYMENT_IP } from '../../constants';
 
 const CartPaymentPage = () => {
   const router = useRouter();
 
   const [orders, setOrders] = useState([]);
+  const [orderId, setOrderId] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
@@ -26,13 +28,16 @@ const CartPaymentPage = () => {
     const storedItems = sessionStorage.getItem('checkoutItems');
     if (storedItems) {
       const parsedItems = JSON.parse(storedItems);
-      setOrders(parsedItems);
+      setOrders(parsedItems?.items);
+      setOrderId(parsedItems?.checkoutId);
     }
 
     const savedTableId = sessionStorage.getItem('tableId');
     if (savedTableId) {
       setTableId(savedTableId);
     }
+
+    setLoading(false);
   }, []);
 
   // useEffect(() => {
@@ -82,15 +87,20 @@ const CartPaymentPage = () => {
     const isValidCvv = cvvRegex.test(cvv);
     const isValidExpiryDate = expiryDateRegex.test(expiryDate);
 
-    if (!isValidCardNumber || !isValidCvv || !isValidExpiryDate) {
-      alert('Please enter valid payment details.');
+    // if (!isValidCardNumber || !isValidCvv || !isValidExpiryDate) {
+    //   alert('Please enter valid payment details.');
+    //   return;
+    // }
+
+    if (!orderId) {
+      alert('Missing order ID.');
       return;
     }
 
-    const storedOrderId = sessionStorage.getItem('orderId'); // retrieve from storage
+    const existingSession = sessionStorage.getItem('customerSessionId'); // Uncomment to use sessionStorage
 
-    if (!storedOrderId) {
-      alert('Missing order ID.');
+    if (!existingSession) {
+      setError('Session ID is missing.');
       return;
     }
 
@@ -98,14 +108,15 @@ const CartPaymentPage = () => {
     setIsPaymentModalOpen(false);
 
     try {
-      const response = await fetch('/api/payments/update-status', {
+      const response = await fetch(PAYMENT_IP + '/api/payments/update-status', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           // 'Authorization': `Bearer ${sessionId}`, // Uncomment and replace if needed
         },
         body: JSON.stringify({
-          orderId: storedOrderId,
+          "sessionId": existingSession ,
+          checkoutId: orderId,
           paymentStatus: 'successful',
         }),
       });
@@ -139,12 +150,12 @@ const CartPaymentPage = () => {
             <h2 className={styles.title}>Payment</h2>
           </div>
           {orders.length > 0 ? (
-            orders.map((order) => (
-              <div key={order.itemId}>
-                <div className={styles.orderDetails}>
+            // orders.map((order) => (
+              <div>
+                {/* <div className={styles.orderDetails}>
                   <h3>Table: {tableId ?? '-'}</h3>
                   <h3>Order ID: {order?.itemId || '-'}</h3>
-                </div>
+                </div> */}
                 <p>Items in Cart</p>
 
                 <table className={styles.table}>
@@ -156,9 +167,9 @@ const CartPaymentPage = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {order.items.map((item, index) => (
+                    {orders?.map((item, index) => (
                       <tr key={index}>
-                        <td>{item.name}</td>
+                        <td>{item.itemName}</td>
                         <td>{item.quantity}</td>
                         <td>{`$${(item.quantity * item.unitPrice).toFixed(2)}`}</td>
                       </tr>
@@ -169,8 +180,7 @@ const CartPaymentPage = () => {
                 <div className={styles.totalAmount}>
                   <h3>
                     Total Amount: $
-                    {order.items
-                      .reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
+                    {orders?.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
                       .toFixed(2)}
                   </h3>
                 </div>
@@ -182,7 +192,7 @@ const CartPaymentPage = () => {
                   Proceed to Payment
                 </button>
               </div>
-            ))
+            // ))
           ) : (
             <p>No items in cart.</p>
           )}

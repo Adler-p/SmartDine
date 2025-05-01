@@ -12,37 +12,50 @@ const IncomingOrders = () => {
   const [error, setError] = useState(null);
   const router = useRouter();
 
-  useEffect(() => {
-    // Fetch current user and ensure they are staff
-    const fetchUser = async () => {
-      try {
-        const res = await fetch(AUTH_IP + '/api/users/currentuser', {
-          credentials: 'include',
-        });
-        const data = await res.json();
-        if (!data.currentUser || data.currentUser.role !== 'staff') {
-          router.push(AUTH_IP + '/auth/staff-login');
-        } else {
-          setUser(data.currentUser);
-        }
-      } catch (err) {
-        console.error('Error fetching user:', err);
-        router.push('/auth/staff-login');
-      } finally {
-        setLoading(false);
-      }
-    };
+  // useEffect(() => {
+  //   // Fetch current user and ensure they are staff
+  //   const fetchUser = async () => {
+  //     try {
+  //       const res = await fetch(AUTH_IP + '/api/users/currentuser', {
+  //         credentials: 'include',
+  //       });
+  //       const data = await res.json();
+  //       if (!data.currentUser || data.currentUser.role !== 'staff') {
+  //         router.push(AUTH_IP + '/auth/staff-login');
+  //       } else {
+  //         setUser(data.currentUser);
+  //       }
+  //     } catch (err) {
+  //       console.error('Error fetching user:', err);
+  //       router.push('/auth/staff-login');
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchUser();
-  }, [router]);
+  //   fetchUser();
+  // }, [router]);
 
   // Fetch incoming orders
   useEffect(() => {
     const fetchOrders = async () => {
       setLoading(true);
+
+      const accessToken = sessionStorage.getItem('accessToken'); // Uncomment to use sessionStorage
+
+      if (!accessToken) {
+        setError('Access token is missing.');
+        return;
+      }
+
       try {
-        const res = await fetch(ORDER_IP + '/api/staff/orders?orderStatus=created', {
-          credentials: 'include',
+        const res = await fetch(ORDER_IP + '/api/staff/orders', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 'orderStatus': 'created', accessToken }),
+          credentials: 'include', // include cookies
         });
         const data = await res.json();
 
@@ -50,8 +63,13 @@ const IncomingOrders = () => {
         const enrichedOrders = await Promise.all(
           data.map(async (order) => {
             try {
-              const paymentRes = await fetch(PAYMENT_IP + `/api/payments/staff/${order.orderId}`, {
-                credentials: 'include',
+              const paymentRes = await fetch(PAYMENT_IP + `/api/payments/staff`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ orderId: order.orderId, accessToken }),
+                credentials: 'include', // include cookies
               });
               const paymentData = await paymentRes.json();
               return { ...order, paymentStatus: paymentData.paymentStatus };
@@ -75,7 +93,7 @@ const IncomingOrders = () => {
   }, []);
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
+  // if (error) return <p>{error}</p>;
 
   return (
     <div className={styles.container}>
@@ -85,7 +103,7 @@ const IncomingOrders = () => {
         <div className={styles.main}>
           <h2 className={styles.title}>Incoming Orders</h2>
           {orders.length === 0 ? (
-            <p>No incoming orders</p>
+            error ? <p>{error}</p> : <p>No incoming orders</p>
           ) : (
             orders.map((order) => (
               <div key={order.orderId} className={styles.orderBlock}>

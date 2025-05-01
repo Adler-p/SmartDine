@@ -14,9 +14,17 @@ const PastOrdersPage = () => {
   useEffect(() => {
     // Fetching past orders from the backend
     const fetchPastOrders = async () => {
+
+      const accessToken = sessionStorage.getItem('accessToken'); // Uncomment to use sessionStorage
+
+      if (!accessToken) {
+        setError('Access token is missing.');
+        return;
+      }
+
       try {
-        const response = await axios.get(ORDER_IP + '/api/staff/orders', {
-          params: { orderStatus: 'completed' }, // Fetching orders with status 'completed'
+        const response = await axios.post(ORDER_IP + '/api/staff/orders?orderStatus=completed', {
+          accessToken
         });
         setPastOrders(response.data);
       } catch (err) {
@@ -33,9 +41,9 @@ const PastOrdersPage = () => {
     return <div>Loading past orders...</div>;
   }
 
-  if (error) {
-    return <div>{error}</div>;
-  }
+  // if (error) {
+  //   return <div>{error}</div>;
+  // }
 
   return (
     <div className={styles.container}>
@@ -45,7 +53,7 @@ const PastOrdersPage = () => {
         <div className={styles.main}>
           <h2 className={styles.title}>Past Orders</h2>
           {pastOrders.length === 0 ? (
-            <p>No past orders found.</p>
+            error ? <p>{error}</p> :<p>No past orders found.</p>
           ) : (
             pastOrders.map((order) => (
               <div key={order.orderId} className={styles.orderBlock}>

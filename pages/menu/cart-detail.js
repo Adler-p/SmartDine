@@ -5,7 +5,7 @@ import DeleteItemButton from '../../components/customer/DeleteItemButton';
 import { ShoppingCart } from 'lucide-react';
 import axios from 'axios';
 import { useRouter } from 'next/router'; // Import useRouter from next/router
-import { BACKEND_IP, CART_IP } from '../../constants';
+import { BACKEND_IP, CART_IP, PAYMENT_IP } from '../../constants';
 
 const CartDetailPage = () => {
   const [orders, setOrders] = useState([]);
@@ -20,24 +20,23 @@ const CartDetailPage = () => {
       try {
         // Retrieve sessionId from localStorage (or sessionStorage)
         // const sessionId = localStorage.getItem('customerSessionId'); // Uncomment to use localStorage
-        const sessionId = sessionStorage.getItem('customerSessionId'); // Uncomment to use sessionStorage
+        const existingSession = sessionStorage.getItem('customerSessionId'); // Uncomment to use sessionStorage
 
         // Temporary for debugging:
         // const sessionId = 'dummySessionId'; // This is just for now, remove after implementation
 
-        if (!sessionId) {
+        if (!existingSession) {
           setError('Session ID is missing.');
           return;
         }
 
-        const response = await axios.get(CART_IP + '/api/cart', {
-          headers: {
-            'Cookie': `session=${sessionId}`,  // <-- this is where you set the cookie manually
-          },
+        const response = await axios.post(CART_IP + '/api/cart', {
+          "sessionId": existingSession
         });
 
         if (response.data.cart) {
           setOrders(response.data.cart);
+          console.log(orders.toString())
         } else {
           setOrders([]);
         }
@@ -45,6 +44,7 @@ const CartDetailPage = () => {
         setError(null);
       } catch (err) {
         setError('Failed to fetch cart data.');
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -83,17 +83,19 @@ const CartDetailPage = () => {
       return; // Exit early as we don't need to update the quantity
     }
 
+    const existingSession = sessionStorage.getItem('customerSessionId'); // Uncomment to use sessionStorage
+
+    if (!existingSession) {
+      setError('Session ID is missing.');
+      return;
+    }
+
     // First, update the backend with the new quantity
     try {
       await axios.post(CART_IP + '/api/cart/update-quantity', {
+        "sessionId": existingSession,
         itemId: selectedItem.itemId, // Assuming item has itemId property
         quantity: updatedQuantity,
-      },
-      {
-        headers: {
-          Cookie: `session=${sessionId}`, // manually set the cookie
-        },
-        withCredentials: true, // include cookies in cross-origin requests if needed
       }
     );
       console.log('Quantity updated successfully in backend');
@@ -118,9 +120,17 @@ const CartDetailPage = () => {
       return;
     }
 
+    const existingSession = sessionStorage.getItem('customerSessionId'); // Uncomment to use sessionStorage
+
+    if (!existingSession) {
+      setError('Session ID is missing.');
+      return;
+    }
+
     // Send the DELETE request to remove the item from the cart
     try {
       await axios.post(CART_IP + '/api/cart/remove', {
+        "sessionId": existingSession,
         itemId: itemToDelete.itemId, // Assuming item has itemId property
       });
       console.log('Item removed successfully');
@@ -133,23 +143,37 @@ const CartDetailPage = () => {
   };
 
   const handleProceedToPayment = async () => {
+    const existingSession = sessionStorage.getItem('customerSessionId'); // Uncomment to use sessionStorage
+
+    if (!existingSession) {
+      setError('Session ID is missing.');
+      return;
+    }
+
+    const tableId = sessionStorage.getItem('tableId'); // Uncomment to use sessionStorage
+
+    if (!tableId) {
+      setError('Table ID is missing.');
+      return;
+    }
+
     try {
-      const response = await fetch('/api/checkout', {
+      const response = await fetch(CART_IP + '/api/cart/checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ items: orders }), // assuming orders is your cart
+        body: JSON.stringify({ tableId: tableId, "sessionId": existingSession }), // assuming orders is your cart
       });
 
       const result = await response.json();
 
       if (response.ok) {
         // Option 1: Pass items via sessionStorage
-        sessionStorage.setItem('checkoutItems', JSON.stringify(result.items));
+        sessionStorage.setItem('checkoutItems', JSON.stringify(result));
 
         // Redirect
-        router.push('/menu/card-payment');
+        router.push('/menu/cart-payment');
       } else {
         console.error('Checkout failed:', result.message);
         // Optionally show user error
@@ -177,13 +201,13 @@ const CartDetailPage = () => {
             <ShoppingCart size={32} className={styles.cartIcon} />
             <h2 className={styles.title}>My Cart</h2>
           </div>
-          {orders.length > 0 ? (
-            orders.map((order) => (
-              <div key={order.orderId}>
-                <div className={styles.orderDetails}>
-                  <h3>Table: {order.table}</h3>
-                  <h3>Order ID: {order.orderId}</h3>
-                </div>
+          {orders?.length > 0 ? (
+            // orders.map((order) => (
+              <div>
+                {/* <div className={styles.orderDetails}>
+                  <h3>Table: {order?.table}</h3>
+                  <h3>Order ID: {order.itemId}</h3>
+                </div> */}
                 <p>Items in Cart</p>
 
                 <table className={styles.table}>
@@ -196,7 +220,7 @@ const CartDetailPage = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {order.items.map((item, index) => (
+                    {orders?.map((item, index) => (
                       <tr key={index}>
                         <td>{item.itemName}</td>
                         <td>
@@ -227,7 +251,7 @@ const CartDetailPage = () => {
                   Place Order
                 </button>
               </div>
-            ))
+            // ))
           ) : (
             <p>No items in cart.</p>
           )}

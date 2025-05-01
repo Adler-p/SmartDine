@@ -4,7 +4,7 @@ import styles from './OrderDetailPage.module.css';
 import StaffHeader from '../../components/StaffHeader';
 import StaffSidebar from '../../components/StaffSidebar';
 import StatusUpdateButton from '../../components/StatusUpdateButton';
-import { BACKEND_IP } from '../../constants';
+import { ORDER_IP } from '../../constants';
 
 const OrderDetailPage = () => {
   const router = useRouter();
@@ -17,8 +17,24 @@ const OrderDetailPage = () => {
     const fetchOrderDetails = async () => {
       if (!id) return;
 
+      const accessToken = sessionStorage.getItem('accessToken'); // Uncomment to use sessionStorage
+
+      if (!accessToken) {
+        setError('Access token is missing.');
+        return;
+      }
+
       try {
-        const response = await fetch(BACKEND_IP + `/api/staff/orders/${id}`);
+        const response = await fetch(ORDER_IP + `/api/staff/orders/${id}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            accessToken
+          }),
+        });
+
         if (!response.ok) {
           throw new Error('Failed to fetch order details');
         }
@@ -36,12 +52,21 @@ const OrderDetailPage = () => {
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {
+
+      const accessToken = sessionStorage.getItem('accessToken'); // Uncomment to use sessionStorage
+
+      if (!accessToken) {
+        setError('Access token is missing.');
+        return;
+      }
+
       const response = await fetch(BACKEND_IP + `/api/staff/orders/${orderId}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          accessToken,
           orderStatus: newStatus, // Send the updated status here
         }),
       });
