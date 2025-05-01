@@ -1,23 +1,23 @@
 import express, { Request, Response } from 'express';
 import { requireAuth, validateRequest, UserRole, requireRole } from '@smartdine/common';
-import { param } from 'express-validator';
+import { param, body } from 'express-validator';
 import { Order } from '../../models/order';
 import { OrderItem } from '../../models/orderItem';
 
 const router = express.Router();
 
 router.post(
-  '/api/staff/orders/:orderId',
+  '/api/staff/orderDetails',
   requireAuth,
   requireRole([UserRole.STAFF]),
   [
-    param('orderId')
+    body('orderId')
       .isUUID()
       .withMessage('Order ID must be a valid UUID'),
   ],
   validateRequest,
   async (req: Request, res: Response) => {
-    const { orderId } = req.params;
+    const { orderId } = req.body;
 
     try {
       const order = await Order.findByPk(orderId, {

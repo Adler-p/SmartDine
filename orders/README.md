@@ -140,15 +140,14 @@ The Order Service is responsible for managing customer orders within the SmartDi
     ```
 
 ### Get Order Details (Staff)
--   **POST** `/api/staff/orders/:orderId`
+-   **POST** `/api/staff/orderDetails`
 -   **Description**: Retrieves the details of a specific order for staff users.
 -   **Requires**: Authentication as a staff user through accessToken in request body. 
--   **Path Parameter**:
-    -   `orderId`: The UUID of the order to retrieve.
 -   **Request Body**:
     ```json
     {
-      "accessToken": "accessToken"
+      "accessToken": "accessToken", 
+      "orderId": "order-uuid-2"
     }
     ```
 -   **Response**: `200 OK` (Same structure as the customer's get order details)
