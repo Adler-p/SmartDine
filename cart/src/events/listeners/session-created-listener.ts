@@ -1,12 +1,11 @@
 import { Message } from 'node-nats-streaming';
 import { Subjects, Listener, SessionCreatedEvent } from '@smartdine/common';
-// import { queueGroupName } from './queue-group-name';
-// import { Payment } from '../../models/payment';
 import { redis } from '../../redis-client';
+import { queueGroupName } from './queue-group-name';
 
 export class SessionCreatedListener extends Listener<SessionCreatedEvent> {
   readonly subject = Subjects.SessionCreated;
-  queueGroupName = 'cart-service'; 
+  queueGroupName = queueGroupName; 
 
   async onMessage(data: SessionCreatedEvent['data'], msg: Message) {
     const { sessionId } = data;

@@ -122,7 +122,7 @@ The Cart Service is responsible for managing shopping carts for customer session
         ```
 
 ### View Cart
--   **GET** `/api/cart`
+-   **POST** `/api/cart`
 -   **Description**: Retrieves the contents of the customer's cart.
 -   **Requires**: Valid `sessionId` (typically from a cookie).
 -   **Request Body**: 
@@ -164,6 +164,7 @@ The Cart Service is responsible for managing shopping carts for customer session
     ```json
     {
       "message": "Checkout successful",
+      "orderId": "order-id", 
       "items": [
         {
           "itemId": "menu-item-uuid-1",

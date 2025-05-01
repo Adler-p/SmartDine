@@ -5,6 +5,7 @@ import { natsWrapper } from './nats-wrapper';
 import dotenv from 'dotenv';
 
 import { SessionCreatedListener } from './events/listeners/session-created-listener';
+import { CheckoutOrderCreatedListener } from './events/listeners/checkout-order-created-listener';
 
 dotenv.config();
 
@@ -48,8 +49,9 @@ const start = async () => {
     process.on('SIGINT', () => natsWrapper.client.close());
     process.on('SIGTERM', () => natsWrapper.client.close());
 
-    // Start listening for session:created events
+    // Start listening for session:created & order:created events
     new SessionCreatedListener(natsWrapper.client).listen();
+    new CheckoutOrderCreatedListener(natsWrapper.client).listen();
 
   } catch (err) {
     console.error('Error starting service:', err);
