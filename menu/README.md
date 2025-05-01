@@ -69,6 +69,7 @@ This service handles menu item management for the SmartDine application. It prov
 -   **Request Body**:
     ```json
     {
+      "accessToken": "accessToken", 
       "name": "Delicious Burger",
       "description": "A juicy beef burger with all the fixings.",
       "price": 12.99,
@@ -105,6 +106,7 @@ This service handles menu item management for the SmartDine application. It prov
 -   **Request Body**: (all fields optional):
     ```json
     {
+      "accessToken": "accessToken", 
       "name": "Updated Name",
       "description": "Updated Description",
       "price": 12.99,
@@ -139,6 +141,7 @@ This service handles menu item management for the SmartDine application. It prov
 -   **Response**: `200 OK`
     ```json
     {
+      "accessToken": "accessToken", 
       "id": "menuItemId",
       "name": "Amazing Burger",
       "description": "A juicy beef burger with all the fixings.",

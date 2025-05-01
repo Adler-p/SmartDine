@@ -21,11 +21,13 @@ export const currentUser = (redisClient: any) => async (
   res: Response,
   next: NextFunction
 ) => {
-  if (req.cookies.session) {
-    req.session = { jwt: req.cookies.session };
-  }
-  let token = typeof req.session === 'string' ? req.session : req.session?.jwt;
-  if (!token) {
+  // if (req.cookies.session) {
+  //   req.session = { jwt: req.cookies.session };
+  // }
+  // let token = typeof req.session === 'string' ? req.session : req.session?.jwt;
+
+  let { accessToken } = req.body;
+  if (!accessToken) {
     return next();  // No token, proceed without attaching currentUser
   }
 
@@ -37,7 +39,7 @@ export const currentUser = (redisClient: any) => async (
     // }
 
     const payload = jwt.verify(
-      token,
+      accessToken,
       process.env.JWT_KEY!
     ) as UserPayload;
     req.currentUser = payload;

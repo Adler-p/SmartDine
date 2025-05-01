@@ -95,7 +95,7 @@ router.post(
 
     console.log('Cookies being set:', res.getHeader('Set-Cookie'));
 
-    res.status(200).send({ user: { id: existingUser.id, email: existingUser.email, role: existingUser.role, name: existingUser.name } });
+    res.status(200).send({ accessToken, user: { id: existingUser.id, email: existingUser.email, role: existingUser.role, name: existingUser.name } });
   }
 );
 

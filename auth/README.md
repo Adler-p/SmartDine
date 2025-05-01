@@ -32,10 +32,13 @@ These events are consumed by other services that need to react to user-related c
 -   **Response**: `201 Created`
     ```json
     {
-      "id": "user_id", 
-      "email": "don@example.com", 
-      "name": "Don", 
-      "role": "staff"
+      "accessToken": "accessToken", 
+      "user": {
+        "id": "user_id", 
+        "email": "don@example.com", 
+        "name": "Don", 
+        "role": "staff"
+      }
     }
     ```
 ### User Login (Staff)
@@ -54,10 +57,13 @@ These events are consumed by other services that need to react to user-related c
 -   **Response**: `200 OK`
     ```json
     {
-      "id": "user_id", 
-      "email": "don@example.com", 
-      "name": "Don", 
-      "role": "staff"
+      "accessToken": "accessToken", 
+      "user": {
+        "id": "user_id", 
+        "email": "don@example.com", 
+        "name": "Don", 
+        "role": "staff"
+      }
     }
     ```
 ### Sign Out (Staff)
