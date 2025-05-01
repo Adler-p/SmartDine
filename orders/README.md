@@ -70,16 +70,15 @@ The Order Service is responsible for managing customer orders within the SmartDi
     ```
 
 ### Update Order Status (Staff)
--   **PATCH** `/api/staff/orders/:orderId/status`
+-   **PATCH** `/api/staff/orders/status`
 -   **Description**: Updates the status of a specific order. Requires staff authentication.
 -   **Requires**: Authentication as a staff user.
--   **Path Parameter**:
-    -   `orderId`: The UUID of the order to update.
 -   **Request Body**:
     ```json
     {
       "accessToken": "accessToken",
-      "orderStatus": "preparing"
+      "orderStatus": "preparing",
+      "orderId": "order-uuid"
     }
     ```
 -   **Validation**:
