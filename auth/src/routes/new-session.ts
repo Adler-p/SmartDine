@@ -23,7 +23,7 @@ router.get('/api/session/create', async (req: Request, res: Response) => {
         cart: []
     };
 
-    await redis.set(`session:${sessionId}`, JSON.stringify(sessionData), 'EX', 15 * 60); // 15 minutes in seconds
+    await redis.set(`session:${sessionId}`, JSON.stringify(sessionData), 'EX', 15 * 60 * 1000); // 15 minutes in seconds
 
     // Set the session ID in the cookie
     // req.session = { sessionId };

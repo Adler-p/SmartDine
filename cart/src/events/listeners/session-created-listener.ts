@@ -20,7 +20,7 @@ export class SessionCreatedListener extends Listener<SessionCreatedEvent> {
       }
 
       // Set empty cart in Redis with expiration time 
-      await redis.set(sessionKey, JSON.stringify(initialSessionData), 'EX', 15 * 60); 
+      await redis.set(sessionKey, JSON.stringify(initialSessionData), 'EX', 15 * 60 * 1000); 
       console.log(`Cart initialized for sessionId: ${sessionId}`);
         
       msg.ack();

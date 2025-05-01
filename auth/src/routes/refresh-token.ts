@@ -69,7 +69,7 @@ router.post(
             httpOnly: true,
             secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
             sameSite: 'none',
-            maxAge: 7 * 24 * 15 * 60 * 1000
+            maxAge: 7 * 24 * 60 * 60 * 1000
           });
         
         res.status(200).send({ accessToken });
