@@ -8,8 +8,8 @@ const router = express.Router()
 // Get single menu item by ID
 router.get(
   '/api/menu/:id',
-  requireAuth,
-  requireRole([UserRole.STAFF, UserRole.CUSTOMER]),
+  // requireAuth,
+  // requireRole([UserRole.STAFF, UserRole.CUSTOMER]),
   async (req: Request, res: Response) => {
     const { id } = req.params;
     

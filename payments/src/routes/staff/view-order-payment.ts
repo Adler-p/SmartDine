@@ -5,7 +5,7 @@ import { param } from 'express-validator';
 
 const router = express.Router();
 
-router.get(
+router.post(
   '/api/payments/staff/:orderId',
   requireAuth,
   requireRole([UserRole.STAFF]),

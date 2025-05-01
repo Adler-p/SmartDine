@@ -39,9 +39,15 @@ The Payment Service is responsible for managing payment records associated with 
     ```
 
 ### List All Payments (Staff)
--   **GET** `/api/payments`
+-   **POST** `/api/payments`
 -   **Description**: Retrieves a list of all payment records. Requires staff authentication.
--   **Requires**: Authentication as a staff user.
+-   **Requires**: Authentication as a staff user through accessToken in request body. 
+-   **Request Body**:
+    ```json
+    {
+      "accessToken": "accessToken"
+    }
+    ```
 -   **Response**: `200 OK`
     ```json
     [
@@ -64,10 +70,11 @@ The Payment Service is responsible for managing payment records associated with 
 ### Staff Update Payment Status
 -   **POST** `/api/payments/staff/update-status`
 -   **Description**: Allows authenticated staff to update the status of a payment record.
--   **Requires**: Authentication as a staff user.
+-   **Requires**: Authentication as a staff user through accessToken in request body. 
 -   **Request Body**:
     ```json
     {
+      "accessToken": "accessToken",
       "orderId": "order-uuid",
       "paymentStatus": "failed"
     }
@@ -83,11 +90,17 @@ The Payment Service is responsible for managing payment records associated with 
     ```
 
 ### View Payment by Order ID (Staff)
--   **GET** `/api/payments/staff/:orderId`
+-   **POST** `/api/payments/staff/:orderId`
 -   **Description**: Retrieves a specific payment record based on its associated `orderId`. Requires staff authentication.
--   **Requires**: Authentication as a staff user.
+-   **Requires**: Authentication as a staff user through accessToken in request body. 
 -   **Path Parameter**:
     -   `orderId`: The UUID of the associated order.
+-   **Request Body**:
+    ```json
+    {
+      "accessToken": "accessToken"
+    }
+    ```
 -   **Response**: `200 OK`
     ```json
     {

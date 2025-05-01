@@ -6,7 +6,7 @@ import { OrderItem } from '../../models/orderItem';
 
 const router = express.Router();
 
-router.get(
+router.post(
   '/api/staff/orders',
   requireAuth,
   requireRole([UserRole.STAFF]),

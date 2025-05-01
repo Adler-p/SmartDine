@@ -4,7 +4,7 @@ import { Payment } from '../../models/payment';
 
 const router = express.Router();
 
-router.get(
+router.post(
   '/api/payments',
   requireAuth,
   requireRole([UserRole.STAFF]),

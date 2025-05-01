@@ -78,6 +78,7 @@ The Order Service is responsible for managing customer orders within the SmartDi
 -   **Request Body**:
     ```json
     {
+      "accessToken": "accessToken",
       "orderStatus": "preparing"
     }
     ```
@@ -99,11 +100,17 @@ The Order Service is responsible for managing customer orders within the SmartDi
     ```
 
 ### Get All Orders (Staff - Optional Filtering)
--   **GET** `/api/staff/orders`
+-   **POST** `/api/staff/orders`
 -   **Description**: Retrieves a list of all orders. Requires staff authentication. Optionally filters by `orderStatus` using a query parameter.
--   **Requires**: Authentication as a staff user.
+-   **Requires**: Authentication as a staff user through accessToken in request body. 
 -   **Query Parameters**:
     -   `orderStatus`: Optional string to filter orders by status (e.g., `/api/staff/orders?orderStatus=preparing`).
+    -   **Request Body**:
+    ```json
+    {
+      "accessToken": "accessToken"
+    }
+    ```
 -   **Response**: `200 OK`
     ```json
     [
@@ -134,11 +141,17 @@ The Order Service is responsible for managing customer orders within the SmartDi
     ```
 
 ### Get Order Details (Staff)
--   **GET** `/api/staff/orders/:orderId`
+-   **POST** `/api/staff/orders/:orderId`
 -   **Description**: Retrieves the details of a specific order for staff users.
--   **Requires**: Authentication as a staff user.
+-   **Requires**: Authentication as a staff user through accessToken in request body. 
 -   **Path Parameter**:
     -   `orderId`: The UUID of the order to retrieve.
+-   **Request Body**:
+    ```json
+    {
+      "accessToken": "accessToken"
+    }
+    ```
 -   **Response**: `200 OK` (Same structure as the customer's get order details)
 
 ## Error Responses
