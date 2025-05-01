@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import { requireAuth, validateRequest, UserRole, requireRole, OrderStatus } from '@smartdine/common';
-import { query } from 'express-validator';
+import { query, body } from 'express-validator';
 import { Order } from '../../models/order';
 import { OrderItem } from '../../models/orderItem';
 
@@ -11,14 +11,14 @@ router.post(
   requireAuth,
   requireRole([UserRole.STAFF]),
   [
-    query('orderStatus')
+    body('orderStatus')
       .optional()
       .isIn(Object.values(OrderStatus))
       .withMessage('Invalid order status'),
   ],
   validateRequest,
   async (req: Request, res: Response) => {
-    const { orderStatus } = req.query;
+    const { orderStatus } = req.body;
     const whereClause: any = {};
 
     if (orderStatus) {

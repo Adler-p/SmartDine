@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import { requireAuth, validateRequest, requireRole, UserRole } from '@smartdine/common';
 import { Payment } from '../../models/payment';
-import { param } from 'express-validator';
+import { param, body } from 'express-validator';
 
 const router = express.Router();
 
@@ -10,13 +10,13 @@ router.post(
   requireAuth,
   requireRole([UserRole.STAFF]),
   [
-    param('orderId')
+    body('orderId')
       .notEmpty()
-      .withMessage('Payment ID is required')
+      .withMessage('Order ID is required')
   ],
   validateRequest,
   async (req: Request, res: Response) => {
-    const { orderId } = req.params;
+    const { orderId } = req.body;
     console.log('orderId:', orderId);
 
     try{

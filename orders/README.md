@@ -103,12 +103,11 @@ The Order Service is responsible for managing customer orders within the SmartDi
 -   **POST** `/api/staff/orders`
 -   **Description**: Retrieves a list of all orders. Requires staff authentication. Optionally filters by `orderStatus` using a query parameter.
 -   **Requires**: Authentication as a staff user through accessToken in request body. 
--   **Query Parameters**:
-    -   `orderStatus`: Optional string to filter orders by status (e.g., `/api/staff/orders?orderStatus=preparing`).
-    -   **Request Body**:
+-   **Request Body**:
     ```json
     {
-      "accessToken": "accessToken"
+      "accessToken": "accessToken", 
+      "orderStatus": "created"  //optional
     }
     ```
 -   **Response**: `200 OK`

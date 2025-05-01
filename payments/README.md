@@ -93,12 +93,11 @@ The Payment Service is responsible for managing payment records associated with 
 -   **POST** `/api/payments/staff/:orderId`
 -   **Description**: Retrieves a specific payment record based on its associated `orderId`. Requires staff authentication.
 -   **Requires**: Authentication as a staff user through accessToken in request body. 
--   **Path Parameter**:
-    -   `orderId`: The UUID of the associated order.
 -   **Request Body**:
     ```json
     {
-      "accessToken": "accessToken"
+      "accessToken": "accessToken",
+      "orderId": "orderId"
     }
     ```
 -   **Response**: `200 OK`
