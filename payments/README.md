@@ -22,12 +22,14 @@ The Payment Service is responsible for managing payment records associated with 
 -   **Request Body**:
     ```json
     {
-      "orderId": "order-uuid",
+      "checkoutId": "checkoutId",
+      "sessionId": "c3c592a8-8751-4cab-ba29-2985585f856e",
       "paymentStatus": "successful"
     }
     ```
 -   **Validation**:
-    -   `orderId`: Required, a valid UUID.
+    -   `checkoutId`: Required.
+    -   `sessionId`: Required.
     -   `paymentStatus`: Required, must be one of the valid `PaymentStatus` values: `"pending"`, `"successful"`, `"failed"`.
 -   **Response**: `200 OK`
     ```json

@@ -49,23 +49,19 @@ router.post(
         });
 
         // Await for orderId from order:created event
-        const checkoutId = `${sessionId}-${tableId}`;
-        const orderIdPromise = new Promise<string>((resolve) => {
-            orderIdPromises[checkoutId] = resolve;
-        });
+        const checkoutId = `${sessionId}_${tableId}`;
+        // const orderIdPromise = new Promise<string>((resolve) => {
+        //     orderIdPromises[checkoutId] = resolve;
+        // });
     
-        const orderId = await Promise.race([
-            orderIdPromise,
-            new Promise((_, reject) => setTimeout(() => reject(new Error('Order creation timeout')), 30000))
-        ]);
+        // const orderId = await Promise.race([
+        //     orderIdPromise,
+        //     new Promise((_, reject) => setTimeout(() => reject(new Error('Order creation timeout')), 30000))
+        // ]);
 
-        if (orderId) {
-            // Clear the cart in Redis
-            await redis.del(`session:${sessionId}`);
-            res.status(200).send({ message: 'Checkout successful', orderId, items: cartItems });
-        } else {
-            res.status(500).send({ error: 'Failed to create order in time. Please try again.' });
-        }
+        // Clear the cart in Redis
+        await redis.del(`session:${sessionId}`);
+        res.status(200).send({ message: 'Checkout successful', checkoutId, items: cartItems });
     
     }
 )

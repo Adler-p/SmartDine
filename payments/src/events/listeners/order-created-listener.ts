@@ -2,13 +2,14 @@ import { Message } from 'node-nats-streaming';
 import { Subjects, Listener, OrderCreatedEvent, PaymentStatus } from '@smartdine/common';
 import { queueGroupName } from './queue-group-name';
 import { Payment } from '../../models/payment';
+import { redis } from '../../redis-client';
 
 export class OrderCreatedListener extends Listener<OrderCreatedEvent> {
   readonly subject = Subjects.OrderCreated;
   queueGroupName = queueGroupName;
 
   async onMessage(data: OrderCreatedEvent['data'], msg: Message) {
-    const { orderId, totalAmount, sessionId } = data;
+    const { orderId, totalAmount, sessionId, tableId } = data;
 
     try {
       
@@ -18,6 +19,11 @@ export class OrderCreatedListener extends Listener<OrderCreatedEvent> {
         paymentStatus: PaymentStatus.PENDING, 
         sessionId
       })
+
+      const checkoutId = `${sessionId}_${tableId}`;
+
+      // Store the orderId in Redis, keyed by the checkoutId
+      await redis.set(`checkoutId:${checkoutId}`, JSON.stringify({ orderId }), 'EX', 24 * 60 * 60); // Example: Expire after 24 hours
 
       msg.ack();
       console.log(`Payment record created for ${orderId}:`); 

@@ -10,7 +10,7 @@ export class CheckoutOrderCreatedListener extends Listener<OrderCreatedEvent> {
 
   async onMessage(data: OrderCreatedEvent['data'], msg: Message) {
     const { orderId, sessionId, tableId } = data;
-    const checkoutId = `${sessionId}-${tableId}`;
+    const checkoutId = `${sessionId}_${tableId}`;
 
     try {
       

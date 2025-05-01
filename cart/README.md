@@ -164,7 +164,7 @@ The Cart Service is responsible for managing shopping carts for customer session
     ```json
     {
       "message": "Checkout successful",
-      "orderId": "order-id", 
+      "checkoutId": "sessionId_tableId", 
       "items": [
         {
           "itemId": "menu-item-uuid-1",
