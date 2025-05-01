@@ -17,10 +17,13 @@ const router = express.Router()
 
 // Update menu item route with validation
 router.put(
-  '/api/menu/:id',
+  '/api/menu',
   requireAuth,
   requireRole([UserRole.STAFF]),
   [
+    body('id')
+      .notEmpty()
+      .withMessage('Menu item ID is required'),
     body('name')
       .optional()
       .not()
@@ -51,7 +54,7 @@ router.put(
   ],
   validateRequest,
   async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const { id } = req.body;
     
     try {
       // 检查ID是否是有效的MongoDB ObjectId

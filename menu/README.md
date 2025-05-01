@@ -100,13 +100,14 @@ This service handles menu item management for the SmartDine application. It prov
     ```
 
 ### Update Menu Item
--   **PUT** `/api/menu/:id`
+-   **PUT** `/api/menu`
 -   **Description**: Updates an existing menu item
--   **Requires**: Authentication as a staff user.
--   **Request Body**: (all fields optional):
+-   **Requires**: Authentication as a staff user via accessToken in request body
+-   **Request Body**:
     ```json
     {
       "accessToken": "accessToken", 
+      "id": "menuItemId",
       "name": "Updated Name",
       "description": "Updated Description",
       "price": 12.99,
