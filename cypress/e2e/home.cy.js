@@ -9,7 +9,7 @@ describe('Home Page', () => {
   });
 
   it('should display the login buttons', () => {
-    cy.get('button').contains('Login as Customer').should('exist'); // Customer login button exists
+    cy.get('button').contains('Start Ordering').should('exist'); // Customer login button exists
     cy.get('button').contains('Login as Staff').should('exist'); // Staff login button exists
   });
 
