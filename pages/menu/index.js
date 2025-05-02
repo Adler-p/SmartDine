@@ -35,11 +35,15 @@ const Menu = () => {
 
       if (!existingSession) {
         try {
-          const res = await axios.get(AUTH_IP + '/api/session/create', {
-            params: { role: 'customer', tableId },
-          },{
-            withCredentials: true,
-          });
+          const res = await axios.get(
+            AUTH_IP + '/api/session/create',
+            {
+              params: { role: 'customer', tableId },
+            },
+            {
+              withCredentials: true,
+            }
+          );
 
           const urlParams = new URLSearchParams(res.request.responseURL.split('?')[1]);
           const sessionId = urlParams.get('sessionId');
@@ -62,11 +66,15 @@ const Menu = () => {
   const fetchMenuItems = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(MENU_IP + '/api/menu', {
-        params: { category: selectedCategory !== 'All' ? selectedCategory : undefined },
-      },{
-        withCredentials: true,
-      });
+      const response = await axios.get(
+        MENU_IP + '/api/menu',
+        {
+          params: { category: selectedCategory !== 'All' ? selectedCategory : undefined },
+        },
+        {
+          withCredentials: true,
+        }
+      );
       setMenuItems(response.data);
       setError(null);
     } catch (err) {
@@ -93,18 +101,21 @@ const Menu = () => {
 
     try {
       // Call the Add to Cart endpoint
-      await axios.post(CART_IP + '/api/cart/add', {
-        "sessionId": existingSession,
-        "item": {
-          "itemId": selectedItem.id,
-          "itemName": selectedItem.name,
-          "unitPrice": selectedItem.price,
-          "quantity": 1
+      await axios.post(
+        CART_IP + '/api/cart/add',
+        {
+          sessionId: existingSession,
+          item: {
+            itemId: selectedItem.id,
+            itemName: selectedItem.name,
+            unitPrice: selectedItem.price,
+            quantity: 1,
+          },
+        },
+        {
+          withCredentials: true, // allows browser to send cookies automatically
         }
-      }, 
-      {
-        withCredentials: true // allows browser to send cookies automatically
-      });
+      );
 
       // Fetch the updated menu items from the backend
       // await fetchMenuItems(); // Wait for the menu items to be updated
@@ -142,15 +153,18 @@ const Menu = () => {
                   height={300} // required
                   priority // optional: eager load for LCP images
                 /> */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={item.imageUrl} alt={item.name} className={styles.image} />
                 <h3>{item.name}</h3>
                 <p>${item.price.toFixed(2)}</p>
                 <button
                   onClick={() => handleConfirmPayment(item.id)}
-                  className={item.availability === "available" ? styles.availableBtn : styles.unavailableBtn}
-                  disabled={item.availability !== "available"}
+                  className={
+                    item.availability === 'available' ? styles.availableBtn : styles.unavailableBtn
+                  }
+                  disabled={item.availability !== 'available'}
                 >
-                  {item.availability === "available" ? 'Add to Cart' : 'Unavailable'}
+                  {item.availability === 'available' ? 'Add to Cart' : 'Unavailable'}
                 </button>
               </div>
             ))}

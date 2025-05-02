@@ -1,22 +1,32 @@
 ﻿import React from 'react';
 import styles from './StatusUpdateButton.module.css';
-import { BACKEND_IP } from '../constants';
+import { BACKEND_IP, ORDER_IP } from '../constants';
 
-const StatusUpdateButton = ({ orderId, status, onStatusChange }) => {
-  const handleStatusChange = async (newStatus) => {
+const StatusUpdateButton = ({ orderId, status, setOrder }) => {
+  const handleStatusChange = async (newStatus, orderId) => {
+    console.log('LOLLL1243' + orderId);
+
+    const accessToken = sessionStorage.getItem('accessToken'); // Uncomment to use sessionStorage
+
+    if (!accessToken) {
+      setError('Access token is missing.');
+      return;
+    }
+
     try {
       // Call the backend API to update the order status
-      const response = await fetch(BACKEND_IP + `/api/orders/${orderId}/status`, {
+      const response = await fetch(ORDER_IP + `/api/orders/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ status: newStatus }),
+        body: JSON.stringify({ accessToken, orderId: orderId, status: newStatus }),
       });
 
       if (response.ok) {
         // If the update is successful, update the status
-        onStatusChange(newStatus);
+        // onStatusChange(newStatus);
+        setOrder(newStatus);
       } else {
         const errorData = await response.json();
         alert(`Error: ${errorData.error}`);
@@ -28,22 +38,22 @@ const StatusUpdateButton = ({ orderId, status, onStatusChange }) => {
   };
 
   return (
-    <span className={styles.statusButtons}>
+    <div className={styles.statusButtons}>
       <button
         className={styles.tickBtn}
-        onClick={() => handleStatusChange('Completed')}
-        disabled={status === 'Completed'}
+        onClick={() => handleStatusChange('completed', orderId, setOrder)}
+        disabled={status === 'completed'}
       >
-        ✔️
+        ✔️ Mark as Completed
       </button>
       <button
         className={styles.crossBtn}
-        onClick={() => handleStatusChange('Cancelled')}
-        disabled={status === 'Cancelled'}
+        onClick={() => handleStatusChange('cancelled', orderId, setOrder)}
+        disabled={status === 'cancelled'}
       >
-        ❌
+        ❌ Cancel Order
       </button>
-    </span>
+    </div>
   );
 };
 

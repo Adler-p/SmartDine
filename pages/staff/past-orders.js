@@ -14,7 +14,6 @@ const PastOrdersPage = () => {
   useEffect(() => {
     // Fetching past orders from the backend
     const fetchPastOrders = async () => {
-
       const accessToken = sessionStorage.getItem('accessToken'); // Uncomment to use sessionStorage
 
       if (!accessToken) {
@@ -23,8 +22,9 @@ const PastOrdersPage = () => {
       }
 
       try {
-        const response = await axios.post(ORDER_IP + '/api/staff/orders?orderStatus=completed', {
-          accessToken
+        const response = await axios.post(ORDER_IP + '/api/staff/orders', {
+          orderStatus: 'completed',
+          accessToken,
         });
         setPastOrders(response.data);
       } catch (err) {
@@ -53,22 +53,24 @@ const PastOrdersPage = () => {
         <div className={styles.main}>
           <h2 className={styles.title}>Past Orders</h2>
           {pastOrders.length === 0 ? (
-            error ? <p>{error}</p> :<p>No past orders found.</p>
+            error ? (
+              <p>{error}</p>
+            ) : (
+              <p>No past orders found.</p>
+            )
           ) : (
             pastOrders.map((order) => (
               <div key={order.orderId} className={styles.orderBlock}>
                 <h3>Order ID: {order.orderId}</h3>
                 <p>Table: {order.tableId}</p>
                 <p>Time Ordered: {new Date(order.createdAt).toLocaleString()}</p>
-                <p>Time Completed: {new Date(order.completedAt).toLocaleString()}</p>
+                <p>Time Completed: {new Date(order.updatedAt).toLocaleString()}</p>
 
                 <table className={styles.table}>
                   <thead>
                     <tr>
                       <th>Name</th>
                       <th>Quantity</th>
-                      <th>Payment</th>
-                      <th>Status</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -76,8 +78,6 @@ const PastOrdersPage = () => {
                       <tr key={index}>
                         <td>{item.itemName}</td>
                         <td>{item.quantity}</td>
-                        <td>{item.paymentStatus}</td>
-                        <td>{item.status}</td>
                       </tr>
                     ))}
                   </tbody>

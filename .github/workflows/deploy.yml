@@ -3,10 +3,10 @@ name: Frontend CI Workflow
 on:
   push:
     branches:
-      - frontend  # Trigger this workflow only on 'frontend' branch push
+      - frontend # Trigger this workflow only on 'frontend' branch push
   pull_request:
     branches:
-      - frontend  # Trigger on pull requests to 'frontend' branch
+      - frontend # Trigger on pull requests to 'frontend' branch
 
 jobs:
   linting_and_testing:
@@ -20,7 +20,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '16'  # Specify your node version (adjust if needed)
+          node-version: '16' # Specify your node version (adjust if needed)
 
       # Install dependencies
       - name: Install dependencies
@@ -40,10 +40,10 @@ jobs:
         with:
           browser: chrome
           start: npm run dev
-          wait-on: "http://localhost:3000"
+          wait-on: 'http://localhost:3000'
 
   deploy:
-    needs: linting_and_testing  # Ensure linting and tests are successful before deployment
+    needs: linting_and_testing # Ensure linting and tests are successful before deployment
     runs-on: ubuntu-latest
     steps:
       # Checkout the code from the repository again
@@ -64,5 +64,5 @@ jobs:
       - name: Deploy to Vercel
         run: npx vercel --prod --yes --token ${{ secrets.VERCEL_TOKEN }} --scope=zufiqqar-lees-projects --project=nus-iss-smart-dine
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}  # Set your Vercel token as a GitHub secret
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }} # Set your Vercel token as a GitHub secret
 

@@ -25,13 +25,14 @@ const OrderDetailPage = () => {
       }
 
       try {
-        const response = await fetch(ORDER_IP + `/api/staff/orders/${id}`, {
+        const response = await fetch(ORDER_IP + `/api/staff/orderDetails`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            accessToken
+            orderId: id,
+            accessToken,
           }),
         });
 
@@ -51,31 +52,32 @@ const OrderDetailPage = () => {
   }, [id]);
 
   const handleStatusChange = async (orderId, newStatus) => {
+    console.log('LOLLL12' + orderId);
     try {
+      // const accessToken = sessionStorage.getItem('accessToken'); // Uncomment to use sessionStorage
 
-      const accessToken = sessionStorage.getItem('accessToken'); // Uncomment to use sessionStorage
+      // if (!accessToken) {
+      //   setError('Access token is missing.');
+      //   return;
+      // }
 
-      if (!accessToken) {
-        setError('Access token is missing.');
-        return;
-      }
+      // const response = await fetch(ORDER_IP + `/api/orders/status`, {
+      //   method: 'PATCH',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify({
+      //     orderId,
+      //     accessToken,
+      //     orderStatus: newStatus, // Send the updated status here
+      //   }),
+      // });
 
-      const response = await fetch(BACKEND_IP + `/api/staff/orders/${orderId}/status`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          accessToken,
-          orderStatus: newStatus, // Send the updated status here
-        }),
-      });
+      // if (!response.ok) {
+      //   throw new Error('Failed to update order status');
+      // }
 
-      if (!response.ok) {
-        throw new Error('Failed to update order status');
-      }
-
-      const updatedOrder = await response.json();
+      // const updatedOrder = await response.json();
       setOrder(updatedOrder); // Update local state with the new order data
     } catch (err) {
       setError(err.message);
@@ -108,30 +110,27 @@ const OrderDetailPage = () => {
                   <tr>
                     <th>Name</th>
                     <th>Quantity</th>
-                    <th>Payment</th>
-                    <th>Status</th>
-                    <th>Update Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {order.orderItems.map((item, index) => (
+                  {order.orderItems?.map((item, index) => (
                     <tr key={index}>
                       <td>{item.itemName}</td>
                       <td>{item.quantity}</td>
-                      <td>{item.paymentStatus}</td>
-                      <td>{item.status}</td>
-                      <td>
-                        <StatusUpdateButton
-                          status={item.status}
-                          onStatusChange={
-                            (newStatus) => handleStatusChange(order.orderId, newStatus) // Pass updated status
-                          }
-                        />
-                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              <div>
+                <StatusUpdateButton
+                  orderId={order.orderId}
+                  status={order.orderStatus}
+                  setOrder={setOrder}
+                  // onStatusChange={
+                  //   (newStatus) => handleStatusChange(item.orderId, newStatus) // Pass updated status
+                  // }
+                />
+              </div>
             </>
           ) : (
             <p>Order not found</p>

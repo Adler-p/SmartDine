@@ -24,12 +24,15 @@ const EditMenu = () => {
       }
 
       try {
-        const response = await axios.post(MENU_IP + '/api/menu', {
-          accessToken,
-          category: selectedCategory !== 'All' ? selectedCategory : undefined ,
-        },{
-          withCredentials: true,
-        });
+        const response = await axios.get(
+          MENU_IP + '/api/menu',
+          {
+            params: { category: selectedCategory !== 'All' ? selectedCategory : undefined },
+          },
+          {
+            withCredentials: true,
+          }
+        );
         setMenuItems(response.data);
         setError(null); // Clear any previous error
       } catch (err) {
@@ -43,7 +46,6 @@ const EditMenu = () => {
   }, [selectedCategory]);
 
   const toggleAvailability = async (id) => {
-
     const accessToken = sessionStorage.getItem('accessToken'); // Uncomment to use sessionStorage
 
     if (!accessToken) {
@@ -56,8 +58,9 @@ const EditMenu = () => {
       const updatedAvailability = item.availability === 'available' ? 'out_of_stock' : 'available';
 
       await axios.put(
-        MENU_IP + `/api/menu/${id}`,
+        MENU_IP + `/api/menu`,
         {
+          id,
           accessToken,
           availability: updatedAvailability,
         },
@@ -99,7 +102,8 @@ const EditMenu = () => {
                   height={300} // required
                   priority // optional: eager load for LCP images
                 /> */}
-                <img src={item.imageUrl} alt={item.name} className={styles.image} /> 
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={item.imageUrl} alt={item.name} className={styles.image} />
                 <h3>{item.name}</h3>
                 <p>${item.price.toFixed(2)}</p>
                 <button

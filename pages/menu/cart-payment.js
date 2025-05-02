@@ -115,7 +115,7 @@ const CartPaymentPage = () => {
           // 'Authorization': `Bearer ${sessionId}`, // Uncomment and replace if needed
         },
         body: JSON.stringify({
-          "sessionId": existingSession ,
+          sessionId: existingSession,
           checkoutId: orderId,
           paymentStatus: 'successful',
         }),
@@ -151,49 +151,47 @@ const CartPaymentPage = () => {
           </div>
           {orders.length > 0 ? (
             // orders.map((order) => (
-              <div>
-                {/* <div className={styles.orderDetails}>
+            <div>
+              {/* <div className={styles.orderDetails}>
                   <h3>Table: {tableId ?? '-'}</h3>
                   <h3>Order ID: {order?.itemId || '-'}</h3>
                 </div> */}
-                <p>Items in Cart</p>
+              <p>Items in Cart</p>
 
-                <table className={styles.table}>
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Quantity</th>
-                      <th>Price</th>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orders?.map((item, index) => (
+                    <tr key={index}>
+                      <td>{item.itemName}</td>
+                      <td>{item.quantity}</td>
+                      <td>{`$${(item.quantity * item.unitPrice).toFixed(2)}`}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {orders?.map((item, index) => (
-                      <tr key={index}>
-                        <td>{item.itemName}</td>
-                        <td>{item.quantity}</td>
-                        <td>{`$${(item.quantity * item.unitPrice).toFixed(2)}`}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                  ))}
+                </tbody>
+              </table>
 
-                <div className={styles.totalAmount}>
-                  <h3>
-                    Total Amount: $
-                    {orders?.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
-                      .toFixed(2)}
-                  </h3>
-                </div>
-
-                <button
-                  className={styles.paymentButton}
-                  onClick={() => setIsPaymentModalOpen(true)}
-                >
-                  Proceed to Payment
-                </button>
+              <div className={styles.totalAmount}>
+                <h3>
+                  Total Amount: $
+                  {orders
+                    ?.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
+                    .toFixed(2)}
+                </h3>
               </div>
-            // ))
+
+              <button className={styles.paymentButton} onClick={() => setIsPaymentModalOpen(true)}>
+                Proceed to Payment
+              </button>
+            </div>
           ) : (
+            // ))
             <p>No items in cart.</p>
           )}
         </div>

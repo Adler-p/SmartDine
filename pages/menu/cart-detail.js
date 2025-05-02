@@ -31,12 +31,12 @@ const CartDetailPage = () => {
         }
 
         const response = await axios.post(CART_IP + '/api/cart', {
-          "sessionId": existingSession
+          sessionId: existingSession,
         });
 
         if (response.data.cart) {
           setOrders(response.data.cart);
-          console.log(orders.toString())
+          console.log(orders.toString());
         } else {
           setOrders([]);
         }
@@ -51,6 +51,7 @@ const CartDetailPage = () => {
     };
 
     fetchCart();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only run once when the component mounts
 
   const handleStatusChange = (orderId, itemIndex, newStatus) => {
@@ -93,11 +94,10 @@ const CartDetailPage = () => {
     // First, update the backend with the new quantity
     try {
       await axios.post(CART_IP + '/api/cart/update-quantity', {
-        "sessionId": existingSession,
+        sessionId: existingSession,
         itemId: selectedItem.itemId, // Assuming item has itemId property
         quantity: updatedQuantity,
-      }
-    );
+      });
       console.log('Quantity updated successfully in backend');
     } catch (error) {
       console.error('Error updating quantity:', error);
@@ -130,7 +130,7 @@ const CartDetailPage = () => {
     // Send the DELETE request to remove the item from the cart
     try {
       await axios.post(CART_IP + '/api/cart/remove', {
-        "sessionId": existingSession,
+        sessionId: existingSession,
         itemId: itemToDelete.itemId, // Assuming item has itemId property
       });
       console.log('Item removed successfully');
@@ -163,7 +163,7 @@ const CartDetailPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ tableId: tableId, "sessionId": existingSession }), // assuming orders is your cart
+        body: JSON.stringify({ tableId: tableId, sessionId: existingSession }), // assuming orders is your cart
       });
 
       const result = await response.json();
@@ -203,56 +203,56 @@ const CartDetailPage = () => {
           </div>
           {orders?.length > 0 ? (
             // orders.map((order) => (
-              <div>
-                {/* <div className={styles.orderDetails}>
+            <div>
+              {/* <div className={styles.orderDetails}>
                   <h3>Table: {order?.table}</h3>
                   <h3>Order ID: {order.itemId}</h3>
                 </div> */}
-                <p>Items in Cart</p>
+              <p>Items in Cart</p>
 
-                <table className={styles.table}>
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Quantity</th>
-                      <th>Price</th>
-                      <th></th>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orders?.map((item, index) => (
+                    <tr key={index}>
+                      <td>{item.itemName}</td>
+                      <td>
+                        <button
+                          className={styles.btn}
+                          onClick={() => handleQuantityChange(item.itemId, index, -1)}
+                          disabled={item.quantity <= 1} // Prevent quantity going below 1
+                        >
+                          -
+                        </button>
+                        <span className={styles.quantity}>{item.quantity}</span>
+                        <button
+                          className={styles.btn}
+                          onClick={() => handleQuantityChange(item.itemId, index, 1)}
+                        >
+                          +
+                        </button>
+                      </td>
+                      <td>{`$${(item.quantity * item.unitPrice).toFixed(2)}`}</td>
+                      <td>
+                        <DeleteItemButton onDelete={() => handleDeleteItem(item.itemId, index)} />
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {orders?.map((item, index) => (
-                      <tr key={index}>
-                        <td>{item.itemName}</td>
-                        <td>
-                          <button
-                            className={styles.btn}
-                            onClick={() => handleQuantityChange(item.itemId, index, -1)}
-                            disabled={item.quantity <= 1} // Prevent quantity going below 1
-                          >
-                            -
-                          </button>
-                          <span className={styles.quantity}>{item.quantity}</span>
-                          <button
-                            className={styles.btn}
-                            onClick={() => handleQuantityChange(item.itemId, index, 1)}
-                          >
-                            +
-                          </button>
-                        </td>
-                        <td>{`$${(item.quantity * item.unitPrice).toFixed(2)}`}</td>
-                        <td>
-                          <DeleteItemButton onDelete={() => handleDeleteItem(item.itemId, index)} />
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                <button className={styles.paymentButton} onClick={handleProceedToPayment}>
-                  Place Order
-                </button>
-              </div>
-            // ))
+                  ))}
+                </tbody>
+              </table>
+              <button className={styles.paymentButton} onClick={handleProceedToPayment}>
+                Place Order
+              </button>
+            </div>
           ) : (
+            // ))
             <p>No items in cart.</p>
           )}
         </div>

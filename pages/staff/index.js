@@ -52,9 +52,9 @@ const IncomingOrders = () => {
         const res = await fetch(ORDER_IP + '/api/staff/orders', {
           method: 'POST',
           headers: {
-              'Content-Type': 'application/json',
+            'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ 'orderStatus': 'created', accessToken }),
+          body: JSON.stringify({ orderStatus: 'created', accessToken }),
           credentials: 'include', // include cookies
         });
         const data = await res.json();
@@ -66,7 +66,7 @@ const IncomingOrders = () => {
               const paymentRes = await fetch(PAYMENT_IP + `/api/payments/staff`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                  'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ orderId: order.orderId, accessToken }),
                 credentials: 'include', // include cookies
@@ -102,38 +102,44 @@ const IncomingOrders = () => {
         <StaffSidebar />
         <div className={styles.main}>
           <h2 className={styles.title}>Incoming Orders</h2>
-          {orders.length === 0 ? (
-            error ? <p>{error}</p> : <p>No incoming orders</p>
+          {orders === undefined || orders.length === 0 ? (
+            error ? (
+              <p>{error}</p>
+            ) : (
+              <p>No incoming orders</p>
+            )
           ) : (
             orders.map((order) => (
               <div key={order.orderId} className={styles.orderBlock}>
                 <h3>
-                  Order ID {order.orderId} - Time Ordered: {order.createdAt}
+                  <div>Order ID {order.orderId}</div>
                 </h3>
-                {order.items.length > 0 ? (
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Name</th>
-                        <th>Quantity</th>
-                        <th>Payment</th>
-                        <th>Status</th>
+                <h4>
+                  <div>Time Ordered: {order.createdAt}</div>
+                </h4>
+                {/* {order.length > 0 ? ( */}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Quantity</th>
+                      <th>Payment</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {order.orderItems.map((item, index) => (
+                      <tr key={index}>
+                        <td>{item.itemName}</td>
+                        <td>{item.quantity}</td>
+                        <td>{order.orderStatus === 'created' ? 'Pending' : 'Paid'}</td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {order.items.map((item, index) => (
-                        <tr key={index}>
-                          <td>{item.name}</td>
-                          <td>{item.quantity}</td>
-                          <td>{order.paymentStatus === 'successful' ? 'Paid' : 'Pending'}</td>
-                          <td>{item.status}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                ) : (
+                    ))}
+                  </tbody>
+                </table>
+                {/* ) : (
                   <p>No items for this order.</p>
-                )}
+                ) */}
+                {/* } */}
               </div>
             ))
           )}

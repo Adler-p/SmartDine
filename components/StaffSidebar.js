@@ -19,19 +19,19 @@ const StaffSidebar = () => {
       }
 
       try {
-        const res = await fetch(ORDER_IP + '/api/staff/orders?orderStatus=awaiting:preparation', {
+        const res = await fetch(ORDER_IP + '/api/staff/orders', {
           method: 'POST',
           headers: {
-              'Content-Type': 'application/json',
+            'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ accessToken }),
+          body: JSON.stringify({ orderStatus: 'awaiting:preparation', accessToken }),
           credentials: 'include', // include cookies
         });
         if (!res.ok) {
           setError('Failed to fetch orders');
         }
         const data = await res.json();
-        setOrders(data.orders || []);
+        setOrders(data || []);
       } catch (error) {
         setError('Failed to fetch orders');
         console.error('Error fetching orders:', error);
@@ -44,13 +44,17 @@ const StaffSidebar = () => {
   return (
     <div className={styles.sidebar}>
       <h3>Orders Awaiting Preparation</h3>
-      {orders.length === 0 ? (
-        error ? <p>{error}</p> : <p>No pending orders.</p>
+      {orders?.length === 0 ? (
+        error ? (
+          <p>{error}</p>
+        ) : (
+          <p>No pending orders.</p>
+        )
       ) : (
-        orders.map((order) => (
-          <Link key={order.id} href={`/staff/order-detail?id=${order.id}`} passHref>
+        orders?.map((order) => (
+          <Link key={order.orderId} href={`/staff/order-detail?id=${order.orderId}`} passHref>
             <div className={styles.sidebarLink}>
-              <button className={styles.orderButton}>Order ID {order.id}</button>
+              <button className={styles.orderButton}>Order ID {order.orderId}</button>
             </div>
           </Link>
         ))

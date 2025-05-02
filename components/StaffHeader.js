@@ -18,7 +18,7 @@ const StaffHeader = () => {
 
       if (res.ok) {
         // If logout is successful, redirect to the login page
-        router.push(AUTH_IP + '/auth/staff-login');
+        router.push('/auth/staff-login');
       } else {
         alert('Logout failed');
       }
