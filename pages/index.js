@@ -43,7 +43,7 @@ export default function Home() {
 
         <div className="loginContainer">
           <button onClick={handleCustomerLogin} className="button">
-            Login as Customer
+            Start Ordering
           </button>
 
           <Link href="/auth/staff-login">
