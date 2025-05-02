@@ -51,6 +51,18 @@ export default function Home() {
           </Link>
         </div>
       </div>
+      <label 
+        style={{ 
+          display: 'none', 
+          position: 'fixed', 
+          bottom: '10px', 
+          left: '50%', 
+          transform: 'translateX(-50%)' 
+        }} 
+        id="hiddenLabel"
+      >
+        {'02/05/2025, 13:37:46'}
+      </label>
     </div>
   );
 }
