@@ -117,13 +117,15 @@ const IncomingOrders = () => {
                 <h4>
                   <div>Time Ordered: {order.createdAt}</div>
                 </h4>
+                <h4>
+                  <div>Payment Status: {order.orderStatus === 'created' ? 'Pending' : 'Preparing'}</div>
+                </h4>
                 {/* {order.length > 0 ? ( */}
                 <table>
                   <thead>
                     <tr>
                       <th>Name</th>
                       <th>Quantity</th>
-                      <th>Payment</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -131,7 +133,6 @@ const IncomingOrders = () => {
                       <tr key={index}>
                         <td>{item.itemName}</td>
                         <td>{item.quantity}</td>
-                        <td>{order.orderStatus === 'created' ? 'Pending' : 'Paid'}</td>
                       </tr>
                     ))}
                   </tbody>
