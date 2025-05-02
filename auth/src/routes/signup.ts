@@ -53,7 +53,8 @@ router.post(
         email: user.email,
         role: user.role
       },
-      process.env.JWT_KEY!
+      process.env.JWT_KEY!,
+      { expiresIn: '60m' } // Token expires in 60 minutes
     );
 
     // Store it on session object

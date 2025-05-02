@@ -10,6 +10,7 @@ import { indexMenuRouter } from './routes/index'
 import { updateMenuItemRouter } from './routes/staff/update-entire-item'
 import { updateMenuItemPriceRouter } from './routes/staff/update-price'
 import { markMenuItemOutOfStockRouter } from './routes/staff/mark-out-of-stock'
+import { deleteMenuItemRouter } from './routes/staff/delete-item'
 import cors from 'cors'; 
 import cookieParser from 'cookie-parser';
 // 创建一个mock redis客户端
@@ -68,6 +69,7 @@ app.use(indexMenuRouter)
 app.use(updateMenuItemRouter)
 app.use(updateMenuItemPriceRouter)
 app.use(markMenuItemOutOfStockRouter)
+app.use(deleteMenuItemRouter)
 
 // 全局错误捕获
 app.use((err, req, res, next) => {

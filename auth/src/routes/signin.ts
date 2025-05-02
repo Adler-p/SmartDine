@@ -63,8 +63,10 @@ router.post(
         role: existingUser.role
       },
       process.env.JWT_KEY!,
-      { expiresIn: '5m' } // Token expires in 5 minutes
+      { expiresIn: '60m' } // Token expires in 60 minutes
     )
+
+    console.log('Access Token:', accessToken);
 
     // Generate and Store Refresh Token
     const refreshToken = await generateRefreshToken(existingUser.id);
