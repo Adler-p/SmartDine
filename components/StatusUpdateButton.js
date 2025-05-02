@@ -1,9 +1,11 @@
 ﻿import React from 'react';
 import styles from './StatusUpdateButton.module.css';
 import { BACKEND_IP, ORDER_IP } from '../constants';
+import { useRouter } from 'next/router';
 
 const StatusUpdateButton = ({ orderId, status, setOrder }) => {
-  const handleStatusChange = async (newStatus, orderId) => {
+    const router = useRouter();
+    const handleStatusChange = async (newStatus, orderId) => {
     console.log('LOLLL1243' + orderId);
 
     const accessToken = sessionStorage.getItem('accessToken'); // Uncomment to use sessionStorage
@@ -27,6 +29,7 @@ const StatusUpdateButton = ({ orderId, status, setOrder }) => {
         // If the update is successful, update the status
         // onStatusChange(newStatus);
         setOrder(newStatus);
+        router.push('/staff'); // Redirects to the main page (/pages/index.js)
       } else {
         const errorData = await response.json();
         alert(`Error: ${errorData.error}`);
