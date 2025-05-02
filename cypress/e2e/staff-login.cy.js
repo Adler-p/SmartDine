@@ -29,6 +29,6 @@ describe('Staff Login Flow', () => {
     cy.wait(1000); // Adjust this if necessary based on how long the API takes to respond
 
     // Verify the error message is displayed
-    cy.contains('Something went wrong. Try again.').should('be.visible');
+    cy.contains('Invalid user').should('be.visible');
   });
 });
